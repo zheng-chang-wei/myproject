@@ -1,0 +1,30 @@
+
+//position的简写系列
+-pos(type, args)
+	i = 0
+	position: unquote(type)
+	{args[i]}: args[i += 1]
+	{args[i += 1]}: args[i += 1]
+
+absolute()
+	-pos('absolute', arguments)
+
+fixed()
+	-pos('fixed', arguments)
+
+//只有一行文字且居中的块
+block-line()
+	display block
+	height arguments[0]
+	line-height arguments[0]
+	text-align center
+
+//同时设置背景和前景色
+colors()
+	background-color arguments[0]
+	color arguments[1]
+
+//同时设置高度和最小高度
+heights()
+	height arguments[0]
+	min-height arguments[1]

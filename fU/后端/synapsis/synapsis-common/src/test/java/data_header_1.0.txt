@@ -1,0 +1,1 @@
+<storeVariables><VariableGroup type="MVB" consumptionId="1" slotId="1"><multicastIp>127.0.0.1</multicastIp><multicastPort>65535</multicastPort><variables><MVBVariable device="1" deviceName="受电弓" carriage="1" system="受电弓" port="1" fcode="1" byteOffset="1" bitOffset="1" bitLen="1" name="电压" unit="V" signalName="电压" dataType="7"/></variables></VariableGroup></storeVariables>

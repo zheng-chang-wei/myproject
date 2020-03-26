@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:flowable="http://flowable.org/bpmn"
+  typeLanguage="http://www.w3.org/2001/XMLSchema"
+  expressionLanguage="http://www.w3.org/1999/XPath"
+  targetNamespace="http://www.flowable.org/processdef">
+ 
+	<process id="maintenance" name="maintenance flow" isExecutable="true">
+		<startEvent id="start" name="StartEvent"/>
+		<userTask id="worksheet" name="创建工单"/>
+		<userTask id="after-sale-audit" name="售后审核"/>
+		
+		<exclusiveGateway id="audit1" name="After-Sale Audit"/>
+		
+		<userTask id="quality-invest" name="质量调查"/>
+		<userTask id="quality-audit" name="质量审核"/>
+		
+		
+		<exclusiveGateway id="audit2" name="Quality Audit"/>
+		
+		<userTask id="resolve" name="问题解决"/>
+		
+		<exclusiveGateway id="audit3" name="Problem Resolve"/>
+		
+		<userTask id="track" name="跟踪"></userTask>
+		
+		<exclusiveGateway id="audit4" name="Close"/>
+		
+		<endEvent id="end" name="EndEvent"/>
+		
+		<sequenceFlow targetRef="worksheet" sourceRef="start"/>
+		<sequenceFlow targetRef="after-sale-audit" sourceRef="worksheet">
+			<!-- condition 提交工单 -->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${commit}
+				]]>
+			</conditionExpression>
+		</sequenceFlow>
+		<sequenceFlow targetRef="audit1" sourceRef="after-sale-audit"/>
+		
+		<sequenceFlow targetRef="quality-invest" sourceRef="audit1">
+			<!-- condition 通过工单-->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${commit&&!terminate}
+				]]>
+			</conditionExpression>		
+		</sequenceFlow>
+		<sequenceFlow targetRef="worksheet" sourceRef="audit1">
+			<!-- condition 驳回工单-->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${!commit}
+				]]>
+			</conditionExpression>
+		</sequenceFlow>
+		<sequenceFlow targetRef="end" sourceRef="audit1">
+			<!-- 中止 -->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${commit&&terminate}
+				]]>
+			</conditionExpression>
+		</sequenceFlow>
+		
+		<sequenceFlow targetRef="quality-audit" sourceRef="quality-invest">
+			<!-- condition 提交质量调查-->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${commit}
+				]]>
+			</conditionExpression>	
+		</sequenceFlow>
+		<sequenceFlow targetRef="audit2" sourceRef="quality-audit"/>
+		
+		<sequenceFlow targetRef="resolve" sourceRef="audit2">
+			<!-- condition 通过质量调查-->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${commit}
+				]]>
+			</conditionExpression>		
+		</sequenceFlow>
+		<sequenceFlow targetRef="quality-invest" sourceRef="audit2">
+			<!-- condition 驳回质量调查-->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${!commit}
+				]]>
+			</conditionExpression>				
+		</sequenceFlow>
+		
+		<sequenceFlow targetRef="audit3" sourceRef="resolve"/>
+		<sequenceFlow targetRef="track" sourceRef="audit3">
+			<!-- 问题解决 -->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${commit}
+				]]>
+			</conditionExpression>		
+		</sequenceFlow>
+		<sequenceFlow targetRef="quality-invest" sourceRef="audit3">
+			<!-- 申诉 -->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${!commit}
+				]]>
+			</conditionExpression>		
+		</sequenceFlow>
+		<sequenceFlow targetRef="audit4" sourceRef="track"/>
+		<sequenceFlow targetRef="end" sourceRef="audit4">
+			<!-- 关闭工单 -->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${commit}
+				]]>
+			</conditionExpression>		
+		</sequenceFlow>
+		<sequenceFlow targetRef="resolve" sourceRef="audit4">
+			<!--  -->
+			<conditionExpression xsi:type="tFormalExpression">
+				<![CDATA[
+					${!commit}
+				]]>
+			</conditionExpression>		
+		</sequenceFlow>
+	</process> 
+</definitions>

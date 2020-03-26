@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Root busType="mvb" name="MVB Model" appVersion="1.0.0">
+    <dataTypes>
+        <dataType baseType="BOOLEAN" name="boolean" length="1" range="0(FALSE),1(TRUE)"/>
+        <dataType baseType="INT8" name="int8" length="8" range="-128~127"/>
+        <dataType baseType="UINT8" name="uint8" length="8" range="0~255"/>
+        <dataType baseType="INT16" name="int16" length="16" range="-32768~32767"/>
+        <dataType baseType="UINT16" name="uint16" length="16" range="0~65535"/>
+        <dataType baseType="INT32" name="int32" length="32" range="-2147483648~2147483647"/>
+        <dataType baseType="UINT32" name="uint32" length="32" range="0~4294967295"/>
+        <dataType baseType="FLOAT" name="float" length="32" range="+/-3,4E+/-38"/>
+        <dataType baseType="BITS" name="bits" length="0" range="0~4294967295" description="1~32"/>
+    </dataTypes>
+    <devices>
+        <device address="2" name="test" description="test"/>
+        <device address="3" name="test2" description="test2"/>
+    </devices>
+    <ports>
+        <port address="1" name="端口1" size="128" circle="2.0" timeSlot="1" description="吞吞吐吐拖"/>
+        <port address="2" name="端口2" size="256" circle="4.0" timeSlot="3" description="222222"/>
+    </ports>
+    <datagrams>
+        <datagram id="191204193720_0" name="11" byteOrder="LITTLE_ENDIAN" idleValue="0" sheetName="数据信息（默认）">
+            <signal id="191204193720_2" varId="v1" signalName="s1" dataType="INT8" byteOffset="11" bitOffset="2" length="8" range="" fomula="false" factor="4.0" offset="2.0" unit="" locked="false" description=""/>
+        </datagram>
+        <datagram id="191204193720_1" name="12" byteOrder="BIG_ENDIAN" idleValue="0" sheetName="数据信息（默认）">
+            <signal id="191204193720_3" varId="v2" signalName="s2" dataType="INT16" byteOffset="12" bitOffset="3" length="16" range="" fomula="false" factor="0.0" offset="0.0" unit="" locked="false" description=""/>
+        </datagram>
+    </datagrams>
+    <DeviceStructures>
+        <DeviceStructure deviceAddress="2" car="11" system="Windows" description="test">
+            <PortStructure portAddress="1" deviceAddressSource="2" deviceAddressSinks="3" datagramId="191204193720_0" enable="true" description="吞吞吐吐拖"/>
+            <PortStructure portAddress="2" deviceAddressSource="3" deviceAddressSinks="2" datagramId="191204193720_1" enable="true" description="222222"/>
+        </DeviceStructure>
+        <DeviceStructure deviceAddress="3" car="12" system="Windows2" description="test2">
+            <PortStructure portAddress="1" deviceAddressSource="2" deviceAddressSinks="3" datagramId="191204193720_0" enable="true" description="吞吞吐吐拖"/>
+            <PortStructure portAddress="2" deviceAddressSource="3" deviceAddressSinks="2" datagramId="191204193720_1" enable="true" description="222222"/>
+        </DeviceStructure>
+    </DeviceStructures>
+</Root>

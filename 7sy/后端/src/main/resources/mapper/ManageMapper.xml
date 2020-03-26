@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.hirain.qsy.shaft.dao.ManageMapper">
+
+<select id="existInitialDataTable" parameterType="Integer" resultType="Integer">
+	select count(*)
+	from information_schema.TABLES
+	where table_name='t_initial_data_${trainId}'
+</select>
+
+<update id="createInitialDataTable" parameterType="java.util.Map">
+	CREATE TABLE `t_initial_data_${trainId}` (
+  `acquisition_time` datetime NOT NULL COMMENT '采集时间',
+  `ambient_temperature_1` int(11) NOT NULL COMMENT '环境温度1',
+  `ambient_temperature_2` int(11) NOT NULL COMMENT '环境温度2',
+  `axle1_1` int(11) NOT NULL COMMENT '1轴1测点温度',
+  `axle1_2` int(11) NOT NULL COMMENT '1轴2测点温度',
+  `axle1_3` int(11) NOT NULL COMMENT '1轴3测点温度',
+  `axle1_4` int(11) NOT NULL COMMENT '1轴4测点温度',
+  `axle1_5` int(11) NOT NULL COMMENT '1轴5测点温度',
+  `axle1_6` int(11) NOT NULL COMMENT '1轴6测点温度',
+  `axle2_1` int(11) NOT NULL COMMENT '2轴1测点温度',
+  `axle2_2` int(11) NOT NULL COMMENT '2轴2测点温度',
+  `axle2_3` int(11) NOT NULL COMMENT '2轴3测点温度',
+  `axle2_4` int(11) NOT NULL COMMENT '2轴4测点温度',
+  `axle2_5` int(11) NOT NULL COMMENT '2轴5测点温度',
+  `axle2_6` int(11) NOT NULL COMMENT '2轴6测点温度',
+  `axle3_1` int(11) NOT NULL COMMENT '3轴1测点温度',
+  `axle3_2` int(11) NOT NULL COMMENT '3轴2测点温度',
+  `axle3_3` int(11) NOT NULL COMMENT '3轴3测点温度',
+  `axle3_4` int(11) NOT NULL COMMENT '3轴4测点温度',
+  `axle3_5` int(11) NOT NULL COMMENT '3轴5测点温度',
+  `axle3_6` int(11) NOT NULL COMMENT '3轴6测点温度',
+  `axle4_1` int(11) NOT NULL COMMENT '4轴1测点温度',
+  `axle4_2` int(11) NOT NULL COMMENT '4轴2测点温度',
+  `axle4_3` int(11) NOT NULL COMMENT '4轴3测点温度',
+  `axle4_4` int(11) NOT NULL COMMENT '4轴4测点温度',
+  `axle4_5` int(11) NOT NULL COMMENT '4轴5测点温度',
+  `axle4_6` int(11) NOT NULL COMMENT '4轴6测点温度',
+  `axle5_1` int(11) NOT NULL COMMENT '5轴1测点温度',
+  `axle5_2` int(11) NOT NULL COMMENT '5轴2测点温度',
+  `axle5_3` int(11) NOT NULL COMMENT '5轴3测点温度',
+  `axle5_4` int(11) NOT NULL COMMENT '5轴4测点温度',
+  `axle5_5` int(11) NOT NULL COMMENT '5轴5测点温度',
+  `axle5_6` int(11) NOT NULL COMMENT '5轴6测点温度',
+  `axle6_1` int(11) NOT NULL COMMENT '6轴1测点温度',
+  `axle6_2` int(11) NOT NULL COMMENT '6轴2测点温度',
+  `axle6_3` int(11) NOT NULL COMMENT '6轴3测点温度',
+  `axle6_4` int(11) NOT NULL COMMENT '6轴4测点温度',
+  `axle6_5` int(11) NOT NULL COMMENT '6轴5测点温度',
+  `axle6_6` int(11) NOT NULL COMMENT '6轴6测点温度',
+  `gps_speed` int(11) NOT NULL COMMENT 'GPS速度',
+  `original_primary_key` varchar(50) NOT NULL COMMENT '原属表主键',
+  PRIMARY KEY (`original_primary_key`,`acquisition_time`) USING BTREE,
+  KEY `index_name` (`acquisition_time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC
+	 PARTITION by range(to_days(acquisition_time))
+		<foreach collection="list" index="index" item="time" open="(" separator="," close=")">
+			partition p${time} values less than(to_days(#{time}))
+		</foreach> 
+</update>
+<update id="createExceptionDataTable" parameterType="java.util.Map">
+	CREATE TABLE `t_exception_data_${trainId}` (
+  `acquisition_time` datetime NOT NULL COMMENT '采集时间',
+  `result_axle1_1` varchar(50) NOT NULL COMMENT '1轴1测点温度分析结果',
+  `result_axle1_2` varchar(50) NOT NULL COMMENT '1轴2测点温度分析结果',
+  `result_axle1_3` varchar(50) NOT NULL COMMENT '1轴3测点温度分析结果',
+  `result_axle1_4` varchar(50) NOT NULL COMMENT '1轴4测点温度分析结果',
+  `result_axle1_5` varchar(50) NOT NULL COMMENT '1轴5测点温度分析结果',
+  `result_axle1_6` varchar(50) NOT NULL COMMENT '1轴6测点温度分析结果',
+  `result_axle2_1` varchar(50) NOT NULL COMMENT '2轴1测点温度分析结果',
+  `result_axle2_2` varchar(50) NOT NULL COMMENT '2轴2测点温度分析结果',
+  `result_axle2_3` varchar(50) NOT NULL COMMENT '2轴3测点温度分析结果',
+  `result_axle2_4` varchar(50) NOT NULL COMMENT '2轴4测点温度分析结果',
+  `result_axle2_5` varchar(50) NOT NULL COMMENT '2轴5测点温度分析结果',
+  `result_axle2_6` varchar(50) NOT NULL COMMENT '2轴6测点温度分析结果',
+  `result_axle3_1` varchar(50) NOT NULL COMMENT '3轴1测点温度分析结果',
+  `result_axle3_2` varchar(50) NOT NULL COMMENT '3轴2测点温度分析结果',
+  `result_axle3_3` varchar(50) NOT NULL COMMENT '3轴3测点温度分析结果',
+  `result_axle3_4` varchar(50) NOT NULL COMMENT '3轴4测点温度分析结果',
+  `result_axle3_5` varchar(50) NOT NULL COMMENT '3轴5测点温度分析结果',
+  `result_axle3_6` varchar(50) NOT NULL COMMENT '3轴6测点温度分析结果',
+  `result_axle4_1` varchar(50) NOT NULL COMMENT '4轴1测点温度分析结果',
+  `result_axle4_2` varchar(50) NOT NULL COMMENT '4轴2测点温度分析结果',
+  `result_axle4_3` varchar(50) NOT NULL COMMENT '4轴3测点温度分析结果',
+  `result_axle4_4` varchar(50) NOT NULL COMMENT '4轴4测点温度分析结果',
+  `result_axle4_5` varchar(50) NOT NULL COMMENT '4轴5测点温度分析结果',
+  `result_axle4_6` varchar(50) NOT NULL COMMENT '4轴6测点温度分析结果',
+  `result_axle5_1` varchar(50) NOT NULL COMMENT '5轴1测点温度分析结果',
+  `result_axle5_2` varchar(50) NOT NULL COMMENT '5轴2测点温度分析结果',
+  `result_axle5_3` varchar(50) NOT NULL COMMENT '5轴3测点温度分析结果',
+  `result_axle5_4` varchar(50) NOT NULL COMMENT '5轴4测点温度分析结果',
+  `result_axle5_5` varchar(50) NOT NULL COMMENT '5轴5测点温度分析结果',
+  `result_axle5_6` varchar(50) NOT NULL COMMENT '5轴6测点温度分析结果',
+  `result_axle6_1` varchar(50) NOT NULL COMMENT '6轴1测点温度分析结果',
+  `result_axle6_2` varchar(50) NOT NULL COMMENT '6轴2测点温度分析结果',
+  `result_axle6_3` varchar(50) NOT NULL COMMENT '6轴3测点温度分析结果',
+  `result_axle6_4` varchar(50) NOT NULL COMMENT '6轴4测点温度分析结果',
+  `result_axle6_5` varchar(50) NOT NULL COMMENT '6轴5测点温度分析结果',
+  `result_axle6_6` varchar(50) NOT NULL COMMENT '6轴6测点温度分析结果',
+  `original_primary_key` varchar(50) NOT NULL COMMENT '原属表主键',
+  PRIMARY KEY (`original_primary_key`,`acquisition_time`) USING BTREE,
+  KEY `index_name` (`acquisition_time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC
+	 PARTITION by range(to_days(acquisition_time))
+		<foreach collection="list" index="index" item="time" open="(" separator="," close=")">
+			partition p${time} values less than(to_days(#{time}))
+		</foreach> 
+</update>
+
+ <update id="addPartitions" parameterType="java.util.Map">
+	alter table ${tableName} add partition
+	<foreach collection="list" index="index" item="time" open="(" separator="," close=")">
+		partition p${time} values less than(to_days(#{time}))
+	</foreach>
+</update>
+
+<select id="lastPartition" resultType="java.lang.String">
+select
+partition_name part
+from information_schema.partitions
+where table_schema=schema()
+and table_name='${tableName}'
+order by partition_ordinal_position desc
+limit 0,1
+</select> 
+<update id="dropTable" >
+
+drop table ${tableName}
+
+</update>
+
+
+</mapper>

@@ -1,0 +1,350 @@
+{
+  "namespace": "com.hirain.phm.bd.message.decode",
+  "name": "DecodePacket",
+  "type": "record",
+  "fields": [
+  	{
+  	  "name":"sid",
+  	  "type":"int"
+  	},
+    {
+      "name": "city",
+      "type": "string"
+    },
+    {
+      "name": "line",
+      "type": "string"
+    },
+    {
+      "name": "train",
+      "type": "string"
+    },
+    {
+      "name": "messages",
+      "type": {
+        "type": "array",
+        "items": {
+          "namespace": "com.hirain.phm.bd.message.decode",
+          "name": "DoorMessage",
+          "type": "record",
+          "fields": [
+            {
+              "name": "debug",
+              "type": "boolean"
+            },
+            {
+              "name": "frame",
+              "type": {
+                "namespace": "com.hirain.phm.bd.message.decode",
+                "name": "RunDataFrame",
+                "type": "record",
+                "fields": [
+                  {
+                    "name": "id",
+                    "type": "int"
+                  },
+                  {
+                    "name": "type",
+                    "type": "int"
+                  },
+                  {
+                    "name": "dataFrameD1",
+                    "type": {
+                      "namespace": "com.hirain.phm.bd.message.decode",
+                      "name": "DataFrameD1",
+                      "type": "record",
+                      "fields": [
+                        {
+                          "name": "version",
+                          "type": "int"
+                        },
+                        {
+                          "name": "door_PreventExtrusion",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_Isolation",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_EmergencyUnlock",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_Open",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_Close",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_Action",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_NoSpeed",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_Enable",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_ControlChoose",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "feedback_SwitchAgain",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "detectObstacles",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "feedback_doorClose",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "feedback_doorOpen",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "fault_DoorExist",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "fault_OutputShortCircuit",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_SwitchTimeOut",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "fault_Encoder",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "fault_LockSwitch",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "fault_GreenLoop",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "fault_doorSwitch",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "fault_MotorOverCurrent",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "fault_MotorOpenCircuit",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_ServiceButton",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_SwitchDoorCentralControl",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_CloseDoorCentralControl",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_OpenCloseAgain",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_ZeroSpeed",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_Isolation",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_EmergencyUnlock",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_UnlockSwitch",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_leftDoorOpenClose",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_rightDoorOpenClose",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_CodeAddr1",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_CodeAddr2",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_CodeAddr3",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_CodeAddr4",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_SafetyInterlockInput",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "signal_SafetyInterlockOutput",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "openDoorLightOutput",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "EmergencyUnlockElectromagnetOutput",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "buzzerOutput",
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "dataFrameD2",
+                    "type": {
+                      "namespace": "com.hirain.phm.bd.message.decode",
+                      "name": "DataFrameD2",
+                      "type": "record",
+                      "fields": [
+                        {
+                          "name": "door_Open",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "process_openDoor",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "process_closeDoor",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "door_Close",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "process_PreventExtrusion",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "PreventExtrusionStop",
+                          "type": "boolean"
+                        },
+                        {
+                          "name": "motorVoltage",
+                          "type": "int"
+                        },
+                        {
+                          "name": "motorCurrent",
+                          "type": "int"
+                        },
+                        {
+                          "name": "carNo",
+                          "type": "int"
+                        },
+                        {
+                          "name": "doorAddr",
+                          "type": "int"
+                        },
+                        {
+                          "name": "trainNo",
+                          "type": "int"
+                        },
+                        {
+                          "name": "openDoorTime",
+                          "type": "int"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "dataFrameD3",
+                    "type": {
+                      "namespace": "com.hirain.phm.bd.message.decode",
+                      "name": "DataFrameD3",
+                      "type": "record",
+                      "fields": [
+                        {
+                          "name": "closeDoorTime",
+                          "type": "int"
+                        },
+                        {
+                          "name": "Encoder",
+                          "type": "int"
+                        },
+                        {
+                          "name": "date",
+                          "type": "int"
+                        },
+                        {
+                          "name": "hour",
+                          "type": "int"
+                        },
+                        {
+                          "name": "minute",
+                          "type": "int"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "dataFrameD4",
+                    "type": {
+                      "namespace": "com.hirain.phm.bd.message.decode",
+                      "name": "DataFrameD4",
+                      "type": "record",
+                      "fields": [
+                        {
+                          "name": "second",
+                          "type": "int"
+                        },
+                        {
+                          "name": "millisecond",
+                          "type": "int"
+                        },
+                        {
+                          "name": "temperature",
+                          "type": "int"
+                        },
+                        {
+                          "name": "verifyCRC",
+                          "type": "int"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

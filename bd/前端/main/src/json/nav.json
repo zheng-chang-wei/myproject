@@ -1,0 +1,70 @@
+[
+	{
+		"name": "安装包管理",
+		"url": "/corp/swz/package_control"
+	}, {
+		"name": "企业管理",
+		"children": [
+			{
+				"name": "侍卫长",
+				"children": [
+					{
+						"name": "安装包管理",
+						"url": "/corp/swz/package_control"
+					}, {
+						"name": "功能管理",
+						"url": "/corp/swz/function"
+					}, {
+						"name": "广告管理",
+						"url": "/corp/swz/ad"
+					}, {
+						"name": "参数配置",
+						"url": "/corp/swz/canshu"
+					}, {
+						"name": "小豆科技",
+						"url": "/corp/swz/xiaodou"
+					}
+				]
+			}, {
+				"name": "迪亚士",
+				"children": [
+					{
+						"name": "备用",
+						"url": "/corp/dys/beiyong"
+					}
+				]
+			}
+		]
+	}, {
+		"name": "波导产品管理",
+		"children": [
+			{
+				"name": "模版管理",
+				"url": "/product/template"
+			}, {
+				"name": "硬件管理",
+				"url": "/product/hardware"
+			}, {
+				"name": "APP管理",
+				"url": "/product/application"
+			}, {
+				"name": "APP功能池",
+				"url": "/product/application-chi"
+			}
+		]
+	}, {
+		"name": "系统管理",
+		"children": [
+			{
+				"name": "用户管理",
+				"url": "/system/user"
+			}, {
+				"name": "角色管理",
+				"url": "/system/role"
+			}, {
+				"name": "菜单管理",
+				"url": "/system/menu"
+			}
+		]
+	}
+]

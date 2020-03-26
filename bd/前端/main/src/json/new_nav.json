@@ -1,0 +1,447 @@
+ [
+        {
+            "id": 25,
+            "name": "首页",
+            "parentid": 0,
+            "reskey": "system",
+            "type": "0",
+            "resurl": "adaf",
+            "level": 0,
+            "icon": "",
+            "ishide": 0,
+            "description": "后台管理系统用于开发的菜单，请勿修改删除",
+            "children": []
+        },
+        {
+            "id": 82,
+            "name": "企业管理",
+            "parentid": 0,
+            "reskey": "sys_company",
+            "type": "0",
+            "resurl": "afasdf",
+            "level": 0,
+            "icon": "",
+            "ishide": 0,
+            "description": "企业管理",
+            "children": [
+                {
+                    "id": 118,
+                    "name": "侍卫长",
+                    "parentid": 82,
+                    "reskey": "sys_swz",
+                    "type": "3",
+                    "resurl": "afdadsf",
+                    "level": 3,
+                    "icon": "",
+                    "ishide": 0,
+                    "description": "侍卫长",
+                    "children": [
+                        {
+                            "id": 119,
+                            "name": "安装包管理",
+                            "parentid": 118,
+                            "reskey": "sys_swz_package",
+                            "type": "2",
+                            "resurl": "/corp/swz/package_control",
+                            "level": 2,
+                            "icon": "",
+                            "ishide": 0,
+                            "description": "安装包管理",
+                            "children": []
+                        },
+                        {
+                            "id": 120,
+                            "name": "功能管理",
+                            "parentid": 118,
+                            "reskey": "sys_swz_function",
+                            "type": "2",
+                            "resurl": "222",
+                            "level": 2,
+                            "icon": "",
+                            "ishide": 0,
+                            "description": "功能管理",
+                            "children": []
+                        },
+                        {
+                            "id": 121,
+                            "name": "广告管理",
+                            "parentid": 118,
+                            "reskey": "sys_swz_ad",
+                            "type": "2",
+                            "resurl": "adfadsf",
+                            "level": 2,
+                            "icon": "",
+                            "ishide": 0,
+                            "description": "广告管理",
+                            "children": []
+                        },
+                        {
+                            "id": 186,
+                            "name": "参数配置",
+                            "parentid": 118,
+                            "reskey": "sys_参数配置",
+                            "type": "0",
+                            "resurl": "参数配置",
+                            "level": 2,
+                            "ishide": 0,
+                            "children": []
+                        },
+                        {
+                            "id": 187,
+                            "name": "小豆科技",
+                            "parentid": 118,
+                            "reskey": "sys_小豆科技",
+                            "type": "0",
+                            "resurl": "小豆科技",
+                            "level": 2,
+                            "ishide": 0,
+                            "children": []
+                        },
+                        {
+                            "id": 196,
+                            "name": "迪亚士",
+                            "parentid": 118,
+                            "reskey": "sys_dys",
+                            "type": "3",
+                            "resurl": "sadfds",
+                            "level": 2,
+                            "ishide": 0,
+                            "children": [
+                                {
+                                    "id": 197,
+                                    "name": "安装包管理",
+                                    "parentid": 196,
+                                    "reskey": "sys_dys_package",
+                                    "type": "2",
+                                    "resurl": "sadfds",
+                                    "level": 2,
+                                    "ishide": 0,
+                                    "children": []
+                                },
+                                {
+                                    "id": 198,
+                                    "name": "功能管理",
+                                    "parentid": 196,
+                                    "reskey": "sys_dys_function",
+                                    "type": "2",
+                                    "resurl": "sadfds",
+                                    "level": 2,
+                                    "ishide": 0,
+                                    "children": []
+                                },
+                                {
+                                    "id": 199,
+                                    "name": "广告管理",
+                                    "parentid": 196,
+                                    "reskey": "sys_dys_ad",
+                                    "type": "2",
+                                    "resurl": "sadfds",
+                                    "level": 2,
+                                    "ishide": 0,
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": 169,
+                    "name": "侍卫长2",
+                    "parentid": 82,
+                    "reskey": "sys_swz3",
+                    "type": "3",
+                    "resurl": "adf",
+                    "level": 2,
+                    "ishide": 0,
+                    "children": [
+                        {
+                            "id": 170,
+                            "name": "安装包管理",
+                            "parentid": 169,
+                            "reskey": "sys_swz3_package",
+                            "type": "2",
+                            "resurl": "adf",
+                            "level": 2,
+                            "ishide": 0,
+                            "children": []
+                        },
+                        {
+                            "id": 171,
+                            "name": "功能管理",
+                            "parentid": 169,
+                            "reskey": "adfasdfafds",
+                            "type": "2",
+                            "resurl": "adsfasdfasd",
+                            "level": 2,
+                            "icon": "",
+                            "ishide": 0,
+                            "description": "",
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": 200,
+                    "name": "侍卫长3",
+                    "parentid": 82,
+                    "reskey": "sys_admin_swz4",
+                    "type": "3",
+                    "resurl": "adfasdf",
+                    "level": 2,
+                    "ishide": 0,
+                    "children": [
+                        {
+                            "id": 201,
+                            "name": "安装包管理",
+                            "parentid": 200,
+                            "reskey": "sys_admin_swz4_package",
+                            "type": "2",
+                            "resurl": "adfasdf",
+                            "level": 2,
+                            "ishide": 0,
+                            "children": []
+                        },
+                        {
+                            "id": 202,
+                            "name": "功能管理",
+                            "parentid": 200,
+                            "reskey": "sys_admin_swz4_function",
+                            "type": "2",
+                            "resurl": "adfasdf",
+                            "level": 2,
+                            "ishide": 0,
+                            "children": []
+                        },
+                        {
+                            "id": 203,
+                            "name": "广告管理",
+                            "parentid": 200,
+                            "reskey": "sys_admin_swz4_ad",
+                            "type": "2",
+                            "resurl": "adfasdf",
+                            "level": 2,
+                            "ishide": 0,
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 128,
+            "name": "正经菜单",
+            "parentid": 0,
+            "reskey": "sys_2222222",
+            "type": "0",
+            "resurl": "3333333",
+            "icon": "858",
+            "ishide": 0,
+            "description": "666",
+            "children": [
+                {
+                    "id": 129,
+                    "name": "正经菜单的子菜单22",
+                    "parentid": 128,
+                    "reskey": "sys_444444444",
+                    "type": "0",
+                    "resurl": "55555",
+                    "ishide": 0,
+                    "description": "3333",
+                    "children": [
+                        {
+                            "id": 130,
+                            "name": "5252",
+                            "parentid": 129,
+                            "reskey": "sys_6363",
+                            "type": "0",
+                            "resurl": "6363",
+                            "icon": "8888",
+                            "ishide": 0,
+                            "description": "555",
+                            "children": []
+                        },
+                        {
+                            "id": 140,
+                            "name": "8555",
+                            "parentid": 129,
+                            "reskey": "sys_888",
+                            "type": "0",
+                            "ishide": 0,
+                            "children": [
+                                {
+                                    "id": 156,
+                                    "name": "5556",
+                                    "parentid": 140,
+                                    "reskey": "sys_33",
+                                    "type": "2",
+                                    "resurl": "666",
+                                    "level": 2,
+                                    "ishide": 0,
+                                    "description": "<button data-v-55d17577=\"\" type=\"button\" class=\"el-button el-button--primary\"><span data-v-55d17577=\"\">新增</span></button>",
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 173,
+            "name": "5555",
+            "parentid": 0,
+            "reskey": "asdfasdf",
+            "type": "0",
+            "resurl": "/corp/abc/agg_aaa",
+            "level": 2,
+            "icon": "",
+            "ishide": 0,
+            "description": "",
+            "children": [
+                {
+                    "id": 174,
+                    "name": "444444",
+                    "parentid": 173,
+                    "reskey": "sys_555555",
+                    "type": "0",
+                    "resurl": "66666666",
+                    "level": 2,
+                    "ishide": 0,
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": 176,
+            "name": "角色菜单测试10级用(1)",
+            "parentid": 0,
+            "reskey": "sys_1",
+            "type": "0",
+            "resurl": "2",
+            "level": 2,
+            "icon": "",
+            "ishide": 0,
+            "description": "",
+            "children": [
+                {
+                    "id": 177,
+                    "name": "角色菜单测试10级用(2)",
+                    "parentid": 176,
+                    "reskey": "sys_2",
+                    "type": "0",
+                    "resurl": "3",
+                    "level": 2,
+                    "icon": "",
+                    "ishide": 0,
+                    "description": "",
+                    "children": [
+                        {
+                            "id": 178,
+                            "name": "角色菜单测试10级用(3)",
+                            "parentid": 177,
+                            "reskey": "sys_角色菜单测试10级用(3)",
+                            "type": "0",
+                            "resurl": "角色菜单测试10级用(3)",
+                            "level": 2,
+                            "ishide": 0,
+                            "children": [
+                                {
+                                    "id": 179,
+                                    "name": "角色菜单测试10级用(4)",
+                                    "parentid": 178,
+                                    "reskey": "sys_角色菜单测试10级用(4)",
+                                    "type": "0",
+                                    "resurl": "角色菜单测试10级用(4)",
+                                    "level": 2,
+                                    "ishide": 0,
+                                    "children": [
+                                        {
+                                            "id": 180,
+                                            "name": "角色菜单测试10级用(5)",
+                                            "parentid": 179,
+                                            "reskey": "sys_角色菜单测试10级用(5)",
+                                            "type": "0",
+                                            "resurl": "角色菜单测试10级用(5)",
+                                            "level": 2,
+                                            "ishide": 0,
+                                            "children": [
+                                                {
+                                                    "id": 181,
+                                                    "name": "角色菜单测试10级用(6)",
+                                                    "parentid": 180,
+                                                    "reskey": "sys_角色菜单测试10级用(6)",
+                                                    "type": "0",
+                                                    "resurl": "角色菜单测试10级用(6)",
+                                                    "level": 2,
+                                                    "icon": "",
+                                                    "ishide": 0,
+                                                    "description": "",
+                                                    "children": [
+                                                        {
+                                                            "id": 182,
+                                                            "name": "角色菜单测试10级用(7)",
+                                                            "parentid": 181,
+                                                            "reskey": "sys_角色菜单测试10级用(7)",
+                                                            "type": "0",
+                                                            "resurl": "角色菜单测试10级用(7)",
+                                                            "level": 2,
+                                                            "icon": "",
+                                                            "ishide": 0,
+                                                            "description": "",
+                                                            "children": [
+                                                                {
+                                                                    "id": 183,
+                                                                    "name": "角色菜单测试10级用(8)",
+                                                                    "parentid": 182,
+                                                                    "reskey": "sys_角色菜单测试10级用(8)",
+                                                                    "type": "0",
+                                                                    "resurl": "角色菜单测试10级用(8)",
+                                                                    "level": 2,
+                                                                    "icon": "",
+                                                                    "ishide": 0,
+                                                                    "description": "",
+                                                                    "children": [
+                                                                        {
+                                                                            "id": 184,
+                                                                            "name": "角色菜单测试10级用(9)",
+                                                                            "parentid": 183,
+                                                                            "reskey": "sys_角色菜单测试10级用(9)",
+                                                                            "type": "0",
+                                                                            "resurl": "角色菜单测试10级用(9)",
+                                                                            "level": 2,
+                                                                            "icon": "",
+                                                                            "ishide": 0,
+                                                                            "description": "",
+                                                                            "children": [
+                                                                                {
+                                                                                    "id": 185,
+                                                                                    "name": "角色菜单测试10级用(10)",
+                                                                                    "parentid": 184,
+                                                                                    "reskey": "sys_角色菜单测试10级用(10)",
+                                                                                    "type": "0",
+                                                                                    "resurl": "角色菜单测试10级用(10)",
+                                                                                    "level": 2,
+                                                                                    "icon": "",
+                                                                                    "ishide": 0,
+                                                                                    "description": "",
+                                                                                    "children": []
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]

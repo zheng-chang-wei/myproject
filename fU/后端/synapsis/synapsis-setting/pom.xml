@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.hirain.phm</groupId>
+    <artifactId>synapsis</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <groupId>com.hirain.phm.synapsis</groupId>
+  <artifactId>synapsis-setting</artifactId>
+  <name>synapsis-setting</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+  <dependency>
+  	<groupId>org.mybatis.spring.boot</groupId>
+  	<artifactId>mybatis-spring-boot-starter</artifactId>
+  	<type>pom.lastUpdated</type>
+  </dependency>
+  <dependency>
+  	<groupId>tk.mybatis</groupId>
+  	<artifactId>mapper-spring-boot-starter</artifactId>
+  </dependency>
+  <dependency>
+  	<groupId>com.alibaba</groupId>
+  	<artifactId>druid-spring-boot-starter</artifactId>
+  </dependency>
+  <dependency>
+  	<groupId>org.projectlombok</groupId>
+  	<artifactId>lombok</artifactId>
+  </dependency>
+  <dependency>
+  	<groupId>com.hirain.phm.synapsis</groupId>
+  	<artifactId>synapsis-common</artifactId>
+  </dependency>
+  <dependency>
+	<groupId>com.h2database</groupId>
+	<artifactId>h2</artifactId>
+	<scope>test</scope>
+  </dependency>
+  <!-- https://mvnrepository.com/artifact/org.apache.derby/derbyclient -->
+	<dependency>
+    	<groupId>org.apache.derby</groupId>
+    	<artifactId>derbyclient</artifactId>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+    <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>fastjson</artifactId>
+    </dependency>
+
+    <dependency>
+    	<groupId>com.hirain.mapper</groupId>
+    	<artifactId>derby-mapper</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>
