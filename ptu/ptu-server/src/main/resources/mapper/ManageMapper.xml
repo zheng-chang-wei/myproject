@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hirain.ptu.dao.ManageMapper">
+
+    <select id="isExistTable" parameterType="String" resultType="Integer">
+        select count(*)
+        from information_schema.TABLES
+        where table_name='${tableName}'
+    </select>
+
+    <update id="createComIdDataTable" parameterType="java.util.Map">
+        CREATE TABLE ${tableName} (
+        `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        `date` datetime NOT NULL,
+        `ip` varchar(15) NOT NULL,
+        `com_id` int(10) unsigned NOT NULL,
+        `period_stability_p_h_m` tinyint(4) NOT NULL,
+        `lost_rate_p_h_m` tinyint(4) NOT NULL,
+        `abnomal_lost_p_h_m` tinyint(4) NOT NULL,
+        `window_time` int(11) NOT NULL,
+        `period_mean` int(11) NOT NULL,
+        `period_std` int(11) NOT NULL,
+        `lost_rate` float NOT NULL,
+        `lost_max_rate` float NOT NULL,
+        `life_signal_stop_rate` float NOT NULL,
+        `life_signal_stop_max_rate` float NOT NULL,
+        PRIMARY KEY (`id`,`date`),
+        KEY `time` (`date`) USING BTREE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC
+        PARTITION by range(to_days(date))
+        <foreach collection="list" index="index" item="time" open="(" separator="," close=")">
+            partition p${time} values less than(to_days(#{time}))
+        </foreach>
+    </update>
+    <update id="createCsPortDataTable" parameterType="java.util.Map">
+        CREATE TABLE ${tableName} (
+        `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        `date` datetime NOT NULL,
+        `ip` varchar(15) NOT NULL,
+        `com_id` int(10) unsigned NOT NULL,
+        `port` int(10) unsigned NOT NULL,
+        `link_p_h_m` tinyint(4) NOT NULL,
+        `link_flash_p_h_m` tinyint(4) NOT NULL,
+        `rx_traffic_p_h_m` tinyint(4) NOT NULL,
+        `rx_err_rate_p_h_m` tinyint(4) NOT NULL,
+        `rx_err_predict_p_h_m` tinyint(4) NOT NULL,
+        `tx_traffic_p_h_m` tinyint(4) NOT NULL,
+        `tx_err_rate_p_h_m` tinyint(4) NOT NULL,
+        `tx_err_predict_p_h_m` tinyint(4) NOT NULL,
+        `enable` tinyint(4) NOT NULL,
+        `link_mean` float NOT NULL,
+        `rx_mcast` int(11) NOT NULL,
+        `rx_traffic_mean` int(11) NOT NULL,
+        `rx_traffic_std` int(11) NOT NULL,
+        `rx_err_rate_mean` int(11) NOT NULL,
+        `rx_err_rate_std` int(11) NOT NULL,
+        `tx_mcast` int(11) NOT NULL,
+        `tx_traffic_mean` int(11) NOT NULL,
+        `tx_traffic_std` int(11) NOT NULL,
+        `tx_err_rate_mean` int(11) NOT NULL,
+        `tx_err_rate_std` int(11) NOT NULL,
+        PRIMARY KEY (`id`,`date`),
+        KEY `date` (`date`) USING BTREE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC
+        PARTITION by range(to_days(date))
+        <foreach collection="list" index="index" item="time" open="(" separator="," close=")">
+            partition p${time} values less than(to_days(#{time}))
+        </foreach>
+    </update>
+
+    <update id="addPartitions" parameterType="java.util.Map">
+        alter table ${tableName} add partition
+        <foreach collection="list" index="index" item="time" open="(" separator="," close=")">
+            partition p${time} values less than(to_days(#{time}))
+        </foreach>
+    </update>
+
+    <select id="lastPartition" resultType="java.lang.String">
+        select
+        partition_name part
+        from information_schema.partitions
+        where table_schema=schema()
+        and table_name='${tableName}'
+        order by partition_ordinal_position desc
+        limit 0,1
+    </select>
+    <update id="dropTable">
+
+        drop table ${tableName}
+
+    </update>
+
+
+</mapper>
