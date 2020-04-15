@@ -73,7 +73,8 @@ export default {
       total: 0,
       pageNum: 1,
       pageSize: 20,
-      currentPage: 1
+      currentPage: 1,
+      selectedObjTableDatas: []
     }
   },
   created() {
@@ -88,19 +89,51 @@ export default {
     changeHeight() {
       this.tableMaxHeight = document.body.offsetHeight * 0.6 + 'px'
     },
-    openAddObjDialog() {
+    openAddObjDialog(selection) {
+      this.selectedObjTableDatas = []
+      selection.forEach(element => {
+        this.selectedObjTableDatas.push(element)
+      })
       this.addObjDialogVisible = true
+      const vm = this
+      if (vm.$refs.allObjTable !== undefined) {
+        vm.setSelect()
+      } else {
+        setTimeout(function() {
+          vm.setSelect()
+        }, '10')
+      }
     },
     tableSelect(selection, row) {
+      const sameData = this.getSameData(row, this.selectedObjTableDatas)
+      if (sameData === null) {
+        this.selectedObjTableDatas.push(row)
+      } else {
+        this.selectedObjTableDatas.splice(this.selectedObjTableDatas.indexOf(sameData), 1)
+      }
     },
     inputChange() {
-      // this.$refs.allObjTable.toggleRowSelection(this.allObjTableDatas[0], true)
       this.currentPage = 1
       this.handleCurrentChange(1)
     },
     addComIdObjConfirm() {
-      this.$emit('addComIdObjConfirm', this.$refs.allObjTable.selection)
+      this.$emit('addComIdObjConfirm', this.selectedObjTableDatas)
       this.addObjDialogVisible = false
+    },
+    setSelect() {
+      this.$refs.allObjTable.clearSelection()
+      this.selectedObjTableDatas.forEach(element => {
+        this.$refs.allObjTable.toggleRowSelection(this.getSameData(element, this.allObjTableDatas), true)
+      })
+    },
+    getSameData(element, tableData) {
+      for (let index = 0; index < tableData.length; index++) {
+        const data = tableData[index]
+        if (data.comId === element.comId && data.ip === element.ip && data.port === element.port) {
+          return data
+        }
+      }
+      return null
     },
     getTableDatas() {
       const parm = {
@@ -116,6 +149,12 @@ export default {
         if (response.code === 0) {
           this.allObjTableDatas = response.msg.rows
           this.total = response.msg.total
+          if (this.$refs.allObjTable !== undefined) {
+            const vm = this
+            setTimeout(function() {
+              vm.setSelect()
+            }, '10')
+          }
         }
       }).catch(response => {
         console.log(response)

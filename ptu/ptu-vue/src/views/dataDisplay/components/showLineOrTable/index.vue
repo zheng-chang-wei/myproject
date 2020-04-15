@@ -101,7 +101,7 @@ export default {
     this.$bus.$on('featuresChange', (data) => {
       this.features = []
       this.json_fields = {
-        'date': 'time',
+        'date': 'date',
         'IP': 'ip',
         'Comid': 'comId'
       }
@@ -178,6 +178,12 @@ export default {
           }
           this.total = response.msg.total
           this.listLoading = false
+          if (this.total === 0) {
+            this.$message({
+              type: 'warning',
+              message: '查询数据为空'
+            })
+          }
         }
       }).catch(response => {
         console.log(response)

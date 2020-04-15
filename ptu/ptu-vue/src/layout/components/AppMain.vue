@@ -54,8 +54,8 @@ export default {
       } else if (data.code === 2) { // 要下载文件的个数
         this.$bus.$emit('downloadCount', data.data)
       } else if (data.code === 3) { // 一个文件下载成功
-        this.$bus.$emit('downloadSuccess')
-      } else if (data.code === 500) {
+        this.$bus.$emit('downloadSuccess', data.data)
+      } else if (data.code === 500) { // 下载文件失败
         this.$bus.$emit('downloadCount', 0)
       }
     },

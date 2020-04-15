@@ -2,7 +2,7 @@
   <section>
     <el-form :inline="true" size="mini">
       <el-form-item>
-        <el-input v-model="fileName" />
+        <el-input v-model="fileName" disabled />
         <input ref="file" style="display: none" accept=".xls,.xlsx" type="file" @change="handleClick">
       </el-form-item>
       <el-form-item>

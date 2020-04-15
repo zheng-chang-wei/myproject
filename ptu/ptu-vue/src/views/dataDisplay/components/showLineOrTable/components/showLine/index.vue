@@ -135,6 +135,9 @@ export default {
           })
           this.dataloading = false
         }
+      }).catch(response => {
+        console.log(response)
+        this.dataloading = false
       })
     }
   }

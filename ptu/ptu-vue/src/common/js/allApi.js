@@ -2,6 +2,8 @@ const appApi = {
   download: '/download/download',
   getDataOverview: '/download/getDataOverview',
   delete: '/download/delete',
+  dropTable: '/download/dropTable',
+  clearDownloadedFiles: '/download/clearDownloadedFiles',
 
   getComIdTableDatas: '/data/getComIdTableDatas',
   getCsPortTableDatas: '/data/getCsPortTableDatas',

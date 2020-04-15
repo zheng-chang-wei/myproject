@@ -36,7 +36,7 @@
       </el-table-column>
       <el-table-column prop="value" label="参数值" align="center" width="110">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.value" size="mini" />
+          <el-input v-model="scope.row.value" size="mini" oninput="this.value=this.value.replace(/\D/g,'')" />
         </template>
       </el-table-column>
       <el-table-column prop="relationship" label="关系" align="center" width="110">
@@ -202,7 +202,7 @@ export default {
           // 逻辑表达式
           let expression = ''
           this.logicalTableDatas.forEach(element => {
-            expression += element.featureName + element.logicalOperator + element.value + element.relationship
+            expression += element.featureName + ' ' + element.logicalOperator + ' ' + element.value + ' ' + element.relationship + ' '
           })
           const parm = {
             id: this.id,

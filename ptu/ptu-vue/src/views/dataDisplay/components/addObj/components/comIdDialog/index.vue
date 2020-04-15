@@ -54,12 +54,6 @@
 <script>
 import app from '@/common/js/app'
 export default {
-  props: {
-    selectedObjTableDatas: {
-      type: Array,
-      default: null
-    }
-  },
   data() {
     return {
       form: {
@@ -74,7 +68,8 @@ export default {
       total: 0,
       pageNum: 1,
       pageSize: 20,
-      currentPage: 1
+      currentPage: 1,
+      selectedObjTableDatas: []
     }
   },
   created() {
@@ -89,7 +84,11 @@ export default {
     changeHeight() {
       this.tableMaxHeight = document.body.offsetHeight * 0.6 + 'px'
     },
-    openAddObjDialog() {
+    openAddObjDialog(selection) {
+      this.selectedObjTableDatas = []
+      selection.forEach(element => {
+        this.selectedObjTableDatas.push(element)
+      })
       this.addObjDialogVisible = true
       const vm = this
       if (vm.$refs.allObjTable !== undefined) {
@@ -101,26 +100,30 @@ export default {
       }
     },
     tableSelect(selection, row) {
-      // console.log(selection)
-      // console.log(row)
+      const sameData = this.getSameData(row, this.selectedObjTableDatas)
+      if (sameData === null) {
+        this.selectedObjTableDatas.push(row)
+      } else {
+        this.selectedObjTableDatas.splice(this.selectedObjTableDatas.indexOf(sameData), 1)
+      }
     },
     inputChange() {
       this.currentPage = 1
       this.handleCurrentChange(1)
     },
     addComIdObjConfirm() {
-      this.$emit('addComIdObjConfirm', this.$refs.allObjTable.selection)
+      this.$emit('addComIdObjConfirm', this.selectedObjTableDatas)
       this.addObjDialogVisible = false
     },
     setSelect() {
       this.$refs.allObjTable.clearSelection()
       this.selectedObjTableDatas.forEach(element => {
-        this.$refs.allObjTable.toggleRowSelection(this.getSameData(element), true)
+        this.$refs.allObjTable.toggleRowSelection(this.getSameData(element, this.allObjTableDatas), true)
       })
     },
-    getSameData(element) {
-      for (let index = 0; index < this.allObjTableDatas.length; index++) {
-        const data = this.allObjTableDatas[index]
+    getSameData(element, tableData) {
+      for (let index = 0; index < tableData.length; index++) {
+        const data = tableData[index]
         if (data.comId === element.comId && data.ip === element.ip) {
           return data
         }

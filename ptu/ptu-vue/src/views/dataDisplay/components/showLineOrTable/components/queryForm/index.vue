@@ -40,7 +40,7 @@ export default {
     return {
       retrieveForm: {
         logicalCondition: '',
-        time: '2020-04-08'
+        time: ''
       },
       logicalConditionOptions: [],
       queryFormRules: {

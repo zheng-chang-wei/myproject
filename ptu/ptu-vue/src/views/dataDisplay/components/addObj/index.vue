@@ -21,7 +21,7 @@
         </el-table-column>
       </el-table>
     </el-row>
-    <comIdDialog v-if="type==='ComId'" ref="comIdDialog" :selected-obj-table-datas="selectedObjTableDatas" @addComIdObjConfirm="addComIdObjConfirm" />
+    <comIdDialog v-if="type==='ComId'" ref="comIdDialog" @addComIdObjConfirm="addComIdObjConfirm" />
     <csPortDialog v-if="type==='CsPort'" ref="csPortDialog" @addComIdObjConfirm="addComIdObjConfirm" />
   </el-row>
 </template>
@@ -64,10 +64,10 @@ export default {
     openAddObjDialog() {
       switch (this.type) {
         case 'ComId':
-          this.$refs.comIdDialog.openAddObjDialog()
+          this.$refs.comIdDialog.openAddObjDialog(this.selectedObjTableDatas)
           break
         case 'CsPort':
-          this.$refs.csPortDialog.openAddObjDialog()
+          this.$refs.csPortDialog.openAddObjDialog(this.selectedObjTableDatas)
           break
 
         default:
@@ -79,7 +79,11 @@ export default {
       this.$bus.$emit('objChange', this.selectedObjTableDatas)
     },
     addComIdObjConfirm(selection) {
-      this.selectedObjTableDatas = selection
+      this.selectedObjTableDatas = []
+      selection.forEach(element => {
+        this.selectedObjTableDatas.push(element)
+      })
+
       this.$bus.$emit('objChange', this.selectedObjTableDatas)
     }
 
