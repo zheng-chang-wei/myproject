@@ -2,14 +2,13 @@ package com.hirain.ptu.dao;
 
 import com.hirain.ptu.common.config.CommonMapper;
 import com.hirain.ptu.common.model.CommonParms;
+import com.hirain.ptu.common.model.DataOverview;
 import com.hirain.ptu.model.CsPortData;
-import com.hirain.ptu.model.DataOverview;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.springframework.cache.annotation.Cacheable;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 public interface CsPortDataMapper extends CommonMapper<CsPortData> {

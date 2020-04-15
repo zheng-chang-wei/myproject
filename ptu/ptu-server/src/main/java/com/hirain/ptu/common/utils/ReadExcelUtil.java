@@ -23,8 +23,7 @@ public class ReadExcelUtil {
     InputStream is = null;
     Workbook wb = null;
     try {
-      File sourcefile = new File(excelPath);
-      is = new FileInputStream(sourcefile);
+      is = new FileInputStream(new File(excelPath));
       wb = WorkbookFactory.create(is);
       if (wb instanceof XSSFWorkbook) {
         wb = (XSSFWorkbook) wb;

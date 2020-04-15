@@ -2,17 +2,13 @@ package com.hirain.ptu.service.impl;
 
 import com.hirain.ptu.common.exception.CustomException;
 import com.hirain.ptu.common.model.*;
-import com.hirain.ptu.common.utils.DateUtil;
 import com.hirain.ptu.common.utils.HumpConversion;
 import com.hirain.ptu.dao.CsPortDataMapper;
 import com.hirain.ptu.model.CsPortData;
 import com.hirain.ptu.service.CsPortDataService;
-import com.hirain.ptu.service.DataOverviewService;
 import com.hirain.ptu.service.ManageService;
-import com.hirain.ptu.websocket.WebSocketServer;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +22,6 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
 
   @Autowired CsPortDataMapper csPortDataMapper;
   @Autowired ManageService manageService;
-  @Autowired DataOverviewService dataOverviewService;
 
   @Override
   public List<CsPortData> getCsPortTableDatas(DisplayDataCommonRequest commonRequest) {
@@ -62,6 +57,7 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
     List<String> ports = commonRequest.getPorts();
     List<CommonResponse> list = new ArrayList<>();
     List<List<CsPortData>> csPortObjDatas = new ArrayList<>();
+    String errorMsg = "";
     for (int i = 0; i < comIds.size(); i++) {
       CommonParms commonParms =
           new CommonParms(
@@ -73,9 +69,15 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
               commonRequest.getTime());
       List<CsPortData> tableData = csPortDataMapper.getTableData(commonParms);
       if (tableData.size() == 0) {
-        throw new CustomException(ips.get(i) + "_" + comIds.get(i) + "_" + ports.get(i) + " 对象无数据");
+        if (errorMsg.length() != 0) {
+          errorMsg += "</br></br>";
+        }
+        errorMsg += "comId:" + comIds.get(i) + ", ip:" + ips.get(i) + ", port:" + ports.get(i)+ " 数据为空";
       }
       csPortObjDatas.add(tableData);
+    }
+    if (errorMsg.length()!=0){
+      throw new CustomException(errorMsg);
     }
     List<Date> timeList = new ArrayList<>();
     for (CsPortData csPortData : csPortObjDatas.get(0)) {
@@ -100,6 +102,15 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
   }
 
   @Override
+  public DataOverview selectTimeRange() {
+    if (manageService.isExistTable(TableNameConstant.CSPROT_DATA_TABLE_NAME)) {
+      return csPortDataMapper.selectTimeRange();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   @Transactional
   public void insertCsPortData(List<CsPortData> csPortDatas) {
     csPortDataMapper.insertList(csPortDatas);
@@ -110,14 +121,12 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
   public void deleteByTime(String deadLineTime) throws ParseException {
     manageService.deletePartitions(TableNameConstant.CSPROT_DATA_TABLE_NAME, deadLineTime);
     csPortDataMapper.deleteByTime(deadLineTime);
-    dataOverviewService.deleteByTime(deadLineTime, TableNameConstant.CSPORT_TYPE);
   }
 
   @Override
   @Transactional
   public void dropTable() {
     manageService.dropTable(TableNameConstant.CSPROT_DATA_TABLE_NAME);
-    dataOverviewService.deleteCsPortAll();
   }
 
   private String getExpression(String expression) {

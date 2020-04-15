@@ -5,7 +5,6 @@ import com.hirain.ptu.dao.DownloadedFileMapper;
 import com.hirain.ptu.model.*;
 import com.hirain.ptu.service.ComIdDataService;
 import com.hirain.ptu.service.CsPortDataService;
-import com.hirain.ptu.service.DataOverviewService;
 import com.hirain.ptu.service.ManageService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,41 +33,19 @@ public class DataHandler {
 
   @Autowired ManageService manageService;
 
-  @Autowired DataOverviewService dataOverviewService;
 
   @Autowired DownloadedFileMapper downloadedFileMapper;
 
   @Transactional
   public synchronized void insertComIdData(List<ComIdData> comIdDataList, String fileName) {
-    Date startDate = comIdDataList.get(0).getDate();
-    Date endDate = comIdDataList.get(comIdDataList.size() - 1).getDate();
-    updateDataOverTime(startDate, endDate, TableNameConstant.COMID_TYPE);
     insertComIdData(comIdDataList);
     downloadedFileMapper.insert(new DownloadedFile(fileName));
   }
 
   @Transactional
   public synchronized void insertCsPortData(List<CsPortData> csPortDataList, String fileName) {
-    Date startDate = csPortDataList.get(0).getDate();
-    Date endDate = csPortDataList.get(csPortDataList.size() - 1).getDate();
-    updateDataOverTime(startDate, endDate, TableNameConstant.CSPORT_TYPE);
     insertCsPortData(csPortDataList);
     downloadedFileMapper.insert(new DownloadedFile(fileName));
-  }
-
-  private void updateDataOverTime(Date startDate, Date endDate, String type) {
-    DataOverview dataOverview = dataOverviewService.selectByType(type);
-    if (dataOverview == null) {
-      dataOverviewService.save(new DataOverview(type, startDate, endDate));
-    } else {
-      if (startDate.before(dataOverview.getStartTime())) {
-        dataOverview.setStartTime(startDate);
-      }
-      if (endDate.after(dataOverview.getEndTime())) {
-        dataOverview.setEndTime(endDate);
-      }
-      dataOverviewService.updateNotNull(dataOverview);
-    }
   }
 
   private void insertComIdData(List<ComIdData> comIdDatas) {
@@ -86,18 +63,7 @@ public class DataHandler {
     csPortDataService.insertCsPortData(csPortDatas);
   }
 
-  /**
-   * Date转LocalDateTime
-   *
-   * @param date
-   * @return
-   */
-  private LocalDateTime date2LocalDateTime(Date date) {
-    Instant instant = date.toInstant();
-    ZoneId zoneId = ZoneId.systemDefault();
-    LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
-    return localDateTime;
-  }
+
 
   /**
    * 获取下月的今天到前70天的日期
@@ -144,4 +110,17 @@ public class DataHandler {
     }
     return partitions;
   }
+  /**
+   * Date转LocalDateTime
+   *
+   * @param date
+   * @return
+   */
+  private LocalDateTime date2LocalDateTime(Date date) {
+    Instant instant = date.toInstant();
+    ZoneId zoneId = ZoneId.systemDefault();
+    LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+    return localDateTime;
+  }
+
 }

@@ -2,8 +2,8 @@ package com.hirain.ptu.dao;
 
 import com.hirain.ptu.common.config.CommonMapper;
 import com.hirain.ptu.common.model.CommonParms;
+import com.hirain.ptu.common.model.DataOverview;
 import com.hirain.ptu.model.ComIdData;
-import com.hirain.ptu.model.DataOverview;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;

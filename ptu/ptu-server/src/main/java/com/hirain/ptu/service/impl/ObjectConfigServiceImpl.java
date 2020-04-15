@@ -1,12 +1,15 @@
 package com.hirain.ptu.service.impl;
 
 import com.hirain.ptu.common.config.CommonMapper;
+import com.hirain.ptu.common.exception.CustomException;
+import com.hirain.ptu.common.model.AttributeMap;
 import com.hirain.ptu.common.utils.ReadExcelUtil;
 import com.hirain.ptu.dao.ComIdObjectMapper;
 import com.hirain.ptu.dao.CsPortObjectMapper;
 import com.hirain.ptu.model.ComIdObject;
 import com.hirain.ptu.model.CsPortObject;
 import com.hirain.ptu.service.ObjectConfigService;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -16,8 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.hirain.ptu.common.utils.ReadExcelUtil.getCellValue;
 
@@ -78,32 +83,60 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
     Workbook workbook = ReadExcelUtil.createWorkbook(targetFile.getAbsolutePath());
     Sheet sheet = workbook.getSheetAt(0);
     List<ComIdObject> comIdObjectList = new ArrayList<>();
-    for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
-      Row row = sheet.getRow(i);
-      ComIdObject comIdObject = new ComIdObject();
-      comIdObject.setComId(Integer.valueOf(getCellValue(row.getCell(1))));
-      comIdObject.setIp(getCellValue(row.getCell(2)));
-      comIdObject.setCarriagePosition(Integer.valueOf(getCellValue(row.getCell(3))));
-      comIdObject.setRemark(getCellValue(row.getCell(4)));
-      comIdObjectList.add(comIdObject);
+    try {
+      List<String> heads = getHeads(sheet);
+      for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
+        Row row = sheet.getRow(i);
+        ComIdObject comIdObject = new ComIdObject();
+        setProperty(heads, row, comIdObject, AttributeMap.comIdMapData);
+        comIdObjectList.add(comIdObject);
+      }
+    } catch (Exception e) {
+      throw new CustomException("文件格式错误");
     }
+
     return comIdObjectList;
   }
 
   private List<CsPortObject> getCsPortObjectsFromFile(File targetFile) throws Exception {
     Workbook workbook = ReadExcelUtil.createWorkbook(targetFile.getAbsolutePath());
     Sheet sheet = workbook.getSheetAt(0);
-    List<CsPortObject> comIdObjectList = new ArrayList<>();
-    for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
-      Row row = sheet.getRow(i);
-      CsPortObject csPortObject = new CsPortObject();
-      csPortObject.setComId(Integer.valueOf(getCellValue(row.getCell(1))));
-      csPortObject.setIp(getCellValue(row.getCell(2)));
-      csPortObject.setTrainNo(Integer.valueOf(getCellValue(row.getCell(3))));
-      csPortObject.setCardNo(Integer.valueOf(getCellValue(row.getCell(4))));
-      csPortObject.setPort(Integer.valueOf(getCellValue(row.getCell(5))));
-      comIdObjectList.add(csPortObject);
+    List<CsPortObject> csPortObjects = new ArrayList<>();
+    try {
+      List<String> heads = getHeads(sheet);
+      for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
+        Row row = sheet.getRow(i);
+        CsPortObject csPortObject = new CsPortObject();
+        setProperty(heads, row, csPortObject, AttributeMap.csPortMapData);
+        csPortObjects.add(csPortObject);
+      }
+    } catch (Exception e) {
+      throw new CustomException("文件格式错误");
     }
-    return comIdObjectList;
+    return csPortObjects;
+  }
+
+  private List<String> getHeads(Sheet sheet) {
+    List<String> heads = new ArrayList<>();
+    Row firstRow = sheet.getRow(0);
+    for (int j = 0; j < firstRow.getLastCellNum(); j++) {
+      String cellValue = getCellValue(firstRow.getCell(j));
+      heads.add(cellValue);
+    }
+    return heads;
+  }
+
+  private void setProperty(List<String> heads, Row row, Object obj, Map<String, String> map)
+      throws IllegalAccessException, InvocationTargetException {
+    for (int j = 1; j < row.getLastCellNum(); j++) {
+      String head = heads.get(j);
+      if (map.containsKey(head)) {
+        String cellValue = getCellValue(row.getCell(j));
+        String proName = map.get(head);
+        BeanUtils.setProperty(obj, proName, cellValue);
+      } else {
+        throw new CustomException("文件格式错误");
+      }
+    }
   }
 }

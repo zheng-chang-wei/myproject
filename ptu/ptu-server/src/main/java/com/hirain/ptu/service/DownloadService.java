@@ -7,4 +7,6 @@ package com.hirain.ptu.service;
  */
 public interface DownloadService {
   void download() throws Exception;
+
+  void clearDownloadedFiles();
 }

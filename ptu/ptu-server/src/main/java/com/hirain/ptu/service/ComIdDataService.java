@@ -1,6 +1,7 @@
 package com.hirain.ptu.service;
 
 import com.hirain.ptu.common.model.CommonResponse;
+import com.hirain.ptu.common.model.DataOverview;
 import com.hirain.ptu.common.model.DisplayDataCommonRequest;
 import com.hirain.ptu.model.ComIdData;
 import com.hirain.ptu.model.CsPortData;
@@ -18,6 +19,9 @@ public interface ComIdDataService extends IService<ComIdData> {
 
   @Cacheable(value = "comIdDataService", key = "'getChartData' + #p0")
   List<CommonResponse> getChartData(DisplayDataCommonRequest commonRequest) throws Exception;
+
+  @Cacheable(value = "comIdDataService", key = "'selectTimeRange'")
+  DataOverview selectTimeRange();
 
   @CacheEvict(value = "comIdDataService", allEntries = true)
   void insertComIdData(List<ComIdData> comIdDatas);

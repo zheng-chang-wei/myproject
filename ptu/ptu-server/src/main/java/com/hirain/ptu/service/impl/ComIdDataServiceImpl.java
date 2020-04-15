@@ -2,18 +2,13 @@ package com.hirain.ptu.service.impl;
 
 import com.hirain.ptu.common.exception.CustomException;
 import com.hirain.ptu.common.model.*;
-import com.hirain.ptu.common.utils.DateUtil;
 import com.hirain.ptu.common.utils.HumpConversion;
 import com.hirain.ptu.dao.ComIdDataMapper;
 import com.hirain.ptu.model.ComIdData;
-import com.hirain.ptu.model.DataOverview;
 import com.hirain.ptu.service.ComIdDataService;
-import com.hirain.ptu.service.DataOverviewService;
 import com.hirain.ptu.service.ManageService;
-import com.hirain.ptu.websocket.WebSocketServer;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +23,6 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
   @Autowired ComIdDataMapper comIdDataMapper;
 
   @Autowired ManageService manageService;
-
-  @Autowired DataOverviewService dataOverviewService;
 
   @Override
   public List<ComIdData> getComIdTableDatas(DisplayDataCommonRequest commonRequest) {
@@ -58,6 +51,7 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
     List<String> ips = commonRequest.getIps();
     List<CommonResponse> list = new ArrayList<>();
     List<List<ComIdData>> comIdObjs = new ArrayList<>();
+    String errorMsg = "";
     for (int i = 0; i < comIds.size(); i++) {
       CommonParms commonParms =
           new CommonParms(
@@ -69,9 +63,15 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
               commonRequest.getTime());
       List<ComIdData> tableData = comIdDataMapper.getTableData(commonParms);
       if (tableData.size() == 0) {
-        throw new CustomException(ips.get(i) + "_" + comIds.get(i) + " 对象无数据");
+        if (errorMsg.length() != 0) {
+          errorMsg += "</br></br>";
+        }
+        errorMsg += "comId:" + comIds.get(i) + ", ip:" + ips.get(i) + " 数据为空";
       }
       comIdObjs.add(tableData);
+    }
+    if (errorMsg.length()!=0){
+        throw new CustomException(errorMsg);
     }
     List<Date> timeList = new ArrayList<>();
     for (ComIdData comIdObj : comIdObjs.get(0)) {
@@ -106,14 +106,12 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
   public void deleteByTime(String deadLineTime) throws ParseException {
     manageService.deletePartitions(TableNameConstant.COMID_DATA_TABLE_NAME, deadLineTime);
     comIdDataMapper.deleteByTime(deadLineTime);
-    dataOverviewService.deleteByTime(deadLineTime, TableNameConstant.COMID_TYPE);
   }
 
   @Override
   @Transactional
   public void dropTable() {
     manageService.dropTable(TableNameConstant.COMID_DATA_TABLE_NAME);
-    dataOverviewService.deleteComIdAll();
   }
 
   private String getExpression(String expression) {
@@ -126,6 +124,15 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
       expression = expression.replace("||", " or ");
     }
     return expression;
+  }
+
+  @Override
+  public DataOverview selectTimeRange() {
+    if (manageService.isExistTable(TableNameConstant.COMID_DATA_TABLE_NAME)) {
+      return comIdDataMapper.selectTimeRange();
+    } else {
+      return null;
+    }
   }
 
   private List<String> getFeatures(String expressionString) {

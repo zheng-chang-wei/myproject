@@ -14,7 +14,7 @@ public interface ManageService {
 
   int createCsPortDataTable(String tableName, List<String> list);
 
-  int isExistTable(String tableName);
+  boolean isExistTable(String tableName);
 
   String lastPartition(String tableName);
 

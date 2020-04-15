@@ -1,10 +1,7 @@
 package com.hirain.ptu.service.impl;
 
-import com.hirain.ptu.common.model.ResponseBo;
 import com.hirain.ptu.common.model.WebSocketResponse;
 import com.hirain.ptu.common.utils.FtpOperation;
-import com.hirain.ptu.dao.ComIdDataMapper;
-import com.hirain.ptu.dao.CsPortDataMapper;
 import com.hirain.ptu.dao.DownloadedFileMapper;
 import com.hirain.ptu.handler.CsvDataHandler;
 import com.hirain.ptu.model.DownloadedFile;
@@ -29,6 +26,7 @@ public class DownloadServiceImpl implements DownloadService {
 
   @Autowired DownloadedFileMapper downloadedFileMapper;
 
+
   @Autowired CsvDataHandler csvDataHandler;
 
   @Override
@@ -45,6 +43,11 @@ public class DownloadServiceImpl implements DownloadService {
         }
       }
     }
+  }
+
+  @Override
+  public void clearDownloadedFiles() {
+    downloadedFileMapper.clearDownloadedFiles();
   }
 
   private List<String> getNeedDownloadFiles() throws Exception {

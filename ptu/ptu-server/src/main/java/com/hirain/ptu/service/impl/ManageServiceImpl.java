@@ -32,8 +32,8 @@ public class ManageServiceImpl implements ManageService {
   }
 
   @Override
-  public int isExistTable(String tableName) {
-    return manageMapper.isExistTable(tableName);
+  public boolean isExistTable(String tableName) {
+    return manageMapper.isExistTable(tableName) == 1;
   }
 
   @Override
@@ -63,11 +63,11 @@ public class ManageServiceImpl implements ManageService {
 
   @Override
   public int createTable(String tableName, List<String> partitions) {
-    switch (tableName){
+    switch (tableName) {
       case TableNameConstant.COMID_DATA_TABLE_NAME:
-        return manageMapper.createComIdDataTable(tableName,partitions);
-      case  TableNameConstant.CSPROT_DATA_TABLE_NAME:
-        return manageMapper.createCsPortDataTable(tableName,partitions);
+        return manageMapper.createComIdDataTable(tableName, partitions);
+      case TableNameConstant.CSPROT_DATA_TABLE_NAME:
+        return manageMapper.createCsPortDataTable(tableName, partitions);
     }
     return 0;
   }

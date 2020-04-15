@@ -1,5 +1,6 @@
 package com.hirain.ptu.controller;
 
+import com.hirain.ptu.common.model.DataOverview;
 import com.hirain.ptu.common.model.ResponseBo;
 import com.hirain.ptu.common.model.TableNameConstant;
 import com.hirain.ptu.common.model.WebSocketResponse;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author changwei.zheng
@@ -22,7 +25,6 @@ import java.text.ParseException;
 @RequestMapping("/download")
 public class DownloadController {
   @Autowired DownloadService downloadService;
-  @Autowired DataOverviewService dataOverviewService;
 
   @Autowired ComIdDataService comIdDataService;
   @Autowired CsPortDataService csPortDataService;
@@ -42,34 +44,53 @@ public class DownloadController {
 
   @GetMapping("/getDataOverview")
   public ResponseBo getDataOverview() {
-    return ResponseBo.ok(dataOverviewService.getDataOverview());
+    List<DataOverview> dataOverviews = new ArrayList<>();
+    DataOverview comIdDataOverview = comIdDataService.selectTimeRange();
+    DataOverview csPortDataOverview = csPortDataService.selectTimeRange();
+    if (comIdDataOverview != null) {
+      comIdDataOverview.setName("ComId对象数据时间范围");
+      comIdDataOverview.setType(TableNameConstant.COMID_TYPE);
+      dataOverviews.add(comIdDataOverview);
+    }
+    if (csPortDataOverview != null) {
+      csPortDataOverview.setName("CsPort对象数据时间范围");
+      csPortDataOverview.setType(TableNameConstant.CSPORT_TYPE);
+      dataOverviews.add(csPortDataOverview);
+    }
+    return ResponseBo.ok(dataOverviews);
   }
 
   @PostMapping("/delete")
-  public ResponseBo delete(Integer index, String deadline) throws ParseException {
-    switch (index) {
-      case 0:
+  public ResponseBo delete(String type, String deadline) throws ParseException {
+    switch (type) {
+      case TableNameConstant.COMID_TYPE:
         comIdDataService.deleteByTime(deadline);
         break;
-      case 1:
+      case TableNameConstant.CSPORT_TYPE:
         csPortDataService.deleteByTime(deadline);
         break;
     }
-    WebSocketServer.sendMessage("admin", new WebSocketResponse(1,null));
+    WebSocketServer.sendMessage("admin", new WebSocketResponse(1, null));
     return ResponseBo.ok();
   }
 
   @PostMapping("/dropTable")
-  public ResponseBo dropTable(Integer index) {
-    switch (index) {
-      case 0:
+  public ResponseBo dropTable(String type) {
+    switch (type) {
+      case TableNameConstant.COMID_TYPE:
         comIdDataService.dropTable();
         break;
-      case 1:
+      case TableNameConstant.CSPORT_TYPE:
         csPortDataService.dropTable();
         break;
     }
     WebSocketServer.sendMessage("admin", new WebSocketResponse(1, null));
+    return ResponseBo.ok();
+  }
+
+  @PostMapping("/clearDownloadedFiles")
+  public ResponseBo clearDownloadedFiles() {
+    downloadService.clearDownloadedFiles();
     return ResponseBo.ok();
   }
 }

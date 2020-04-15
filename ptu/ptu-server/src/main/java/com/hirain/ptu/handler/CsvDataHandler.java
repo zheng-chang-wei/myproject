@@ -4,7 +4,6 @@ import com.hirain.ptu.common.model.WebSocketResponse;
 import com.hirain.ptu.common.utils.DateUtil;
 import com.hirain.ptu.model.ComIdData;
 import com.hirain.ptu.model.CsPortData;
-import com.hirain.ptu.model.DataOverview;
 import com.hirain.ptu.websocket.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -16,7 +15,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
