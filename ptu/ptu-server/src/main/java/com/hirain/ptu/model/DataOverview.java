@@ -21,9 +21,7 @@ public class DataOverview {
   @GeneratedValue(generator = "JDBC")
   private Integer id;
 
-  private String ip;
-  private Integer comId;
-  private Integer port;
+  private String type;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
   private Date startTime;
@@ -33,10 +31,8 @@ public class DataOverview {
 
   public DataOverview() {}
 
-  public DataOverview(String ip, Integer comId, Integer port, Date startTime, Date endTime) {
-    this.ip = ip;
-    this.comId = comId;
-    this.port = port;
+  public DataOverview(String type, Date startTime, Date endTime) {
+    this.type = type;
     this.startTime = startTime;
     this.endTime = endTime;
   }

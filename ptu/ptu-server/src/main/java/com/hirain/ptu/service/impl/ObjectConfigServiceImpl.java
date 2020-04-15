@@ -34,20 +34,8 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
 
   @Override
   public void comIdImport(MultipartFile file) throws Exception {
-
     File targetFile = transferFile(file);
-    Workbook workbook = ReadExcelUtil.createWorkbook(targetFile.getAbsolutePath());
-    Sheet sheet = workbook.getSheetAt(0);
-    List<ComIdObject> comIdObjectList = new ArrayList<>();
-    for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
-      Row row = sheet.getRow(i);
-      ComIdObject comIdObject = new ComIdObject();
-      comIdObject.setComId(Integer.valueOf(getCellValue(row.getCell(1))));
-      comIdObject.setIp(getCellValue(row.getCell(2)));
-      comIdObject.setCarriagePosition(Integer.valueOf(getCellValue(row.getCell(3))));
-      comIdObject.setRemark(getCellValue(row.getCell(4)));
-      comIdObjectList.add(comIdObject);
-    }
+    List<ComIdObject> comIdObjectList = getComIdObjectsFromFile(targetFile);
     deleteAll(comIdObjectMapper);
     comIdObjectMapper.insertList(comIdObjectList);
     targetFile.delete();
@@ -55,21 +43,8 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
 
   @Override
   public void csPortImport(MultipartFile file) throws Exception {
-
     File targetFile = transferFile(file);
-    Workbook workbook = ReadExcelUtil.createWorkbook(targetFile.getAbsolutePath());
-    Sheet sheet = workbook.getSheetAt(0);
-    List<CsPortObject> comIdObjectList = new ArrayList<>();
-    for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
-      Row row = sheet.getRow(i);
-      CsPortObject csPortObject = new CsPortObject();
-      csPortObject.setComId(Integer.valueOf(getCellValue(row.getCell(1))));
-      csPortObject.setIp(getCellValue(row.getCell(2)));
-      csPortObject.setTrainNo(Integer.valueOf(getCellValue(row.getCell(3))));
-      csPortObject.setCardNo(Integer.valueOf(getCellValue(row.getCell(4))));
-      csPortObject.setPort(Integer.valueOf(getCellValue(row.getCell(5))));
-      comIdObjectList.add(csPortObject);
-    }
+    List<CsPortObject> comIdObjectList = getCsPortObjectsFromFile(targetFile);
     deleteAll(csPortObjectMapper);
     csPortObjectMapper.insertList(comIdObjectList);
     targetFile.delete();
@@ -97,5 +72,38 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
     for (Object record : mapper.selectAll()) {
       mapper.delete(record);
     }
+  }
+
+  private List<ComIdObject> getComIdObjectsFromFile(File targetFile) throws Exception {
+    Workbook workbook = ReadExcelUtil.createWorkbook(targetFile.getAbsolutePath());
+    Sheet sheet = workbook.getSheetAt(0);
+    List<ComIdObject> comIdObjectList = new ArrayList<>();
+    for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
+      Row row = sheet.getRow(i);
+      ComIdObject comIdObject = new ComIdObject();
+      comIdObject.setComId(Integer.valueOf(getCellValue(row.getCell(1))));
+      comIdObject.setIp(getCellValue(row.getCell(2)));
+      comIdObject.setCarriagePosition(Integer.valueOf(getCellValue(row.getCell(3))));
+      comIdObject.setRemark(getCellValue(row.getCell(4)));
+      comIdObjectList.add(comIdObject);
+    }
+    return comIdObjectList;
+  }
+
+  private List<CsPortObject> getCsPortObjectsFromFile(File targetFile) throws Exception {
+    Workbook workbook = ReadExcelUtil.createWorkbook(targetFile.getAbsolutePath());
+    Sheet sheet = workbook.getSheetAt(0);
+    List<CsPortObject> comIdObjectList = new ArrayList<>();
+    for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
+      Row row = sheet.getRow(i);
+      CsPortObject csPortObject = new CsPortObject();
+      csPortObject.setComId(Integer.valueOf(getCellValue(row.getCell(1))));
+      csPortObject.setIp(getCellValue(row.getCell(2)));
+      csPortObject.setTrainNo(Integer.valueOf(getCellValue(row.getCell(3))));
+      csPortObject.setCardNo(Integer.valueOf(getCellValue(row.getCell(4))));
+      csPortObject.setPort(Integer.valueOf(getCellValue(row.getCell(5))));
+      comIdObjectList.add(csPortObject);
+    }
+    return comIdObjectList;
   }
 }

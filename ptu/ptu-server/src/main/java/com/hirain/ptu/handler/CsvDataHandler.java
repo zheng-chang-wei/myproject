@@ -37,8 +37,6 @@ public class CsvDataHandler {
   @Async
   public void readComIdCSV(InputStream fileInputStream, String fileName) throws Exception {
     List<ComIdData> comIdDataList = new ArrayList<>();
-    List<String> comIdAndIps = new ArrayList<>();
-    List<DataOverview> dataOverviews = new ArrayList<>();
     String line = null;
     BufferedReader bufferedReader = null;
     InputStreamReader inputStreamReader = null;
@@ -52,10 +50,11 @@ public class CsvDataHandler {
         String[] items = line.split(",");
         setComIdData(comIdData, items);
         comIdDataList.add(comIdData);
-        setDataOverviews(comIdAndIps, dataOverviews, comIdData);
       }
-      dataHandler.insertComIdData(dataOverviews, comIdDataList, fileName);
-      WebSocketServer.sendMessage("admin", new WebSocketResponse(3, null));
+      if (comIdDataList.size()!=0){
+        dataHandler.insertComIdData(comIdDataList, fileName);
+      }
+      WebSocketServer.sendMessage("admin", new WebSocketResponse(3, fileName));
     } catch (Exception e) {
       throw e;
     } finally {
@@ -66,8 +65,6 @@ public class CsvDataHandler {
   @Async
   public void readCsPortCSV(InputStream fileInputStream, String fileName) throws Exception {
     List<CsPortData> csPortDataDataList = new ArrayList<>();
-    List<String> comIdAndIps = new ArrayList<>();
-    List<DataOverview> dataOverviews = new ArrayList<>();
     String line = null;
     BufferedReader bufferedReader = null;
     InputStreamReader inputStreamReader = null;
@@ -80,11 +77,10 @@ public class CsvDataHandler {
         // 数据行
         String[] items = line.split(",");
         setCsPortData(csPortData, items);
-        setDataOverviews(comIdAndIps, dataOverviews, csPortData);
         csPortDataDataList.add(csPortData);
       }
-      dataHandler.insertCsPortData(dataOverviews, csPortDataDataList, fileName);
-      WebSocketServer.sendMessage("admin", new WebSocketResponse(3, null));
+      dataHandler.insertCsPortData(csPortDataDataList, fileName);
+      WebSocketServer.sendMessage("admin", new WebSocketResponse(3, fileName));
     } catch (Exception e) {
       throw e;
     } finally {
@@ -137,43 +133,6 @@ public class CsvDataHandler {
     csPortData.setTxErrRateStd(Float.valueOf(items[24].trim()).intValue());
   }
 
-  private void setDataOverviews(
-      List<String> comIdAndIps, List<DataOverview> dataOverviews, ComIdData comIdData) {
-    String comIdAndIp = comIdData.getComId() + "_" + comIdData.getIp();
-
-    int index = comIdAndIps.indexOf(comIdAndIp);
-    if (index == -1) {
-      comIdAndIps.add(comIdAndIp);
-      dataOverviews.add(
-          new DataOverview(
-              comIdData.getIp(),
-              comIdData.getComId(),
-              0,
-              comIdData.getDate(),
-              comIdData.getDate()));
-    } else {
-      dataOverviews.get(index).setEndTime(comIdData.getDate());
-    }
-  }
-
-  private void setDataOverviews(
-      List<String> comIdAndIps, List<DataOverview> dataOverviews, CsPortData csPortData) {
-    String comIdAndIp =
-        csPortData.getComId() + "_" + csPortData.getIp() + "_" + csPortData.getPort();
-    int index = comIdAndIps.indexOf(comIdAndIp);
-    if (index == -1) {
-      comIdAndIps.add(comIdAndIp);
-      dataOverviews.add(
-          new DataOverview(
-              csPortData.getIp(),
-              csPortData.getComId(),
-              csPortData.getPort(),
-              csPortData.getDate(),
-              csPortData.getDate()));
-    } else {
-      dataOverviews.get(index).setEndTime(csPortData.getDate());
-    }
-  }
 
   private void closeIO(
       InputStream fileInputStream,

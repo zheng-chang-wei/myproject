@@ -1,13 +1,13 @@
 package com.hirain.ptu.common.exception;
 
-public class ExcelFormatException extends RuntimeException {
+public class CustomException extends RuntimeException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8393981291913827910L;
 
-	public ExcelFormatException(String message) {
+	public CustomException(String message) {
 		super(message);
 	}
 

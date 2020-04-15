@@ -39,7 +39,17 @@ LRU，Least Recently Used，最近最少使用的，缓存的元素有一个时�
            memoryStoreEvictionPolicy="LRU">
         <persistence strategy="localTempSwap"/>
     </cache>
-    <cache name="comIdObjService"
+    <cache name="comIdDataService"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToIdleSeconds="120"
+           timeToLiveSeconds="120"
+           maxElementsOnDisk="10000"
+           diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LRU">
+        <persistence strategy="localTempSwap"/>
+    </cache>
+    <cache name="csPortDataService"
            maxElementsInMemory="10000"
            eternal="false"
            timeToIdleSeconds="120"

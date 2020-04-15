@@ -1,5 +1,6 @@
 package com.hirain.ptu.service;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -9,15 +10,23 @@ import org.springframework.cache.annotation.Cacheable;
 
 public interface ManageService {
 
-	int createComIdDataTable(@Param("tableName") String tableName, @Param("list") List<String> list);
+  int createComIdDataTable(String tableName, List<String> list);
 
-	int createCsPortDataTable(@Param("tableName") String tableName, @Param("list") List<String> list);
+  int createCsPortDataTable(String tableName, List<String> list);
 
-	int isExistTable(@Param("tableName") String tableName);
+  int isExistTable(String tableName);
 
-	String lastPartition(@Param("tableName") String tableName);
+  String lastPartition(String tableName);
 
-	int addPartitions(String tableName, List<String> list);
+  List<String> allPartition(String tableName);
 
-	Integer dropTable(@Param("tableName") String tableName);
+  int addPartitions(String tableName, List<String> list);
+
+  Integer dropTable(String tableName);
+
+  Integer dropPartition(String tableName, String partitionName);
+
+  int createTable(String tableName, List<String> partitions);
+
+  void deletePartitions(String tableName, String deadlineTime) throws ParseException;
 }

@@ -2,7 +2,7 @@ package com.hirain.ptu.handler;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.hirain.ptu.common.exception.ExcelFormatException;
+import com.hirain.ptu.common.exception.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 
-	@ExceptionHandler(value = ExcelFormatException.class)
-	public Object handleExcelFormatException(HttpServletRequest request, ExcelFormatException ex) {
+	@ExceptionHandler(value = CustomException.class)
+	public Object handleExcelFormatException(HttpServletRequest request, CustomException ex) {
 		log.error(ex.getMessage(), ex);
 		return ResponseBo.error(ex.getMessage());
 	}

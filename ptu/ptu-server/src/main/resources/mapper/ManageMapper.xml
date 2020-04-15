@@ -86,6 +86,19 @@
         order by partition_ordinal_position desc
         limit 0,1
     </select>
+    <select id="allPartition" resultType="java.lang.String">
+        select
+        partition_name part
+        from information_schema.partitions
+        where table_schema=schema()
+        and table_name='${tableName}'
+        order by partition_ordinal_position desc
+    </select>
+    <update id="dropPartition">
+
+        ALTER TABLE ${tableName} DROP PARTITION ${partitionName}
+
+    </update>
     <update id="dropTable">
 
         drop table ${tableName}

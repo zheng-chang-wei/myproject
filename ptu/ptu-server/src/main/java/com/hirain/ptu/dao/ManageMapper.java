@@ -6,16 +6,20 @@ import org.apache.ibatis.annotations.Param;
 
 public interface ManageMapper {
 
-	int createComIdDataTable(@Param("tableName") String tableName, @Param("list") List<String> list);
+  int createComIdDataTable(@Param("tableName") String tableName, @Param("list") List<String> list);
 
-	int createCsPortDataTable(@Param("tableName") String tableName, @Param("list") List<String> list);
+  int createCsPortDataTable(@Param("tableName") String tableName, @Param("list") List<String> list);
 
-	int isExistTable(@Param("tableName") String tableName);
+  int isExistTable(@Param("tableName") String tableName);
 
-	String lastPartition(@Param("tableName") String tableName);
+  String lastPartition(@Param("tableName") String tableName);
 
-	int addPartitions(String tableName, List<String> list);
+  List<String> allPartition(@Param("tableName") String tableName);
 
-	Integer dropTable(@Param("tableName") String tableName);
+  int addPartitions(String tableName, List<String> list);
 
+  Integer dropTable(@Param("tableName") String tableName);
+
+  Integer dropPartition(
+      @Param("tableName") String tableName, @Param("partitionName") String partitionName);
 }

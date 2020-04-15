@@ -1,18 +1,22 @@
 package com.hirain.ptu.service.impl;
 
+import com.hirain.ptu.common.exception.CustomException;
 import com.hirain.ptu.common.model.*;
+import com.hirain.ptu.common.utils.DateUtil;
 import com.hirain.ptu.common.utils.HumpConversion;
 import com.hirain.ptu.dao.ComIdDataMapper;
 import com.hirain.ptu.model.ComIdData;
+import com.hirain.ptu.model.DataOverview;
 import com.hirain.ptu.service.ComIdDataService;
 import com.hirain.ptu.service.DataOverviewService;
+import com.hirain.ptu.service.ManageService;
 import com.hirain.ptu.websocket.WebSocketServer;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +27,8 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
 
   @Autowired ComIdDataMapper comIdDataMapper;
 
+  @Autowired ManageService manageService;
+
   @Autowired DataOverviewService dataOverviewService;
 
   @Override
@@ -31,8 +37,8 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
     List<String> ips = commonRequest.getIps();
     List<ComIdData> list = new ArrayList<>();
     for (int i = 0; i < comIds.size(); i++) {
-      CommonParms2 commonParms =
-          new CommonParms2(
+      CommonParms commonParms =
+          new CommonParms(
               ips.get(i),
               comIds.get(i),
               null,
@@ -46,21 +52,26 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
   }
 
   @Override
-  public List<CommonResponse> getChartData(DisplayDataCommonRequest commonRequest) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+  public List<CommonResponse> getChartData(DisplayDataCommonRequest commonRequest)
+      throws Exception {
     List<String> comIds = commonRequest.getComIds();
     List<String> ips = commonRequest.getIps();
     List<CommonResponse> list = new ArrayList<>();
     List<List<ComIdData>> comIdObjs = new ArrayList<>();
     for (int i = 0; i < comIds.size(); i++) {
-      CommonParms2 commonParms =
-          new CommonParms2(
+      CommonParms commonParms =
+          new CommonParms(
               ips.get(i),
               comIds.get(i),
               null,
               null,
               getExpression(commonRequest.getLogicalCondition()),
               commonRequest.getTime());
-      comIdObjs.add(comIdDataMapper.getTableData(commonParms));
+      List<ComIdData> tableData = comIdDataMapper.getTableData(commonParms);
+      if (tableData.size() == 0) {
+        throw new CustomException(ips.get(i) + "_" + comIds.get(i) + " 对象无数据");
+      }
+      comIdObjs.add(tableData);
     }
     List<Date> timeList = new ArrayList<>();
     for (ComIdData comIdObj : comIdObjs.get(0)) {
@@ -85,23 +96,24 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
   }
 
   @Override
-  public void insertComIdData(String tableName, List<ComIdData> comIdDatas) {
+  @Transactional
+  public void insertComIdData(List<ComIdData> comIdDatas) {
     comIdDataMapper.insertList(comIdDatas);
   }
 
-  @Async
   @Override
-  public void deleteByTime(String deadLineTime) {
+  @Transactional
+  public void deleteByTime(String deadLineTime) throws ParseException {
+    manageService.deletePartitions(TableNameConstant.COMID_DATA_TABLE_NAME, deadLineTime);
     comIdDataMapper.deleteByTime(deadLineTime);
-    WebSocketServer.sendMessage("admin", new WebSocketResponse(1, null));
+    dataOverviewService.deleteByTime(deadLineTime, TableNameConstant.COMID_TYPE);
   }
 
-  private List<String> transformFeatures(List<String> features) {
-    List<String> list = new ArrayList<>();
-    for (String feature : features) {
-      list.add(HumpConversion.camelToUnderline(feature));
-    }
-    return list;
+  @Override
+  @Transactional
+  public void dropTable() {
+    manageService.dropTable(TableNameConstant.COMID_DATA_TABLE_NAME);
+    dataOverviewService.deleteComIdAll();
   }
 
   private String getExpression(String expression) {

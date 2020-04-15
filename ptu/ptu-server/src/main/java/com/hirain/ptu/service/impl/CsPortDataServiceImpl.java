@@ -1,18 +1,22 @@
 package com.hirain.ptu.service.impl;
 
+import com.hirain.ptu.common.exception.CustomException;
 import com.hirain.ptu.common.model.*;
+import com.hirain.ptu.common.utils.DateUtil;
 import com.hirain.ptu.common.utils.HumpConversion;
 import com.hirain.ptu.dao.CsPortDataMapper;
-import com.hirain.ptu.model.ComIdData;
 import com.hirain.ptu.model.CsPortData;
 import com.hirain.ptu.service.CsPortDataService;
+import com.hirain.ptu.service.DataOverviewService;
+import com.hirain.ptu.service.ManageService;
 import com.hirain.ptu.websocket.WebSocketServer;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +25,8 @@ import java.util.List;
 public class CsPortDataServiceImpl extends BaseService<CsPortData> implements CsPortDataService {
 
   @Autowired CsPortDataMapper csPortDataMapper;
+  @Autowired ManageService manageService;
+  @Autowired DataOverviewService dataOverviewService;
 
   @Override
   public List<CsPortData> getCsPortTableDatas(DisplayDataCommonRequest commonRequest) {
@@ -29,8 +35,8 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
     List<String> ports = commonRequest.getPorts();
     List<CsPortData> list = new ArrayList<>();
     for (int i = 0; i < comIds.size(); i++) {
-      CommonParms2 commonParms =
-          new CommonParms2(
+      CommonParms commonParms =
+          new CommonParms(
               ips.get(i),
               comIds.get(i),
               ports.get(i),
@@ -57,15 +63,19 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
     List<CommonResponse> list = new ArrayList<>();
     List<List<CsPortData>> csPortObjDatas = new ArrayList<>();
     for (int i = 0; i < comIds.size(); i++) {
-      CommonParms2 commonParms =
-          new CommonParms2(
+      CommonParms commonParms =
+          new CommonParms(
               ips.get(i),
               comIds.get(i),
               ports.get(i),
               null,
               getExpression(commonRequest.getLogicalCondition()),
               commonRequest.getTime());
-      csPortObjDatas.add(csPortDataMapper.getTableData(commonParms));
+      List<CsPortData> tableData = csPortDataMapper.getTableData(commonParms);
+      if (tableData.size() == 0) {
+        throw new CustomException(ips.get(i) + "_" + comIds.get(i) + "_" + ports.get(i) + " 对象无数据");
+      }
+      csPortObjDatas.add(tableData);
     }
     List<Date> timeList = new ArrayList<>();
     for (CsPortData csPortData : csPortObjDatas.get(0)) {
@@ -90,23 +100,24 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
   }
 
   @Override
-  public void insertCsPortData(String tableName, List<CsPortData> csPortDatas) {
+  @Transactional
+  public void insertCsPortData(List<CsPortData> csPortDatas) {
     csPortDataMapper.insertList(csPortDatas);
   }
 
-  @Async
   @Override
-  public void deleteByTime(String deadLineTime) {
+  @Transactional
+  public void deleteByTime(String deadLineTime) throws ParseException {
+    manageService.deletePartitions(TableNameConstant.CSPROT_DATA_TABLE_NAME, deadLineTime);
     csPortDataMapper.deleteByTime(deadLineTime);
-    WebSocketServer.sendMessage("admin", new WebSocketResponse(1, null));
+    dataOverviewService.deleteByTime(deadLineTime, TableNameConstant.CSPORT_TYPE);
   }
 
-  private List<String> transformFeatures(List<String> features) {
-    List<String> list = new ArrayList<>();
-    for (String feature : features) {
-      list.add(HumpConversion.camelToUnderline(feature));
-    }
-    return list;
+  @Override
+  @Transactional
+  public void dropTable() {
+    manageService.dropTable(TableNameConstant.CSPROT_DATA_TABLE_NAME);
+    dataOverviewService.deleteCsPortAll();
   }
 
   private String getExpression(String expression) {

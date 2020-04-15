@@ -12,7 +12,14 @@ import java.util.List;
  * @describe
  */
 public interface DataOverviewService extends IService<DataOverview> {
-    void test();
 
-    void deleteByTime(String deadLineTime) throws ParseException;
+  void deleteByTime(String deadlineTime,String type) throws ParseException;
+
+  List<DataOverview> getDataOverview();
+
+  void deleteComIdAll();
+
+  void deleteCsPortAll();
+
+  DataOverview selectByType(String type);
 }

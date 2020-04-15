@@ -13,15 +13,18 @@ import java.util.List;
 
 public interface CsPortDataService extends IService<CsPortData> {
 
-  @Cacheable(value = "comIdObjService", key = "'getCsPortTableDatas' + #p0")
+  @Cacheable(value = "csPortDataService", key = "'getCsPortTableDatas' + #p0")
   List<CsPortData> getCsPortTableDatas(DisplayDataCommonRequest commonRequest);
 
-  @Cacheable(value = "comIdObjService", key = "'getChartData' + #p0")
+  @Cacheable(value = "csPortDataService", key = "'getChartData' + #p0")
   List<CommonResponse> getChartData(DisplayDataCommonRequest commonRequest) throws Exception;
 
-  @CacheEvict(value = "comIdObjService", allEntries = true)
-  void insertCsPortData(String tableName, List<CsPortData> csPortDatas);
+  @CacheEvict(value = "csPortDataService", allEntries = true)
+  void insertCsPortData(List<CsPortData> csPortDatas);
 
-  @CacheEvict(value = "comIdObjService", allEntries = true)
-  void deleteByTime(String deadLineTime);
+  @CacheEvict(value = "csPortDataService", allEntries = true)
+  void deleteByTime(String deadLineTime) throws ParseException;
+
+  @CacheEvict(value = "csPortDataService", allEntries = true)
+  void dropTable();
 }

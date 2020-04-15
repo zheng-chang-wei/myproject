@@ -11,6 +11,12 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class WebSocketResponse {
+  /**
+   * 1:删除数据
+   * 2:要下载文件的个数
+   * 3:一个文件下载成功
+   * 500:下载文件失败
+   */
   private Integer code;
   private Object data;
 }

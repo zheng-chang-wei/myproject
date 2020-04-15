@@ -13,16 +13,18 @@ import java.util.List;
 
 public interface ComIdDataService extends IService<ComIdData> {
 
-  @Cacheable(value = "comIdObjService", key = "'getComIdTableDatas' +#p0")
+  @Cacheable(value = "comIdDataService", key = "'getComIdTableDatas' +#p0")
   List<ComIdData> getComIdTableDatas(DisplayDataCommonRequest commonRequest);
 
-  @Cacheable(value = "comIdObjService", key = "'getChartData' + #p0")
-  List<CommonResponse> getChartData(DisplayDataCommonRequest commonRequest)
-      throws IllegalAccessException, NoSuchMethodException, InvocationTargetException;
+  @Cacheable(value = "comIdDataService", key = "'getChartData' + #p0")
+  List<CommonResponse> getChartData(DisplayDataCommonRequest commonRequest) throws Exception;
 
-  @CacheEvict(value = "comIdObjService", allEntries = true)
-  void insertComIdData(String tableName, List<ComIdData> comIdDatas);
+  @CacheEvict(value = "comIdDataService", allEntries = true)
+  void insertComIdData(List<ComIdData> comIdDatas);
 
-  @CacheEvict(value = "comIdObjService", allEntries = true)
-  void deleteByTime(String deadLineTime);
+  @CacheEvict(value = "comIdDataService", allEntries = true)
+  void deleteByTime(String deadLineTime) throws ParseException;
+
+  @CacheEvict(value = "comIdDataService", allEntries = true)
+  void dropTable();
 }

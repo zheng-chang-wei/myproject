@@ -1,14 +1,13 @@
 package com.hirain.ptu.handler;
 
+import com.hirain.ptu.common.model.TableNameConstant;
 import com.hirain.ptu.dao.DownloadedFileMapper;
-import com.hirain.ptu.model.ComIdData;
-import com.hirain.ptu.model.CsPortData;
-import com.hirain.ptu.model.DataOverview;
-import com.hirain.ptu.model.DownloadedFile;
+import com.hirain.ptu.model.*;
 import com.hirain.ptu.service.ComIdDataService;
 import com.hirain.ptu.service.CsPortDataService;
 import com.hirain.ptu.service.DataOverviewService;
 import com.hirain.ptu.service.ManageService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,31 +39,35 @@ public class DataHandler {
   @Autowired DownloadedFileMapper downloadedFileMapper;
 
   @Transactional
-  public synchronized void insertComIdData(
-      List<DataOverview> dataOverviews, List<ComIdData> comIdDataList, String fileName) {
-    updateDataOverTime(dataOverviews);
+  public synchronized void insertComIdData(List<ComIdData> comIdDataList, String fileName) {
+    Date startDate = comIdDataList.get(0).getDate();
+    Date endDate = comIdDataList.get(comIdDataList.size() - 1).getDate();
+    updateDataOverTime(startDate, endDate, TableNameConstant.COMID_TYPE);
     insertComIdData(comIdDataList);
     downloadedFileMapper.insert(new DownloadedFile(fileName));
   }
 
   @Transactional
-  public synchronized void insertCsPortData(
-      List<DataOverview> dataOverviews, List<CsPortData> csPortDataList, String fileName) {
-    updateDataOverTime(dataOverviews);
+  public synchronized void insertCsPortData(List<CsPortData> csPortDataList, String fileName) {
+    Date startDate = csPortDataList.get(0).getDate();
+    Date endDate = csPortDataList.get(csPortDataList.size() - 1).getDate();
+    updateDataOverTime(startDate, endDate, TableNameConstant.CSPORT_TYPE);
     insertCsPortData(csPortDataList);
     downloadedFileMapper.insert(new DownloadedFile(fileName));
   }
 
-  private void updateDataOverTime(List<DataOverview> dataOverviews) {
-    List<DataOverview> dataOverviewSelecteds = dataOverviewService.selectAll();
-    for (DataOverview dataOverview : dataOverviews) {
-      DataOverview sameDataOverview = getSameDataOverview(dataOverview, dataOverviewSelecteds);
-      if (sameDataOverview == null) {
-        dataOverviewService.save(dataOverview);
-      } else if (!sameDataOverview.getStartTime().equals(dataOverview.getStartTime())
-          && !sameDataOverview.getEndTime().equals(dataOverview.getEndTime())) {
-        dataOverviewService.updateNotNull(sameDataOverview);
+  private void updateDataOverTime(Date startDate, Date endDate, String type) {
+    DataOverview dataOverview = dataOverviewService.selectByType(type);
+    if (dataOverview == null) {
+      dataOverviewService.save(new DataOverview(type, startDate, endDate));
+    } else {
+      if (startDate.before(dataOverview.getStartTime())) {
+        dataOverview.setStartTime(startDate);
       }
+      if (endDate.after(dataOverview.getEndTime())) {
+        dataOverview.setEndTime(endDate);
+      }
+      dataOverviewService.updateNotNull(dataOverview);
     }
   }
 
@@ -72,33 +75,15 @@ public class DataHandler {
 
     Date date = comIdDatas.get(comIdDatas.size() - 1).getDate();
     // 查看分区是否够用，不够用添加分区
-    addPartition("t_comid_data", date);
-    comIdDataService.insertComIdData("t_comid_data", comIdDatas);
+    addPartition(TableNameConstant.COMID_DATA_TABLE_NAME, date);
+    comIdDataService.insertComIdData(comIdDatas);
   }
 
   private void insertCsPortData(List<CsPortData> csPortDatas) {
     Date date = csPortDatas.get(csPortDatas.size() - 1).getDate();
     // 查看分区是否够用，不够用添加分区
-    addPartition("t_csport_data", date);
-    csPortDataService.insertCsPortData("t_csport_data", csPortDatas);
-  }
-
-  private DataOverview getSameDataOverview(
-      DataOverview dataOverview, List<DataOverview> dataOverviewSelecteds) {
-    for (DataOverview dataOverviewSelected : dataOverviewSelecteds) {
-      if (dataOverviewSelected.getComId().equals(dataOverview.getComId())
-          && dataOverviewSelected.getIp().equals(dataOverview.getIp())
-          && dataOverviewSelected.getPort().equals(dataOverview.getPort())) {
-        if (dataOverview.getStartTime().before(dataOverviewSelected.getStartTime())) {
-          dataOverviewSelected.setStartTime(dataOverview.getStartTime());
-        }
-        if (dataOverviewSelected.getEndTime().before(dataOverview.getEndTime())) {
-          dataOverviewSelected.setEndTime(dataOverview.getEndTime());
-        }
-        return dataOverviewSelected;
-      }
-    }
-    return null;
+    addPartition(TableNameConstant.CSPROT_DATA_TABLE_NAME, date);
+    csPortDataService.insertCsPortData(csPortDatas);
   }
 
   /**
@@ -119,11 +104,10 @@ public class DataHandler {
    *
    * @return
    */
-  private List<String> partitions() {
+  private List<String> partitions(LocalDateTime date) {
     final List<String> partitions = new ArrayList<>();
-    final LocalDateTime date = LocalDateTime.now();
     LocalDateTime nextMonth = date.plusMonths(1);
-    for (int i = 70; i >= 0; i--) {
+    for (int i = 60; i >= 0; i--) {
       LocalDateTime dateTime = nextMonth.plusDays(-i);
       final String time = dateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
       partitions.add(time);
@@ -133,18 +117,21 @@ public class DataHandler {
 
   private void addPartition(String tableName, Date date) {
     String partition = manageService.lastPartition(tableName);
-    if (partition.startsWith("p")) {
-      partition = partition.substring(1);
-    }
-    // 最后一个分区时间
-    final LocalDateTime lastPartitionDate =
-        LocalDateTime.parse(partition + "000000", DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
     // 插入数据的最大时间
     LocalDateTime maxInsertDate = date2LocalDateTime(date);
-    final Duration duration = Duration.between(lastPartitionDate, maxInsertDate);
-    final long days = duration.toDays();
-    if (days >= 0) {
-      manageService.addPartitions(tableName, partitions(lastPartitionDate, days));
+    if (StringUtils.isNotEmpty(partition)) {
+      partition = partition.substring(1);
+      // 最后一个分区时间
+      final LocalDateTime lastPartitionDate =
+          LocalDateTime.parse(partition + "000000", DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+
+      final Duration duration = Duration.between(lastPartitionDate, maxInsertDate);
+      final long days = duration.toDays();
+      if (days >= 0) {
+        manageService.addPartitions(tableName, partitions(lastPartitionDate, days));
+      }
+    } else {
+      manageService.createTable(tableName, partitions(maxInsertDate));
     }
   }
 
