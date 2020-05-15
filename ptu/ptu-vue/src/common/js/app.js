@@ -1,7 +1,7 @@
 import axios from 'axios'
 import allApi from './allApi'
 import qs from 'qs'
-axios.defaults.baseURL = 'dev-api'
+// axios.defaults.baseURL = 'dev-api'
 import { Message } from 'element-ui'
 axios.defaults.withCredentials = true
 axios.interceptors.response.use(res => {

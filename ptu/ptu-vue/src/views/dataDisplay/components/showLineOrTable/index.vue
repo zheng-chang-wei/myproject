@@ -17,11 +17,21 @@
       <el-table-column prop="ip" label="源IP地址" align="center" />
       <el-table-column v-if="type==='CsPort'" prop="port" label="端口" align="center" width="42" />
       <template v-for="item in features">
-        <el-table-column :key="item" :prop="item" :label="item" align="center" />
+        <el-table-column :key="item.name_EN" :prop="item.name_EN" :label="item.name_CN" align="center" />
       </template>
     </el-table>
     <el-row v-if="isQueryTable" class="toolbar" style="position:absolute;bottom:10px;">
-      <!-- <el-button type="primary" size="mini" @click="export2Excel">导出CSV</el-button> -->
+      <JsonExcel
+        class="export-excel-wrapper"
+        :data="tableDatas"
+        :fields="json_fields"
+        :name="excelName"
+      >
+        <!-- 上面可以自定义自己的样式，还可以引用其他组件button -->
+        <el-button type="primary" size="mini">导出本页</el-button>
+      </JsonExcel>
+    </el-row>
+    <el-row v-if="isQueryTable" class="toolbar" style="position:absolute;bottom:10px;margin-left:90px">
       <JsonExcel
         class="export-excel-wrapper"
         :data="allTableDatas"
@@ -29,7 +39,7 @@
         :name="excelName"
       >
         <!-- 上面可以自定义自己的样式，还可以引用其他组件button -->
-        <el-button type="primary" size="small">导出Excel</el-button>
+        <el-button type="primary" size="mini">导出所有</el-button>
       </JsonExcel>
     </el-row>
     <!--分页  工具条-->
@@ -53,7 +63,7 @@
 
 <script>
 import app from '@/common/js/app'
-import { dateFormat } from '@/utils/index'
+import util from '@/common/js/util'
 import showLine from './components/showLine/index'
 import queryForm from './components/queryForm/index'
 import JsonExcel from 'vue-json-excel'
@@ -101,16 +111,19 @@ export default {
     this.$bus.$on('featuresChange', (data) => {
       this.features = []
       this.json_fields = {
-        'date': 'date',
-        'IP': 'ip',
-        'Comid': 'comId'
+        '时间': 'date',
+        '源IP地址': 'ip',
+        'ComID': 'comId'
       }
       if (this.type === 'CsPort') {
         this.json_fields['port'] = 'port'
       }
       data.forEach(element => {
-        this.features.push(element.featureName)
-        this.json_fields[element.featureName] = element.featureName
+        this.features.push({
+          name_CN: element.featureName_CN,
+          name_EN: element.featureName_EN
+        })
+        this.json_fields[element.featureName_CN] = element.featureName_EN
       })
     })
   },
@@ -120,6 +133,7 @@ export default {
   beforeDestroy() {
     this.$bus.$off('objChange')
     this.$bus.$off('featuresChange')
+    window.removeEventListener('resize', this.changeHeight)
   },
   methods: {
     changeHeight() {
@@ -132,7 +146,7 @@ export default {
     },
     // 查询
     queryTableDatas(formData) {
-      this.excelName = this.type + '_' + dateFormat('YYYY-mm-dd HH:MM:SS', new Date()) + '.xls'
+      this.excelName = this.type + util.replaceTime(formData.time[0]) + '-' + util.replaceTime(formData.time[1]) + '.xls'
       this.formData = formData
       this.isQueryTable = true
       this.changeHeight()
@@ -213,7 +227,7 @@ export default {
       let ports = ''
       let features = ''
       this.features.forEach(element => {
-        features += element + ','
+        features += element.name_EN + ','
       })
       if (this.type === 'CsPort') {
         this.objs.forEach(element => {
@@ -233,7 +247,8 @@ export default {
         ports: ports.substring(0, ports.length - 1),
         features: features.substring(0, features.length - 1),
         logicalCondition: this.formData.logicalCondition,
-        time: this.formData.time
+        startTime: this.formData.time[0],
+        endTime: this.formData.time[1]
       }
       return parm
     },

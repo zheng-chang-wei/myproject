@@ -9,6 +9,7 @@ import com.hirain.ptu.dao.CsPortObjectMapper;
 import com.hirain.ptu.model.ComIdObject;
 import com.hirain.ptu.model.CsPortObject;
 import com.hirain.ptu.service.ObjectConfigService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -32,6 +33,7 @@ import static com.hirain.ptu.common.utils.ReadExcelUtil.getCellValue;
  * @describe 对象配置service
  */
 @Service
+@Slf4j
 public class ObjectConfigServiceImpl implements ObjectConfigService {
 
   @Autowired ComIdObjectMapper comIdObjectMapper;
@@ -57,6 +59,7 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
 
   @Override
   public List<ComIdObject> listComIds() {
+    log.info("listComIds");
     return comIdObjectMapper.selectAllOrderByComId();
   }
 
@@ -135,6 +138,7 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
         String proName = map.get(head);
         BeanUtils.setProperty(obj, proName, cellValue);
       } else {
+        System.out.println(head);
         throw new CustomException("文件格式错误");
       }
     }

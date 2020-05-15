@@ -7,8 +7,8 @@
     </el-form>
     <el-form :inline="true" size="mini">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-plus" @click="handleAddLogical">新增</el-button>
-        <el-button type="danger" icon="el-icon-delete" @click="handleDelLogical">删除</el-button>
+        <el-button type="primary" icon="el-icon-plus" @click="handleAddLogical">添加条件</el-button>
+        <el-button type="danger" icon="el-icon-delete" @click="handleDelLogical">删除条件</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -16,8 +16,8 @@
       border
       :data="logicalTableDatas"
       highlight-current-row
-      :header-cell-style="{padding:'3px'}"
-      :cell-style="{padding:'3px'}"
+      :header-cell-style="{padding:'3px',fontSize:'11px'}"
+      :cell-style="{padding:'3px',fontSize:'10px'}"
     >
       <el-table-column type="selection" align="center" />
       <el-table-column prop="featureName" label="特征名称" align="center">
@@ -73,7 +73,7 @@ export default {
       logicalTableDatas: [],
       addLoading: false,
       featureNameOptions: [],
-      logicalOperatorOptions: ['>', '<', '=', '!='],
+      logicalOperatorOptions: ['>', '<', '==', '!='],
       relationshiprOptions: ['&&', '||'],
       id: null,
       formRules: {
@@ -91,10 +91,10 @@ export default {
   created() {
     switch (this.type) {
       case 'ComId':
-        this.featureNameOptions = global.comIdFeatureNames
+        this.featureNameOptions = global.comIdFeatureNames_CN
         break
       case 'CsPort':
-        this.featureNameOptions = global.csPortFeatureNames
+        this.featureNameOptions = global.csPortFeatureNames_CN
         break
 
       default:
@@ -117,6 +117,7 @@ export default {
         this.logicalTableDatas = this.getTableDatas(obj.row.expression)
       }
       this.addConditionVisible = true
+      this.addLoading = false
     },
     getTableDatas(expressionString) {
       const ands = expressionString.split('&&')
@@ -199,6 +200,7 @@ export default {
           if (!this.validateLogicalTableDatas()) {
             return
           }
+          this.addLoading = true
           // 逻辑表达式
           let expression = ''
           this.logicalTableDatas.forEach(element => {
@@ -212,14 +214,15 @@ export default {
           }
           app.post('saveCondition', parm).then(response => {
             if (response.code === 0) {
+              this.addConditionVisible = false
+
               this.$message({
                 type: 'success',
                 message: '保存成功'
               })
               this.$emit('getCondition')
-              this.addConditionVisible = false
             }
-          })
+          }).catch(() => { this.addLoading = false })
         }
       })
     },

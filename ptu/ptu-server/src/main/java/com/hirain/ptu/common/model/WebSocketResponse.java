@@ -15,7 +15,8 @@ public class WebSocketResponse {
    * 1:删除数据
    * 2:要下载文件的个数
    * 3:一个文件下载成功
-   * 500:下载文件失败
+   * 4:一个文件上传成功
+   * 500:下载或上传文件失败
    */
   private Integer code;
   private Object data;

@@ -10,23 +10,26 @@ import org.springframework.cache.annotation.Cacheable;
 
 public interface ManageService {
 
-  int createComIdDataTable(String tableName, List<String> list);
+  public int createComIdDataTable(String tableName, List<String> list);
 
-  int createCsPortDataTable(String tableName, List<String> list);
+  public int createCsPortDataTable(String tableName, List<String> list);
 
-  boolean isExistTable(String tableName);
+  public boolean isExistTable(String tableName);
 
-  String lastPartition(String tableName);
+  public String lastPartition(String tableName);
 
-  List<String> allPartition(String tableName);
+  public List<String> allPartition(String tableName);
 
-  int addPartitions(String tableName, List<String> list);
+  public int addPartitions(String tableName, List<String> list);
 
-  Integer dropTable(String tableName);
+  public Integer dropTable(String tableName);
 
-  Integer dropPartition(String tableName, String partitionName);
+  public Integer dropPartition(String tableName, String partitionName);
 
-  int createTable(String tableName, List<String> partitions);
+  public int createTable(String tableName, List<String> partitions);
 
-  void deletePartitions(String tableName, String deadlineTime) throws ParseException;
+  public void deletePartitions(String tableName, String deadlineTime) throws ParseException;
+
+  public void createDatabase(String name);
+
 }

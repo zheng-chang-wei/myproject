@@ -2,8 +2,8 @@
   <div>
     <el-form :inline="true" size="mini">
       <el-form-item>
-        <el-button type="primary" icon="el-icon-plus" @click="openAddConditionDialog">新增</el-button>
-        <el-button type="danger" icon="el-icon-delete" @click="handleDelCondition">删除</el-button>
+        <el-button type="primary" icon="el-icon-plus" @click="openAddConditionDialog">添加条件</el-button>
+        <el-button type="danger" icon="el-icon-delete" @click="handleDelCondition">删除条件</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -13,6 +13,8 @@
       :data="conditionTableDatas"
       highlight-current-row
       :max-height="tableMaxHeight"
+      :header-cell-style="{padding:'3px',fontSize:'11px'}"
+      :cell-style="{padding:'3px',fontSize:'10px'}"
     >
       <el-table-column type="selection" align="center" />
       <el-table-column type="index" label="序号" align="center" width="50px" />

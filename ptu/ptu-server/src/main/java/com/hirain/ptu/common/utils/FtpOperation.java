@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,11 +22,9 @@ import java.util.List;
 @Slf4j
 public class FtpOperation {
 
-  @Value("${ftp.username}")
   private String userName;
 
-  @Value("${ftp.password}")
-  private String passWord;
+  private String password;
 
   @Value("${ftp.port}")
   private int port;
@@ -43,13 +39,12 @@ public class FtpOperation {
   public FTPClient ftpClient() throws Exception {
     // ftp客户端
     FTPClient ftpClient = new FTPClient();
-    setIpAndFilePath();
+    setFtpParm();
     if (!ftpClient.isConnected()) {
       int reply;
       try {
-
         ftpClient.connect(targetIp, port);
-        ftpClient.login(userName, passWord);
+        ftpClient.login(userName, password);
         ftpClient.setControlEncoding("utf-8"); // 设置ftp字符集
         // 设置传输二进制文件
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
@@ -74,15 +69,16 @@ public class FtpOperation {
     return null;
   }
 
-  private void setIpAndFilePath() {
+  private void setFtpParm() {
     List<TargetConfig> targetConfigs = targetConfigService.selectAll();
     if (targetConfigs.size() != 0) {
       TargetConfig targetConfig = targetConfigs.get(0);
       targetIp = targetConfig.getTargetIp();
       targetFilePath = targetConfig.getTargetPath();
+      userName = targetConfig.getUserName();
+      password = targetConfig.getPassword();
     }
   }
-
 
   public List<String> getAllFiles() throws Exception {
     FTPClient ftpClient = ftpClient();
@@ -100,7 +96,7 @@ public class FtpOperation {
       }
     } catch (IOException e) {
       throw e;
-    }finally {
+    } finally {
       closeConnect(ftpClient);
     }
     return names;
@@ -143,7 +139,7 @@ public class FtpOperation {
       }
     } catch (Exception e) {
       log.error("ftp连接关闭失败！", e);
-      throw  e;
+      throw e;
     }
   }
 }

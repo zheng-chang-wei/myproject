@@ -10,7 +10,6 @@ import com.hirain.ptu.websocket.WebSocketServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,26 +21,18 @@ import java.util.List;
 @Service
 public class DownloadServiceImpl implements DownloadService {
 
-  @Autowired FtpOperation ftpOperation;
-
   @Autowired DownloadedFileMapper downloadedFileMapper;
 
-
   @Autowired CsvDataHandler csvDataHandler;
+
+  @Autowired FtpOperation ftpOperation;
 
   @Override
   public void download() throws Exception {
     List<String> needDownloadedFiles = getNeedDownloadFiles();
-    WebSocketServer.sendMessage("admin", new WebSocketResponse(2,needDownloadedFiles.size()));
+    WebSocketServer.sendMessage("admin", new WebSocketResponse(2, needDownloadedFiles.size()));
     for (String fileName : needDownloadedFiles) {
-      InputStream inputStream = ftpOperation.downloadFile(fileName);
-      if (inputStream!=null){
-        if (fileName.startsWith("ComID")) {
-          csvDataHandler.readComIdCSV(inputStream, fileName);
-        } else if (fileName.startsWith("CSport")) {
-          csvDataHandler.readCsPortCSV(inputStream, fileName);
-        }
-      }
+      csvDataHandler.handleFile(fileName);
     }
   }
 
@@ -52,17 +43,18 @@ public class DownloadServiceImpl implements DownloadService {
 
   private List<String> getNeedDownloadFiles() throws Exception {
     List<String> allFiles = ftpOperation.getAllFiles();
-    List<DownloadedFile> downloadedFiles = downloadedFileMapper.selectAll();
     List<String> needDownloadedFiles = new ArrayList<>();
     for (String fileName : allFiles) {
-      if (!isDownloaded(downloadedFiles, fileName)) {
+      if (!isExist(fileName)) {
         needDownloadedFiles.add(fileName);
       }
     }
     return needDownloadedFiles;
   }
 
-  private boolean isDownloaded(List<DownloadedFile> downloadedFiles, String fileName) {
+  @Override
+  public boolean isExist(String fileName) {
+    List<DownloadedFile> downloadedFiles = downloadedFileMapper.selectAll();
     for (DownloadedFile file : downloadedFiles) {
       if (file.getFileName().equals(fileName)) {
         return true;

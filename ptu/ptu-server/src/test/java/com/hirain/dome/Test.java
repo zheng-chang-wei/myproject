@@ -1,23 +1,23 @@
 package com.hirain.dome;
 
-import com.hirain.ptu.common.model.AttributeMappingConfigurationData;
-import com.hirain.ptu.model.ComIdData;
-import com.hirain.ptu.model.CsPortData;
-import org.apache.commons.beanutils.BeanUtils;
-
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class Test {
 
   public static void main(String[] args) throws Exception {
-    String s = "1.00";
-    Float aFloat = Float.valueOf(s);
-    int i = aFloat.intValue();
-    System.out.println(i);
+    String[] items = {"1", "2"};
+    for (String item : items) {
+      item = "3";
+    }
+    for (int i=0;i<items.length;i++){
+      items[i]="3";
+    }
+    System.out.println(items);
   }
 
   private static List<String> partitions() {

@@ -79,12 +79,24 @@ export default {
     }
   },
   created() {
+    // 页面改变时,更改尺寸
+    window.addEventListener('resize', this.changeHeight)
   },
   mounted() {
-
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.changeHeight)
   },
   methods: {
-
+    changeHeight() {
+      for (let j = 0; j < 10; j++) {
+        const doucument = document.getElementById('' + j)
+        if (doucument !== null) {
+          const myChart = this.$echarts.init(doucument)
+          myChart.resize()
+        }
+      }
+    },
     queryLineDatas(value) {
       const objs = value.objs
       this.features = value.features
@@ -127,9 +139,10 @@ export default {
             }
 
             this.option['title'] = {
-              text: this.features[j]
+              text: this.features[j].name_CN
             }
             const myChart = this.$echarts.init(document.getElementById('' + j))
+            myChart.clear()
             myChart.setOption(this.option)
             j++
           })

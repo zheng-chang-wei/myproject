@@ -35,9 +35,9 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
               ips.get(i),
               comIds.get(i),
               ports.get(i),
-              null,
-              getExpression(commonRequest.getLogicalCondition()),
-              commonRequest.getTime());
+              HumpConversion.getExpression(commonRequest.getLogicalCondition()),
+              commonRequest.getStartTime(),
+              commonRequest.getEndTime());
       List<CsPortData> tableDatas = csPortDataMapper.getTableData(commonParms);
       for (CsPortData csPortData : tableDatas) {
         csPortData.setComId(Integer.valueOf(comIds.get(i)));
@@ -64,19 +64,20 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
               ips.get(i),
               comIds.get(i),
               ports.get(i),
-              null,
-              getExpression(commonRequest.getLogicalCondition()),
-              commonRequest.getTime());
+              HumpConversion.getExpression(commonRequest.getLogicalCondition()),
+              commonRequest.getStartTime(),
+              commonRequest.getEndTime());
       List<CsPortData> tableData = csPortDataMapper.getTableData(commonParms);
       if (tableData.size() == 0) {
         if (errorMsg.length() != 0) {
           errorMsg += "</br></br>";
         }
-        errorMsg += "comId:" + comIds.get(i) + ", ip:" + ips.get(i) + ", port:" + ports.get(i)+ " 数据为空";
+        errorMsg +=
+            "comId:" + comIds.get(i) + ", ip:" + ips.get(i) + ", port:" + ports.get(i) + " 数据为空";
       }
       csPortObjDatas.add(tableData);
     }
-    if (errorMsg.length()!=0){
+    if (errorMsg.length() != 0) {
       throw new CustomException(errorMsg);
     }
     List<Date> timeList = new ArrayList<>();
@@ -127,42 +128,5 @@ public class CsPortDataServiceImpl extends BaseService<CsPortData> implements Cs
   @Transactional
   public void dropTable() {
     manageService.dropTable(TableNameConstant.CSPROT_DATA_TABLE_NAME);
-  }
-
-  private String getExpression(String expression) {
-    // 驼峰式命名list
-    List<String> humpList = getFeatures(expression);
-    for (String feature : humpList) {
-      // 将表达式中的驼峰命名方式改为下划线
-      expression = expression.replace(feature, HumpConversion.camelToUnderline(feature));
-      expression = expression.replace("&&", " and ");
-      expression = expression.replace("||", " or ");
-    }
-    return expression;
-  }
-
-  private List<String> getFeatures(String expressionString) {
-    // 驼峰式命名list
-    List<String> humpList = new ArrayList<>();
-    String[] ands = expressionString.split("&&");
-    for (String and : ands) {
-      String[] ors = and.split("\\|\\|");
-      for (String or : ors) {
-        String logicalOperator = getLogicalOperator(or);
-        humpList.add(or.split(logicalOperator)[0]);
-      }
-    }
-    return humpList;
-  }
-
-  private String getLogicalOperator(String element) {
-    String[] logicalOperatorOptions = {">", "<", "=", "!="};
-    for (int index = 0; index < logicalOperatorOptions.length; index++) {
-      String logicalOperator = logicalOperatorOptions[index];
-      if (element.indexOf(logicalOperator) != -1) {
-        return logicalOperator;
-      }
-    }
-    return null;
   }
 }

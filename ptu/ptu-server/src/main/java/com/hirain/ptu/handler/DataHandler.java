@@ -49,7 +49,6 @@ public class DataHandler {
   }
 
   private void insertComIdData(List<ComIdData> comIdDatas) {
-
     Date date = comIdDatas.get(comIdDatas.size() - 1).getDate();
     // 查看分区是否够用，不够用添加分区
     addPartition(TableNameConstant.COMID_DATA_TABLE_NAME, date);

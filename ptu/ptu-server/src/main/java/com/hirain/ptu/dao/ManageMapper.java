@@ -3,6 +3,7 @@ package com.hirain.ptu.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 public interface ManageMapper {
 
@@ -22,4 +23,19 @@ public interface ManageMapper {
 
   Integer dropPartition(
       @Param("tableName") String tableName, @Param("partitionName") String partitionName);
+
+  @Update("create database #{name}")
+  void createDatabase(String name);
+
+  int isExistDatabase(@Param("databaseName") String databaseName);
+
+  int createComIdObjectTable();
+
+  int createConditionTable();
+
+  int createCsPortObjectTable();
+
+  int createDownloadedFileTable();
+
+  int createTargerConfigTable();
 }

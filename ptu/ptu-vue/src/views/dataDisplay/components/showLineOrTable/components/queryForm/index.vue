@@ -2,7 +2,7 @@
   <!--查询-->
   <el-form ref="queryForm" :inline="true" :model="retrieveForm" size="mini" :rules="queryFormRules">
     <el-form-item label="逻辑条件" prop="logicalCondition">
-      <el-select v-model="retrieveForm.logicalCondition" placeholder="请选择逻辑条件">
+      <el-select v-model="retrieveForm.logicalCondition" style="width:125px" placeholder="请选择逻辑条件">
         <el-option
           v-for="item in logicalConditionOptions"
           :key="item.value"
@@ -12,16 +12,25 @@
       </el-select>
     </el-form-item>
     <el-form-item label="日期" prop="time">
-      <el-date-picker
+      <!-- <el-date-picker
         v-model="retrieveForm.time"
         value-format="yyyy-MM-dd"
         placeholder="选择日期"
         :editable="false"
+      /> -->
+      <el-date-picker
+        v-model="retrieveForm.time"
+        style="width:325px"
+        type="datetimerange"
+        value-format="yyyy-MM-dd HH:mm"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        :editable="false"
       />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" icon="el-icon-search" @click="queryTableDatas">查询表格</el-button>
-      <el-button type="primary" icon="el-icon-search" @click="queryLineDatas">查询曲线</el-button>
+      <el-button type="primary" icon="el-icon-search" @click="queryTableDatas">表格</el-button>
+      <el-button type="primary" icon="el-icon-search" @click="queryLineDatas">曲线</el-button>
     </el-form-item>
   </el-form>
 
@@ -30,13 +39,30 @@
 <script>
 import app from '@/common/js/app'
 export default {
+
   props: {
     type: {
       type: String,
       required: true
     }
   },
+
   data() {
+    const checkTime = (rule, value, callback) => {
+      const sTime = new Date(value[0]).getTime()
+      const eTime = new Date(value[1]).getTime()
+      const total = (eTime - sTime) / 1000
+      const day = parseFloat(total / (60 * 60))// 计算整数天数
+      if (sTime !== 0 && eTime !== 0) {
+        if (day > 24) {
+          callback(new Error('时间跨度不能超过1天'))
+        } else {
+          callback()
+        }
+      } else {
+        callback()
+      }
+    }
     return {
       retrieveForm: {
         logicalCondition: '',
@@ -55,6 +81,9 @@ export default {
           {
             required: true,
             message: '必填',
+            trigger: 'change'
+          }, {
+            validator: checkTime,
             trigger: 'change'
           }
         ]
@@ -106,5 +135,7 @@ export default {
 </script>
 
 <style>
-
+.el-time-panel {
+    width: 100%;
+}
 </style>

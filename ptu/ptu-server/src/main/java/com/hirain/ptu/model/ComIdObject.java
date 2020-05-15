@@ -20,13 +20,16 @@ public class ComIdObject implements Serializable {
 
   private String ip;
 
+  /** 组播地址 */
   private String multicastAddress;
-
+  /** 周期 */
   private Integer cycle;
-
+  /** 报文长度 */
+  private Integer packetLength;
+  /** 车厢位置 */
   private Integer carriagePosition;
+  /** 备注 */
+  private String remark1;
 
-  private String unit;
-
-  private String remark;
+  private String remark2;
 }

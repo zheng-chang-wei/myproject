@@ -19,6 +19,8 @@
       :data="tableDatas"
       :max-height="tableMaxHeight"
       highlight-current-row
+      :header-cell-style="{padding:'3px',fontSize:'11px'}"
+      :cell-style="{padding:'3px',fontSize:'10px'}"
     >
       <el-table-column type="index" label="序号" align="center" width="50px" />
       <el-table-column prop="comId" label="comId" align="center" width="150" />
@@ -27,7 +29,7 @@
       <!-- <el-table-column prop="cycle" label="周期（us）" align="center" /> -->
       <el-table-column prop="carriagePosition" label="车厢位置" align="center" width="150" />
       <!-- <el-table-column prop="unit" label="单元" align="center" /> -->
-      <el-table-column prop="remark" label="备注" align="center" />
+      <el-table-column prop="remark1" label="备注" align="center" />
     </el-table>
   </section>
 </template>
@@ -91,7 +93,7 @@ export default {
       app.postData('comIdImport', formData).then(response => {
         if (response.code === 0) {
           this.$message({
-            message: '上传成功',
+            message: '导入成功',
             type: 'success'
           })
           this.getDatas()

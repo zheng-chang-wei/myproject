@@ -27,6 +27,7 @@
       :header-cell-style="{padding:'3px'}"
       :cell-style="{padding:'3px'}"
       @select="tableSelect"
+      @select-all="selectAll"
     >
       <el-table-column type="selection" align="center" />
       <el-table-column prop="comId" label="comId" align="center" />
@@ -82,6 +83,9 @@ export default {
     window.addEventListener('resize', this.changeHeight)
     this.changeHeight()
   },
+  destroyed() {
+    window.removeEventListener('resize', this.changeHeight)
+  },
   mounted() {
     this.getTableDatas()
   },
@@ -104,6 +108,21 @@ export default {
         }, '10')
       }
     },
+    selectAll(selections) {
+      if (selections.length === 0 || (selections.length === 1 && selections[0] === null)) {
+        this.allObjTableDatas.forEach(row => {
+          const sameData = this.getSameData(row, this.selectedObjTableDatas)
+          this.selectedObjTableDatas.splice(this.selectedObjTableDatas.indexOf(sameData), 1)
+        })
+      } else {
+        this.allObjTableDatas.forEach(row => {
+          const sameData = this.getSameData(row, this.selectedObjTableDatas)
+          if (sameData === null) {
+            this.selectedObjTableDatas.push(row)
+          }
+        })
+      }
+    },
     tableSelect(selection, row) {
       const sameData = this.getSameData(row, this.selectedObjTableDatas)
       if (sameData === null) {
@@ -116,7 +135,17 @@ export default {
       this.currentPage = 1
       this.handleCurrentChange(1)
     },
+
     addComIdObjConfirm() {
+      console.log(this.selectedObjTableDatas)
+      if (this.selectedObjTableDatas.length > 10) {
+        this.$message({
+          message: '最多添加10个对象',
+          type: 'warning'
+        })
+        return
+      }
+
       this.$emit('addComIdObjConfirm', this.selectedObjTableDatas)
       this.addObjDialogVisible = false
     },

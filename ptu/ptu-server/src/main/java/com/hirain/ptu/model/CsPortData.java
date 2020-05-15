@@ -70,5 +70,5 @@ public class CsPortData implements Serializable {
 
   private Integer txErrRateStd;
 
-
+  private Float frameCnt;
 }

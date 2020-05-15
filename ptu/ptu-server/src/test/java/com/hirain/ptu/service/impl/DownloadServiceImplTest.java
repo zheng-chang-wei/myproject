@@ -1,5 +1,6 @@
 package com.hirain.ptu.service.impl;
 
+import com.hirain.BaseTest;
 import com.hirain.ptu.Application;
 import com.hirain.ptu.dao.DownloadedFileMapper;
 import com.hirain.ptu.handler.CsvDataHandler;
@@ -21,9 +22,8 @@ import java.util.List;
  * @date 2020/4/4 20:46
  * @describe
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
-public class DownloadServiceImplTest {
+
+public class DownloadServiceImplTest extends BaseTest {
 
   @Autowired CsvDataHandler csvHandler;
   @Autowired DownloadedFileMapper downloadedFileMapper;

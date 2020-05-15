@@ -19,5 +19,7 @@ public class DisplayDataCommonRequest implements Serializable {
 
   private String logicalCondition;
 
-  private String time;
+  private String startTime;
+
+  private String endTime;
 }

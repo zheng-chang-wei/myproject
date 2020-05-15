@@ -3,12 +3,67 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.hirain.ptu.dao.ManageMapper">
-
+    <select id="isExistDatabase" parameterType="String" resultType="Integer">
+        select count(*)
+        from information_schema.schemata
+        where schema_name='${databaseName}'
+    </select>
     <select id="isExistTable" parameterType="String" resultType="Integer">
         select count(*)
         from information_schema.TABLES
         where table_name='${tableName}'
     </select>
+    <update id="createComIdObjectTable">
+        CREATE TABLE `t_comid_object` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `com_id` int(11) NOT NULL,
+        `ip` varchar(15) NOT NULL,
+        `multicast_address` varchar(15) DEFAULT NULL COMMENT '组播地址',
+        `cycle` int(11) DEFAULT NULL COMMENT '周期（us）',
+        `carriage_position` int(11) DEFAULT NULL COMMENT '车厢位置',
+        `packet_length` int(11) DEFAULT NULL COMMENT '报文长度',
+        `remark1` varchar(100) DEFAULT NULL COMMENT '备注1',
+        `remark2` varchar(100) DEFAULT NULL COMMENT '备注2',
+        PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+    </update>
+    <update id="createConditionTable">
+        CREATE TABLE `t_condition` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `condition_name` varchar(50) NOT NULL COMMENT '条件名称',
+        `expression` varchar(255) NOT NULL COMMENT '逻辑表达式',
+        `type` varchar(6) NOT NULL,
+        PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+    </update>
+    <update id="createCsPortObjectTable">
+        CREATE TABLE `t_csport_object` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `com_id` int(11) NOT NULL,
+        `ip` varchar(15) NOT NULL,
+        `train_no` int(11) NOT NULL COMMENT '车号',
+        `card_no` int(11) NOT NULL COMMENT '板卡号',
+        `port` int(11) NOT NULL COMMENT '端口号',
+        PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+    </update>
+    <update id="createDownloadedFileTable">
+        CREATE TABLE `t_downloaded_file` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `file_name` varchar(34) NOT NULL COMMENT '已下载文件名称',
+        PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+    </update>
+    <update id="createTargerConfigTable">
+        CREATE TABLE `t_target_config` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+        `target_ip` varchar(15) NOT NULL,
+        `target_path` varchar(100) NOT NULL,
+        `user_name` varchar(50) NOT NULL,
+        `password` varchar(50) NOT NULL,
+        PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+    </update>
 
     <update id="createComIdDataTable" parameterType="java.util.Map">
         CREATE TABLE ${tableName} (
@@ -26,6 +81,7 @@
         `lost_max_rate` float NOT NULL,
         `life_signal_stop_rate` float NOT NULL,
         `life_signal_stop_max_rate` float NOT NULL,
+        `frame_cnt` float NOT NULL,
         PRIMARY KEY (`id`,`date`),
         KEY `time` (`date`) USING BTREE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC
@@ -61,6 +117,7 @@
         `tx_traffic_std` int(11) NOT NULL,
         `tx_err_rate_mean` int(11) NOT NULL,
         `tx_err_rate_std` int(11) NOT NULL,
+        `frame_cnt` float NOT NULL,
         PRIMARY KEY (`id`,`date`),
         KEY `date` (`date`) USING BTREE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC

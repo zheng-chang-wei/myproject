@@ -1,5 +1,6 @@
 package com.hirain.dome;
 
+import com.hirain.BaseTest;
 import com.hirain.ptu.Application;
 import com.hirain.ptu.handler.CsvDataHandler;
 import com.hirain.ptu.service.ManageService;
@@ -15,9 +16,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
-public class ReadCSVServiceTest {
+
+public class ReadCSVServiceTest extends BaseTest {
 
   @Autowired CsvDataHandler csvHandler;
 

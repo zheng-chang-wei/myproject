@@ -11,16 +11,26 @@ spring:
       url: jdbc:mysql://127.0.0.1:3306/ptu_data?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
       username: root
       password: 123456
-
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     jdbc-type-for-null: null
     map-underscore-to-camel-case: true
 
 
+#ftp:
+#  username: test
+#  password: abc.1234
+#  port: 21
+
 ftp:
-  username: root
-  password: toor
+  username: test
+  password: abc.1234
+  targetIp: 127.0.0.1
+  targetPath: E:/test
   port: 21

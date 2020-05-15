@@ -1,13 +1,19 @@
 package com.hirain.ptu.service.impl;
 
+import com.hirain.BaseTest;
 import com.hirain.ptu.Application;
 import com.hirain.ptu.service.ManageService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
@@ -21,9 +27,7 @@ import static org.junit.Assert.*;
  * @date 2020/4/3 17:24
  * @describe
  */
-// @RunWith(SpringRunner.class)
-// @SpringBootTest(classes = Application.class)
-public class ManageServiceImplTest {
+public class ManageServiceImplTest extends BaseTest {
   @Autowired ManageService manageService;
 
   @Test
@@ -37,7 +41,10 @@ public class ManageServiceImplTest {
   }
 
   @Test
-  public void isExistTable() {}
+  public void isExistTable() {
+    boolean t_target_config = manageService.isExistTable("t_target");
+    System.out.println(t_target_config);
+  }
 
   @Test
   public void lastPartition() {
@@ -90,5 +97,22 @@ public class ManageServiceImplTest {
       partitions.add(time);
     }
     return partitions;
+  }
+
+  @Test
+  public void allPartition() {
+    System.out.println(manageService.allPartition("t_comid_data"));
+    dropPartition();
+    System.out.println(manageService.allPartition("t_comid_data"));
+  }
+
+  @Test
+  public void dropPartition() {
+    manageService.dropPartition("t_comid_data", "p20200226");
+  }
+
+  @Test
+  public void createDatabase() {
+    manageService.createDatabase("ptu_data");
   }
 }

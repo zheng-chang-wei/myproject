@@ -24,12 +24,13 @@
       :header-cell-style="{padding:'3px'}"
       :cell-style="{padding:'3px'}"
       @select="tableSelect"
+      @select-all="selectAll"
     >
       <el-table-column type="selection" align="center" />
       <el-table-column prop="comId" label="comId" align="center" width="71" />
       <el-table-column prop="ip" label="源IP地址" align="center" width="120" />
       <el-table-column prop="carriagePosition" label="车厢位置" align="center" width="85" />
-      <el-table-column prop="remark" label="备注" align="center" />
+      <el-table-column prop="remark1" label="备注" align="center" />
     </el-table>
     <!--分页  工具条-->
     <el-row class="toolbar" style="margin-top:10px">
@@ -77,6 +78,9 @@ export default {
     window.addEventListener('resize', this.changeHeight)
     this.changeHeight()
   },
+  destroyed() {
+    window.removeEventListener('resize', this.changeHeight)
+  },
   mounted() {
     this.getTableDatas()
   },
@@ -99,6 +103,21 @@ export default {
         }, '10')
       }
     },
+    selectAll(selections) {
+      if (selections.length === 0 || (selections.length === 1 && selections[0] === null)) {
+        this.allObjTableDatas.forEach(row => {
+          const sameData = this.getSameData(row, this.selectedObjTableDatas)
+          this.selectedObjTableDatas.splice(this.selectedObjTableDatas.indexOf(sameData), 1)
+        })
+      } else {
+        this.allObjTableDatas.forEach(row => {
+          const sameData = this.getSameData(row, this.selectedObjTableDatas)
+          if (sameData === null) {
+            this.selectedObjTableDatas.push(row)
+          }
+        })
+      }
+    },
     tableSelect(selection, row) {
       const sameData = this.getSameData(row, this.selectedObjTableDatas)
       if (sameData === null) {
@@ -112,6 +131,13 @@ export default {
       this.handleCurrentChange(1)
     },
     addComIdObjConfirm() {
+      if (this.selectedObjTableDatas.length > 10) {
+        this.$message({
+          message: '最多添加10个对象',
+          type: 'warning'
+        })
+        return
+      }
       this.$emit('addComIdObjConfirm', this.selectedObjTableDatas)
       this.addObjDialogVisible = false
     },

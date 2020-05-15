@@ -115,7 +115,7 @@ public class ObjectConfigController {
       }
     }
     if (StringUtils.isNotEmpty(listComIdObjRequest.getRemark())) {
-      if (!String.valueOf(comIdObject.getRemark()).contains(listComIdObjRequest.getRemark())) {
+      if (!String.valueOf(comIdObject.getRemark1()).contains(listComIdObjRequest.getRemark())) {
         return false;
       }
     }

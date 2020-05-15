@@ -3,6 +3,7 @@ package com.hirain.ptu.dao;
 import com.hirain.ptu.common.config.CommonMapper;
 import com.hirain.ptu.model.ComIdObject;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 

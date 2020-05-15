@@ -1,5 +1,7 @@
 package com.hirain.ptu.controller;
 
+import com.hirain.ptu.common.annotation.Log;
+import com.hirain.ptu.common.model.TableNameConstant;
 import com.hirain.ptu.model.ComIdData;
 import com.hirain.ptu.model.CsPortData;
 import com.hirain.ptu.service.ComIdDataService;
@@ -26,6 +28,7 @@ public class DataController {
   @Autowired CsPortDataService csPortDataService;
 
   @GetMapping("/getComIdTableDatas")
+  @Log(TableNameConstant.COMID_DATA_TABLE_NAME)
   public ResponseBo getComIdTableDatas(DisplayDataCommonRequest commonRequest) {
     List<ComIdData> tableDatas = comIdDataService.getComIdTableDatas(commonRequest);
     Map<String, Object> map = new HashMap<>();
@@ -35,6 +38,7 @@ public class DataController {
   }
 
   @GetMapping("/getCsPortTableDatas")
+  @Log(TableNameConstant.CSPROT_DATA_TABLE_NAME)
   public ResponseBo getCsPortTableDatas(DisplayDataCommonRequest commonRequest) {
     List<CsPortData> tableDatas = csPortDataService.getCsPortTableDatas(commonRequest);
     Map<String, Object> map = new HashMap<>();
@@ -44,11 +48,13 @@ public class DataController {
   }
 
   @GetMapping("/getComIdChartData")
+  @Log(TableNameConstant.COMID_DATA_TABLE_NAME)
   public ResponseBo getComIdChartData(DisplayDataCommonRequest commonRequest) throws Exception {
     return ResponseBo.ok(comIdDataService.getChartData(commonRequest));
   }
 
   @GetMapping("/getCsPortChartData")
+  @Log(TableNameConstant.CSPROT_DATA_TABLE_NAME)
   public ResponseBo getCsPortChartData(DisplayDataCommonRequest commonRequest) throws Exception {
     return ResponseBo.ok(csPortDataService.getChartData(commonRequest));
   }

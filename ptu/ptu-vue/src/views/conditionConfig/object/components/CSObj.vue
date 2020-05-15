@@ -19,6 +19,8 @@
       :data="tableDatas"
       :max-height="tableMaxHeight"
       highlight-current-row
+      :header-cell-style="{padding:'3px',fontSize:'11px'}"
+      :cell-style="{padding:'3px',fontSize:'10px'}"
     >
       <el-table-column type="index" label="序号" align="center" width="50px" />
       <el-table-column prop="comId" label="comId" align="center" />
@@ -89,7 +91,7 @@ export default {
       app.postData('csPortImport', formData).then(response => {
         if (response.code === 0) {
           this.$message({
-            message: '上传成功',
+            message: '导入成功',
             type: 'success'
           })
           this.getDatas()

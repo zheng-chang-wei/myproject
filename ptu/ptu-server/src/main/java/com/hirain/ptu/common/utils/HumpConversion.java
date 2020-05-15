@@ -1,5 +1,9 @@
 package com.hirain.ptu.common.utils;
 
+import com.hirain.ptu.common.model.AttributeMap;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,6 +14,46 @@ import java.util.regex.Pattern;
  */
 public class HumpConversion {
   public static final char UNDERLINE = '_';
+
+  public static String getExpression(String expression) {
+    // 驼峰式命名list
+    List<String> humpList = getFeatures(expression);
+    for (String feature : humpList) {
+      // 将表达式中的驼峰命名方式改为下划线
+      expression =
+          expression.replace(
+              feature, camelToUnderline(AttributeMap.featuresMap.get(feature.trim())));
+      expression = expression.replace("==", "=");
+      expression = expression.replace("&&", " and ");
+      expression = expression.replace("||", " or ");
+    }
+    return expression;
+  }
+
+  public static List<String> getFeatures(String expressionString) {
+    // 驼峰式命名list
+    List<String> humpList = new ArrayList<>();
+    String[] ands = expressionString.split("&&");
+    for (String and : ands) {
+      String[] ors = and.split("\\|\\|");
+      for (String or : ors) {
+        String logicalOperator = getLogicalOperator(or);
+        humpList.add(or.split(logicalOperator)[0]);
+      }
+    }
+    return humpList;
+  }
+
+  public static String getLogicalOperator(String element) {
+    String[] logicalOperatorOptions = {">", "<", "==", "!="};
+    for (int index = 0; index < logicalOperatorOptions.length; index++) {
+      String logicalOperator = logicalOperatorOptions[index];
+      if (element.indexOf(logicalOperator) != -1) {
+        return logicalOperator;
+      }
+    }
+    return null;
+  }
 
   /**
    * 驼峰格式字符串转换为下划线格式字符串

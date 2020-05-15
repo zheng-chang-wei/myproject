@@ -3,19 +3,22 @@ package com.hirain.ptu.common.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class CommonParms {
+public class CommonParms implements Serializable {
 
   private String ip;
-  private String comId;
-  private String port;
 
-  private List<String> features;
+  private String comId;
+
+  private String port;
 
   private String logicalCondition;
 
-  private String time;
+  private String startTime;
+
+  private String endTime;
 }

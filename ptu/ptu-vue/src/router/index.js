@@ -13,27 +13,27 @@ export const constantRoutes = [
     hidden: true
   },
 
-  // {
-  //   path: '/',
-  //   component: Layout,
-  //   redirect: '/dashboard',
-  //   children: [{
-  //     path: 'dashboard',
-  //     name: 'Dashboard',
-  //     component: () => import('@/views/dashboard/index'),
-  //     meta: { title: '首页', icon: 'dashboard' }
-  //   }]
-  // },
-
   {
     path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'dashboard',
+      name: 'Dashboard',
+      component: () => import('@/views/dashboard/index'),
+      meta: { title: '首页', icon: 'dashboard' }
+    }]
+  },
+
+  {
+    path: '/download',
     component: Layout,
     children: [
       {
         path: '',
         name: 'download',
         component: () => import('@/views/download/index'),
-        meta: { title: '数据下载与删除', icon: 'tree' }
+        meta: { title: '数据管理', icon: 'tree' }
       }
     ]
   },
@@ -81,18 +81,18 @@ export const constantRoutes = [
     ]
   },
 
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/parmConfig/index'),
-        meta: { title: '参数配置', icon: 'form' }
-      }
-    ]
-  },
+  // {
+  //   path: '/form',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       name: 'Form',
+  //       component: () => import('@/views/parmConfig/index'),
+  //       meta: { title: '参数配置', icon: 'form' }
+  //     }
+  //   ]
+  // },
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }

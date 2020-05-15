@@ -55,5 +55,7 @@ public class ComIdData implements Serializable {
 
   private Float lifeSignalStopMaxRate;
 
+  private Float frameCnt;
+
 
 }

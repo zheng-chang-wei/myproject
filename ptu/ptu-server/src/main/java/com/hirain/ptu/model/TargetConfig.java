@@ -19,4 +19,8 @@ public class TargetConfig implements Serializable {
   private String targetIp;
 
   private String targetPath;
+
+  private String userName;
+
+  private String password;
 }

@@ -7,6 +7,12 @@
       <el-form-item label="数据下载目标路径" prop="targetPath">
         <el-input v-model="form.targetPath" />
       </el-form-item>
+      <el-form-item label="FTP用户名" prop="userName">
+        <el-input v-model="form.userName" />
+      </el-form-item>
+      <el-form-item label="FTP密码" prop="password">
+        <el-input v-model="form.password" />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" style="float:right" @click="onSubmit">保存</el-button>
       </el-form-item>
@@ -44,6 +50,20 @@ export default {
           }
         ],
         targetPath: [
+          {
+            required: true,
+            message: '必填',
+            trigger: 'change'
+          }
+        ],
+        userName: [
+          {
+            required: true,
+            message: '必填',
+            trigger: 'change'
+          }
+        ],
+        password: [
           {
             required: true,
             message: '必填',

@@ -1,4 +1,9 @@
+import apiDomain from './apiDomain.js'
 const appApi = {
+  listComIdOverview: '/overview/listComIds',
+  listCsPortOverview: '/overview/listCsPorts',
+
+  upload_file: '/upload/uploadFile',
   download: '/download/download',
   getDataOverview: '/download/getDataOverview',
   delete: '/download/delete',
@@ -24,5 +29,7 @@ const appApi = {
   editCondition: '/condition/editCondition'
 
 }
-
+for (var i in appApi) {
+  appApi[i] = 'http://' + apiDomain.ip + appApi[i]
+}
 export default appApi

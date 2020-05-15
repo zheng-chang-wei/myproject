@@ -1,5 +1,6 @@
 package com.hirain.dome;
 
+import com.hirain.BaseTest;
 import com.hirain.ptu.Application;
 import com.hirain.ptu.common.utils.FtpOperation;
 import com.hirain.ptu.dao.ComIdDataMapper;
@@ -15,11 +16,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(
-    classes = Application.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class FtpTest {
+
+public class FtpTest extends BaseTest {
 
   @Autowired FtpOperation ftpOperation;
 

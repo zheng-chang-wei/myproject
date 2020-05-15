@@ -7,7 +7,7 @@
       </el-row>
       <el-button style="width:97%;margin:5px 5px" icon="el-icon-plus" type="primary" size="mini" @click="openAddFeaturesDialog">添加</el-button>
       <el-table ref="table" :data="selectedFeaturesTableDatas" style="width: 100%;" border :height="(commonHeight/2)-70" :row-style="{ fontSize: '11px' }" :header-cell-style="{padding:'3px',fontSize:'12px'}" :cell-style="{padding:'3px'}">
-        <el-table-column prop="featureName" label="特征名称" align="center" />
+        <el-table-column prop="featureName_CN" label="特征名称" align="center" />
         <el-table-column align="center" label="操作" width="56">
           <template slot-scope="scope">
             <el-button
@@ -19,7 +19,7 @@
         </el-table-column>
       </el-table>
     </el-row>
-    <el-dialog title="添加变量" :visible.sync="addFeaturesDialogVisible">
+    <el-dialog title="添加变量" :visible.sync="addFeaturesDialogVisible" top="3%">
       <el-table
         ref="allFeaturesTable"
         :border="true"
@@ -30,7 +30,7 @@
         :cell-style="{padding:'3px'}"
       >
         <el-table-column type="selection" align="center" />
-        <el-table-column prop="featureName" label="特征名称" align="center" />
+        <el-table-column prop="featureName_CN" label="特征名称" align="center" />
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="addFeaturesDialogVisible = false">取 消</el-button>
@@ -106,18 +106,20 @@ export default {
     getDatas() {
       switch (this.type) {
         case 'ComId':
-          global.comIdFeatureNames.forEach(element => {
+          for (let index = 0; index < global.comIdFeatureNames_CN.length; index++) {
             this.allFeaturesTable.push({
-              featureName: element
+              featureName_CN: global.comIdFeatureNames_CN[index],
+              featureName_EN: global.comIdFeatureNames_EN[index]
             })
-          })
+          }
           break
         case 'CsPort':
-          global.csPortFeatureNames.forEach(element => {
+          for (let index = 0; index < global.csPortFeatureNames_CN.length; index++) {
             this.allFeaturesTable.push({
-              featureName: element
+              featureName_CN: global.csPortFeatureNames_CN[index],
+              featureName_EN: global.csPortFeatureNames_EN[index]
             })
-          })
+          }
           break
         default:
           break

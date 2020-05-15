@@ -1,7 +1,10 @@
 <template>
   <section class="app-main">
     <transition name="fade-transform" mode="out-in">
-      <router-view :key="key" />
+      <keep-alive>
+        <router-view :key="key" />
+      </keep-alive>
+
     </transition>
   </section>
 </template>
@@ -55,8 +58,10 @@ export default {
         this.$bus.$emit('downloadCount', data.data)
       } else if (data.code === 3) { // 一个文件下载成功
         this.$bus.$emit('downloadSuccess', data.data)
+      } else if (data.code === 4) { // 一个文件上传成功
+        this.$bus.$emit('uploadSuccess', data.data)
       } else if (data.code === 500) { // 下载文件失败
-        this.$bus.$emit('downloadCount', 0)
+        this.$bus.$emit('downloadError')
       }
     },
     setOncloseMessage() {
@@ -107,5 +112,14 @@ export default {
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
+}
+.el-pagination__total {
+    margin-right: 0px;
+}
+.el-pagination__sizes {
+    margin: 0 0 0 0;
+}
+.el-pagination__jump {
+    margin-left: 0px;
 }
 </style>

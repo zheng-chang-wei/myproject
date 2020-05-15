@@ -35,9 +35,9 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
               ips.get(i),
               comIds.get(i),
               null,
-              null,
-              getExpression(commonRequest.getLogicalCondition()),
-              commonRequest.getTime());
+              HumpConversion.getExpression(commonRequest.getLogicalCondition()),
+              commonRequest.getStartTime(),
+              commonRequest.getEndTime());
       List<ComIdData> tableDatas = comIdDataMapper.getTableData(commonParms);
       list.addAll(tableDatas);
     }
@@ -50,7 +50,8 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
     List<String> comIds = commonRequest.getComIds();
     List<String> ips = commonRequest.getIps();
     List<CommonResponse> list = new ArrayList<>();
-    List<List<ComIdData>> comIdObjs = new ArrayList<>();
+    //所有对象数据，每个对象一个list
+    List<List<ComIdData>> comIdDatas = new ArrayList<>();
     String errorMsg = "";
     for (int i = 0; i < comIds.size(); i++) {
       CommonParms commonParms =
@@ -58,30 +59,25 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
               ips.get(i),
               comIds.get(i),
               null,
-              null,
-              getExpression(commonRequest.getLogicalCondition()),
-              commonRequest.getTime());
+              HumpConversion.getExpression(commonRequest.getLogicalCondition()),
+              commonRequest.getStartTime(),
+              commonRequest.getEndTime());
       List<ComIdData> tableData = comIdDataMapper.getTableData(commonParms);
-      if (tableData.size() == 0) {
-        if (errorMsg.length() != 0) {
-          errorMsg += "</br></br>";
-        }
-        errorMsg += "comId:" + comIds.get(i) + ", ip:" + ips.get(i) + " 数据为空";
-      }
-      comIdObjs.add(tableData);
+      errorMsg += checkError(comIds.get(i), ips.get(i), tableData.size());
+      comIdDatas.add(tableData);
     }
-    if (errorMsg.length()!=0){
-        throw new CustomException(errorMsg);
+    if (errorMsg.length() != 0) {
+      throw new CustomException(errorMsg);
     }
     List<Date> timeList = new ArrayList<>();
-    for (ComIdData comIdObj : comIdObjs.get(0)) {
+    for (ComIdData comIdObj : comIdDatas.get(0)) {
       timeList.add(comIdObj.getDate());
     }
     for (int j = 0; j < commonRequest.getFeatures().size(); j++) {
       CommonResponse commonResponse = new CommonResponse();
       commonResponse.setTimes(timeList);
       List<List<String>> values = new ArrayList<>();
-      for (List<ComIdData> comIdObjList : comIdObjs) {
+      for (List<ComIdData> comIdObjList : comIdDatas) {
         List<String> arrayList = new ArrayList<>();
         for (ComIdData comIdObj : comIdObjList) {
           String property = BeanUtils.getProperty(comIdObj, commonRequest.getFeatures().get(j));
@@ -93,6 +89,17 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
       list.add(commonResponse);
     }
     return list;
+  }
+
+  private String checkError(String comId, String ip, int tableDataSize) {
+    String errorMsg = "";
+    if (tableDataSize == 0) {
+      if (errorMsg.length() != 0) {
+        errorMsg += "</br></br>";
+      }
+      errorMsg += "comId:" + comId + ", ip:" + ip + " 数据为空";
+    }
+    return errorMsg;
   }
 
   @Override
@@ -114,18 +121,6 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
     manageService.dropTable(TableNameConstant.COMID_DATA_TABLE_NAME);
   }
 
-  private String getExpression(String expression) {
-    // 驼峰式命名list
-    List<String> humpList = getFeatures(expression);
-    for (String feature : humpList) {
-      // 将表达式中的驼峰命名方式改为下划线
-      expression = expression.replace(feature, HumpConversion.camelToUnderline(feature));
-      expression = expression.replace("&&", " and ");
-      expression = expression.replace("||", " or ");
-    }
-    return expression;
-  }
-
   @Override
   public DataOverview selectTimeRange() {
     if (manageService.isExistTable(TableNameConstant.COMID_DATA_TABLE_NAME)) {
@@ -133,30 +128,5 @@ public class ComIdDataServiceImpl extends BaseService<ComIdData> implements ComI
     } else {
       return null;
     }
-  }
-
-  private List<String> getFeatures(String expressionString) {
-    // 驼峰式命名list
-    List<String> humpList = new ArrayList<>();
-    String[] ands = expressionString.split("&&");
-    for (String and : ands) {
-      String[] ors = and.split("\\|\\|");
-      for (String or : ors) {
-        String logicalOperator = getLogicalOperator(or);
-        humpList.add(or.split(logicalOperator)[0]);
-      }
-    }
-    return humpList;
-  }
-
-  private String getLogicalOperator(String element) {
-    String[] logicalOperatorOptions = {">", "<", "=", "!="};
-    for (int index = 0; index < logicalOperatorOptions.length; index++) {
-      String logicalOperator = logicalOperatorOptions[index];
-      if (element.indexOf(logicalOperator) != -1) {
-        return logicalOperator;
-      }
-    }
-    return null;
   }
 }

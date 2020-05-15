@@ -2,6 +2,7 @@ package com.hirain.ptu.handler;
 
 import com.hirain.ptu.common.model.WebSocketResponse;
 import com.hirain.ptu.common.utils.DateUtil;
+import com.hirain.ptu.common.utils.FtpOperation;
 import com.hirain.ptu.model.ComIdData;
 import com.hirain.ptu.model.CsPortData;
 import com.hirain.ptu.websocket.WebSocketServer;
@@ -9,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +24,25 @@ import java.util.List;
 public class CsvDataHandler {
 
   @Autowired DataHandler dataHandler;
+  @Autowired FtpOperation ftpOperation;
 
+  @Async
+  public void handleFile(String fileName) throws Exception {
+    InputStream inputStream = ftpOperation.downloadFile(fileName);
+    if (inputStream != null) {
+      if (fileName.startsWith("ComID")) {
+        readComIdCSV(inputStream, fileName);
+      } else if (fileName.startsWith("CSport")) {
+        readCsPortCSV(inputStream, fileName);
+      }
+      WebSocketServer.sendMessage("admin", new WebSocketResponse(3, fileName));
+    }
+  }
   /**
    * 读取CSV文件
    *
    * @return
    */
-  @Async
   public void readComIdCSV(InputStream fileInputStream, String fileName) throws Exception {
     List<ComIdData> comIdDataList = new ArrayList<>();
     String line = null;
@@ -49,10 +59,10 @@ public class CsvDataHandler {
         setComIdData(comIdData, items);
         comIdDataList.add(comIdData);
       }
-      if (comIdDataList.size()!=0){
+      if (comIdDataList.size() != 0) {
         dataHandler.insertComIdData(comIdDataList, fileName);
       }
-      WebSocketServer.sendMessage("admin", new WebSocketResponse(3, fileName));
+
     } catch (Exception e) {
       throw e;
     } finally {
@@ -60,7 +70,6 @@ public class CsvDataHandler {
     }
   }
 
-  @Async
   public void readCsPortCSV(InputStream fileInputStream, String fileName) throws Exception {
     List<CsPortData> csPortDataDataList = new ArrayList<>();
     String line = null;
@@ -78,7 +87,6 @@ public class CsvDataHandler {
         csPortDataDataList.add(csPortData);
       }
       dataHandler.insertCsPortData(csPortDataDataList, fileName);
-      WebSocketServer.sendMessage("admin", new WebSocketResponse(3, fileName));
     } catch (Exception e) {
       throw e;
     } finally {
@@ -87,6 +95,11 @@ public class CsvDataHandler {
   }
 
   private void setComIdData(ComIdData comIdData, String[] items) throws ParseException {
+    for (int i = 0; i < items.length; i++) {
+      if ("nan".equals(items[i].trim()) || "inf".equals(items[i].trim())) {
+        items[i] = "0";
+      }
+    }
     comIdData.setDate(
         DateUtil.parse(items[0].trim() + " " + items[1].trim(), "yyyy-MM-dd HH:mm:ss"));
     comIdData.setIp(items[2].trim());
@@ -101,9 +114,15 @@ public class CsvDataHandler {
     comIdData.setLostMaxRate(Float.valueOf(items[11].trim()));
     comIdData.setLifeSignalStopRate(Float.valueOf(items[12].trim()));
     comIdData.setLifeSignalStopMaxRate(Float.valueOf(items[13].trim()));
+    comIdData.setFrameCnt(Float.valueOf(items[14].trim()));
   }
 
   private void setCsPortData(CsPortData csPortData, String[] items) throws ParseException {
+    for (int i = 0; i < items.length; i++) {
+      if ("nan".equals(items[i].trim()) || "inf".equals(items[i].trim())) {
+        items[i] = "0";
+      }
+    }
     csPortData.setDate(
         DateUtil.parse(items[0].trim() + " " + items[1].trim(), "yyyy-MM-dd HH:mm:ss"));
     csPortData.setIp(items[2].trim());
@@ -129,8 +148,8 @@ public class CsvDataHandler {
     csPortData.setTxTrafficStd(Float.valueOf(items[22].trim()).intValue());
     csPortData.setTxErrRateMean(Float.valueOf(items[23].trim()).intValue());
     csPortData.setTxErrRateStd(Float.valueOf(items[24].trim()).intValue());
+    csPortData.setFrameCnt(Float.valueOf(items[25].trim()));
   }
-
 
   private void closeIO(
       InputStream fileInputStream,
