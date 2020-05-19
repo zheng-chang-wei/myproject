@@ -177,7 +177,6 @@ export default {
       })
     },
     featureChange(value) {
-      // console.log(value)
     },
     handleDelLogical() {
       this.$refs.logicalTable.selection
@@ -268,7 +267,6 @@ export default {
           logicals[index].push(element)
         }
       }
-      console.log(logicals)
       return true
     }
   }

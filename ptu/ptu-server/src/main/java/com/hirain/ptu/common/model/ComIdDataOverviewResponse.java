@@ -12,14 +12,20 @@ public class ComIdDataOverviewResponse implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private Integer allComIdObjectSize;
-  private Integer hasDataComIdObjectSize;
-  private Integer errorCount=0;
+  private Integer hasDataComIdObjectSize = 0;
+  private Integer errorCount = 0;
   private Float groupFlow1;
   private Float groupFlow2;
   private List<ComIdDataOverviewTableData> comIdDataOverviewTableDataList;
 
   public Integer getHasDataComIdObjectSize() {
-    return comIdDataOverviewTableDataList.size();
+    Integer hasDataComIdObjectSize = 0;
+    for (ComIdDataOverviewTableData comIdDataOverviewTableData : comIdDataOverviewTableDataList) {
+      if (comIdDataOverviewTableData.getFrameCnt() != 0) {
+        hasDataComIdObjectSize++;
+      }
+    }
+    return hasDataComIdObjectSize;
   }
 
   public void setComIdDataOverviewTableDataList(
@@ -31,7 +37,7 @@ public class ComIdDataOverviewResponse implements Serializable {
       if (comIdDataOverviewTableData.getAbnomalLostPHM()
               + comIdDataOverviewTableData.getLostRatePHM()
               + comIdDataOverviewTableData.getPeriodStabilityPHM()
-          >= 1) {
+          >= 1&&comIdDataOverviewTableData.getFrameCnt()>0) {
         errorCount++;
       }
       if (comIdDataOverviewTableData.getIp().startsWith("10.0")) {
@@ -46,9 +52,7 @@ public class ComIdDataOverviewResponse implements Serializable {
                 / 1024;
       }
     }
-    setGroupFlow1(
-        Float.valueOf(String.format("%.2f", groupFlow1 / comIdDataOverviewTableDataList.size())));
-    setGroupFlow2(
-        Float.valueOf(String.format("%.2f", groupFlow2 / comIdDataOverviewTableDataList.size())));
+    setGroupFlow1(Float.valueOf(String.format("%.2f", groupFlow1 / getHasDataComIdObjectSize())));
+    setGroupFlow2(Float.valueOf(String.format("%.2f", groupFlow2 / getHasDataComIdObjectSize())));
   }
 }

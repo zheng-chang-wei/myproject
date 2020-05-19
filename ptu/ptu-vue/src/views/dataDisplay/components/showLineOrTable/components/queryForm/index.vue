@@ -12,20 +12,15 @@
       </el-select>
     </el-form-item>
     <el-form-item label="日期" prop="time">
-      <!-- <el-date-picker
-        v-model="retrieveForm.time"
-        value-format="yyyy-MM-dd"
-        placeholder="选择日期"
-        :editable="false"
-      /> -->
       <el-date-picker
         v-model="retrieveForm.time"
         style="width:325px"
         type="datetimerange"
-        value-format="yyyy-MM-dd HH:mm"
+        value-format="yyyy-MM-dd HH:mm:ss"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         :editable="false"
+        @change="timeChange"
       />
     </el-form-item>
     <el-form-item>
@@ -91,6 +86,16 @@ export default {
     }
   },
   created() {
+    const time = localStorage.getItem('time')
+    if (time !== undefined && time !== null) {
+      this.retrieveForm.time = time.split(',')
+    }
+    this.$bus.$on('timeChange', (data) => {
+      this.retrieveForm.time = data
+    })
+  },
+  destroyed() {
+    this.$bus.$off('timeChange')
   },
   mounted() {
     this.getCondition()
@@ -128,8 +133,11 @@ export default {
           this.$emit('queryLineDatas', this.retrieveForm)
         }
       })
+    },
+    timeChange() {
+      this.$bus.$emit('timeChange', this.retrieveForm.time)
+      localStorage.setItem('time', this.retrieveForm.time)
     }
-
   }
 }
 </script>

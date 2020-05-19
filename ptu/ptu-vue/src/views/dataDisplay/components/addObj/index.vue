@@ -76,15 +76,14 @@ export default {
     },
     handleDelete(index, row) {
       this.selectedObjTableDatas.splice(index, 1)
-      this.$bus.$emit('objChange', this.selectedObjTableDatas)
+      this.$emit('objChange', this.selectedObjTableDatas)
     },
     addComIdObjConfirm(selection) {
       this.selectedObjTableDatas = []
       selection.forEach(element => {
         this.selectedObjTableDatas.push(element)
       })
-
-      this.$bus.$emit('objChange', this.selectedObjTableDatas)
+      this.$emit('objChange', this.selectedObjTableDatas)
     }
 
   }

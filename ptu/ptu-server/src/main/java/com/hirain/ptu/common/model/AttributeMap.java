@@ -10,6 +10,7 @@ public class AttributeMap {
   public static Map<String, String> featuresMap = new HashMap<>();
 
   static {
+    // comId对象配置文件
     comIdMapData.put("ComID", "comId");
     comIdMapData.put("源IP地址", "ip");
     comIdMapData.put("组播地址", "multicastAddress");
@@ -18,7 +19,7 @@ public class AttributeMap {
     comIdMapData.put("车厢位置", "carriagePosition");
     comIdMapData.put("备注1", "remark1");
     comIdMapData.put("备注2", "remark2");
-
+    // csPort对象配置文件
     csPortMapData.put("ComID号", "comId");
     csPortMapData.put("源IP地址", "ip");
     csPortMapData.put("车号", "trainNo");
@@ -56,5 +57,6 @@ public class AttributeMap {
     featuresMap.put("流量标准差-发", "txTrafficStd");
     featuresMap.put("误码率均值-预留", "txErrRateMean");
     featuresMap.put("误码率标准差-预留", "txErrRateStd");
+    featuresMap.put("收到报文数", "frameCnt");
   }
 }

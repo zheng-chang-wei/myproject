@@ -38,7 +38,7 @@ public class ConditionServiceImpl extends BaseService<Condition> implements Cond
    */
   @Override
   public boolean isRepeat(Condition condition) {
-    Condition selectCondition = selectByName(condition.getConditionName());
+    Condition selectCondition = selectByCondition(condition);
     if (condition.getId() == null) {
       if (selectCondition == null) {
         return false;
@@ -56,11 +56,14 @@ public class ConditionServiceImpl extends BaseService<Condition> implements Cond
     }
   }
 
-  private Condition selectByName(String name) {
+  private Condition selectByCondition(Condition condition) {
     Example example = new Example(Condition.class);
     Example.Criteria criteria = example.createCriteria();
-    if (StringUtil.isNotEmpty(name)) {
-      criteria.andEqualTo("conditionName", name);
+    if (StringUtil.isNotEmpty(condition.getConditionName())) {
+      criteria.andEqualTo("conditionName", condition.getConditionName());
+    }
+    if (StringUtil.isNotEmpty(condition.getType())) {
+      criteria.andEqualTo("type", condition.getType());
     }
     List<Condition> list = conditionMapper.selectByExample(example);
     if (list != null && list.size() != 0) {

@@ -1,11 +1,11 @@
 <template>
   <el-row id="config" :gutter="5">
     <el-col :span="6">
-      <addObj type="ComId" />
-      <addFeatures type="ComId" />
+      <addObj type="ComId" @objChange="objChange" />
+      <addFeatures type="ComId" @featuresChange="featuresChange" />
     </el-col>
     <el-col :span="18">
-      <showLineOrTable type="ComId" />
+      <showLineOrTable ref="comIdLine" type="ComId" />
     </el-col>
   </el-row>
 </template>
@@ -30,7 +30,12 @@ export default {
   mounted() {
   },
   methods: {
-
+    objChange(selectedObjTableDatas) {
+      this.$refs.comIdLine.objChange(selectedObjTableDatas)
+    },
+    featuresChange(selectedFeaturesTableDatas) {
+      this.$refs.comIdLine.featuresChange(selectedFeaturesTableDatas)
+    }
   }
 }
 </script>

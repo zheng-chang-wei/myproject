@@ -102,13 +102,20 @@ export default {
     // 页面改变时,更改尺寸
     window.addEventListener('resize', this.changeHeight)
     this.changeHeight()
-    this.$bus.$on('objChange', (data) => {
+  },
+  mounted() {
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.changeHeight)
+  },
+  methods: {
+    objChange(data) {
       this.objs = []
       data.forEach(element => {
         this.objs.push(element)
       })
-    })
-    this.$bus.$on('featuresChange', (data) => {
+    },
+    featuresChange(data) {
       this.features = []
       this.json_fields = {
         '时间': 'date',
@@ -125,17 +132,7 @@ export default {
         })
         this.json_fields[element.featureName_CN] = element.featureName_EN
       })
-    })
-  },
-  mounted() {
-    // this.getTableDatas()
-  },
-  beforeDestroy() {
-    this.$bus.$off('objChange')
-    this.$bus.$off('featuresChange')
-    window.removeEventListener('resize', this.changeHeight)
-  },
-  methods: {
+    },
     changeHeight() {
       this.tableMaxHeight = document.body.offsetHeight - 170
       if (this.isQueryTable) {

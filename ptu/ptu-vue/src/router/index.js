@@ -16,18 +16,6 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' }
-    }]
-  },
-
-  {
-    path: '/download',
-    component: Layout,
     children: [
       {
         path: '',
@@ -58,6 +46,16 @@ export const constantRoutes = [
         meta: { title: '逻辑条件配置', icon: 'form' }
       }
     ]
+  },
+  {
+    path: '/dataOverview',
+    component: Layout,
+    children: [{
+      path: '',
+      name: 'DataOverview',
+      component: () => import('@/views/dashboard/index'),
+      meta: { title: '数据总览', icon: 'dashboard' }
+    }]
   },
   {
     path: '/data',

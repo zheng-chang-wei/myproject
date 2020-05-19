@@ -137,7 +137,6 @@ export default {
     },
 
     addComIdObjConfirm() {
-      console.log(this.selectedObjTableDatas)
       if (this.selectedObjTableDatas.length > 10) {
         this.$message({
           message: '最多添加10个对象',

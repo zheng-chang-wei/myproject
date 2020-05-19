@@ -9,13 +9,13 @@
       :data="tableDatas"
       :max-height="tableMaxHeight"
       highlight-current-row
-      :header-cell-style="{padding:'3px',fontSize:'11px'}"
+      :header-cell-style="{padding:'3px',fontSize:'10.5px'}"
       :cell-style="{padding:'3px',fontSize:'10px'}"
     >
       <el-table-column type="index" label="序号" align="center" width="50px" />
-      <el-table-column prop="comId" label="comId" align="center" />
+      <el-table-column prop="comId" label="comId" align="center" width="60px" />
       <el-table-column prop="ip" label="源IP地址" align="center" />
-      <el-table-column prop="trainNo" label="车号" align="center" width="60px" />
+      <el-table-column prop="trainNo" label="车号" align="center" width="50px" />
       <el-table-column prop="cardNo" label="板卡号" align="center" width="60px" />
       <el-table-column prop="port" label="端口号" align="center" width="60px" />
       <el-table-column prop="enable" label="使能状态" align="center" />
@@ -25,6 +25,14 @@
       <el-table-column prop="txTrafficPHM" label="流量异常（发）" align="center" width="110px" />
       <el-table-column prop="rxErrRatePHM" label="误码异常" align="center" />
       <el-table-column prop="rxErrPredictPHM" label="误码趋势异常" align="center" width="100px" />
+      <el-table-column label="是否异常" align="center">
+        <template slot-scope="scope">
+          <el-tag
+            :type="scope.row.error ? 'danger' : 'success'"
+            disable-transitions
+          >{{ scope.row.error ? '是' : '否' }}</el-tag>
+        </template>
+      </el-table-column>
     </el-table>
 
   </section>

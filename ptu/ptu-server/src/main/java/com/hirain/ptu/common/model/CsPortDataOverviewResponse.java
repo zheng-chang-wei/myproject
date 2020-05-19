@@ -48,29 +48,32 @@ public class CsPortDataOverviewResponse implements Serializable {
 
   private Integer cardNo;
 
+  private Boolean error = false;
+
   public void setCsPortData(CsPortDataOverview csPortData) {
     this.ip = csPortData.getIp();
     this.comId = csPortData.getComId();
     this.port = csPortData.getPort();
-//    this.linkPHM = csPortData.getLinkPHM();
-//    this.linkFlashPHM = csPortData.getLinkFlashPHM();
-//    this.rxTrafficPHM = csPortData.getRxTrafficPHM();
-//    this.rxErrRatePHM = csPortData.getRxErrRatePHM();
-//    this.rxErrPredictPHM = csPortData.getRxErrPredictPHM();
-//    this.txTrafficPHM = csPortData.getTxTrafficPHM();
-//    this.txErrRatePHM = csPortData.getTxErrRatePHM();
-//    this.txErrPredictPHM = csPortData.getTxErrPredictPHM();
-//    this.enable = csPortData.getEnable();
-
-        this.linkPHM = csPortData.getLinkPHM() ? (byte) 1 : (byte) 0;
-        this.linkFlashPHM = csPortData.getLinkFlashPHM() ? (byte) 1 : (byte) 0;
-        this.rxTrafficPHM = csPortData.getRxTrafficPHM() ? (byte) 1 : (byte) 0;
-        this.rxErrRatePHM = csPortData.getRxErrRatePHM() ? (byte) 1 : (byte) 0;
-        this.rxErrPredictPHM = csPortData.getRxErrPredictPHM() ? (byte) 1 : (byte) 0;
-        this.txTrafficPHM = csPortData.getTxTrafficPHM() ? (byte) 1 : (byte) 0;
-        this.txErrRatePHM = csPortData.getTxErrRatePHM() ? (byte) 1 : (byte) 0;
-        this.txErrPredictPHM = csPortData.getTxErrPredictPHM() ? (byte) 1 : (byte) 0;
-        this.enable = csPortData.getEnable() ? (byte) 1 : (byte) 0;
+    this.linkPHM = csPortData.getLinkPHM() ? (byte) 1 : (byte) 0;
+    this.linkFlashPHM = csPortData.getLinkFlashPHM() ? (byte) 1 : (byte) 0;
+    this.rxTrafficPHM = csPortData.getRxTrafficPHM() ? (byte) 1 : (byte) 0;
+    this.rxErrRatePHM = csPortData.getRxErrRatePHM() ? (byte) 1 : (byte) 0;
+    this.rxErrPredictPHM = csPortData.getRxErrPredictPHM() ? (byte) 1 : (byte) 0;
+    this.txTrafficPHM = csPortData.getTxTrafficPHM() ? (byte) 1 : (byte) 0;
+    this.txErrRatePHM = csPortData.getTxErrRatePHM() ? (byte) 1 : (byte) 0;
+    this.txErrPredictPHM = csPortData.getTxErrPredictPHM() ? (byte) 1 : (byte) 0;
+    this.enable = csPortData.getEnable() ? (byte) 1 : (byte) 0;
+    this.error =
+        (this.enable == 1
+            && (this.linkPHM
+                    + this.linkFlashPHM
+                    + this.rxTrafficPHM
+                    + this.rxErrRatePHM
+                    + this.rxErrPredictPHM
+                    + this.txTrafficPHM
+                    + this.txErrRatePHM
+                    + this.txErrPredictPHM)
+                >= 1);
   }
 
   public void setCsPortObject(CsPortObject csPortObject) {

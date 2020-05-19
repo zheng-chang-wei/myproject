@@ -1,11 +1,11 @@
 <template>
   <el-row id="config" :gutter="5">
     <el-col :span="6">
-      <addObj type="CsPort" />
-      <addFeatures type="CsPort" />
+      <addObj type="CsPort" @objChange="objChange" />
+      <addFeatures type="CsPort" @featuresChange="featuresChange" />
     </el-col>
     <el-col :span="18">
-      <showLineOrTable type="CsPort" />
+      <showLineOrTable ref="csPortLine" type="CsPort" />
     </el-col>
   </el-row>
 </template>
@@ -30,7 +30,12 @@ export default {
   mounted() {
   },
   methods: {
-
+    objChange(selectedObjTableDatas) {
+      this.$refs.csPortLine.objChange(selectedObjTableDatas)
+    },
+    featuresChange(selectedFeaturesTableDatas) {
+      this.$refs.csPortLine.featuresChange(selectedFeaturesTableDatas)
+    }
   }
 }
 </script>

@@ -97,11 +97,11 @@ export default {
         this.selectedFeaturesTableDatas.push(element)
       })
       this.addFeaturesDialogVisible = false
-      this.$bus.$emit('featuresChange', this.selectedFeaturesTableDatas)
+      this.$emit('featuresChange', this.selectedFeaturesTableDatas)
     },
     handleDelete(index, row) {
       this.selectedFeaturesTableDatas.splice(index, 1)
-      this.$bus.$emit('featuresChange', this.selectedFeaturesTableDatas)
+      this.$emit('featuresChange', this.selectedFeaturesTableDatas)
     },
     getDatas() {
       switch (this.type) {

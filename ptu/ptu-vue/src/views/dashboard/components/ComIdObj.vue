@@ -1,6 +1,6 @@
 <template>
   <section>
-    <queryForm :table-datas="tableDatas" :json-fields="jsonFields" :title="title" :cols="cols" type="ComID" @getDatas="getDatas" />
+    <queryForm :table-datas="tableDatas" :json-fields="jsonFields" :title="title" :cols="cols" type="ComId" @getDatas="getDatas" />
     <span class="center" style="font-size:13px;margin-bottom:5px">{{ title }}</span>
     <!-- 表格 -->
     <el-table
@@ -9,7 +9,7 @@
       :data="tableDatas"
       :max-height="tableMaxHeight"
       highlight-current-row
-      :header-cell-style="{padding:'3px',fontSize:'11px'}"
+      :header-cell-style="{padding:'3px',fontSize:'10.5px'}"
       :cell-style="{padding:'3px',fontSize:'10px'}"
     >
       <el-table-column type="index" label="序号" align="center" width="50px" />
@@ -21,6 +21,14 @@
       <el-table-column prop="lostRatePHM" label="丢帧率异常" align="center" width="95" />
       <el-table-column prop="abnomalLostPHM" label="丢帧行为异常" align="center" width="105" />
       <el-table-column prop="frameCnt" label="平均每秒报文数" align="center" width="115" />
+      <el-table-column label="是否异常" align="center" width="75">
+        <template slot-scope="scope">
+          <el-tag
+            :type="scope.row.error ? 'danger' : 'success'"
+            disable-transitions
+          >{{ scope.row.error ? '是' : '否' }}</el-tag>
+        </template>
+      </el-table-column>
     </el-table>
   </section>
 </template>

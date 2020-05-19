@@ -35,6 +35,8 @@ public class ComIdDataOverviewTableData implements Serializable {
   /** 备注 */
   private String remark1;
 
+  private Boolean error = false;
+
   public void setComIdData(ComIdDataOverview comIdData) {
     this.ip = comIdData.getIp();
     this.comId = comIdData.getComId();
@@ -47,6 +49,11 @@ public class ComIdDataOverviewTableData implements Serializable {
   public void setComIdObject(ComIdObject comIdObject) {
     this.carriagePosition = comIdObject.getCarriagePosition();
     this.remark1 = comIdObject.getRemark1();
-    this.packetLength=comIdObject.getPacketLength();
+    this.packetLength = comIdObject.getPacketLength();
+  }
+
+  public Boolean getError() {
+    return (this.periodStabilityPHM + this.lostRatePHM + this.abnomalLostPHM) >= 1
+        && this.frameCnt > 0;
   }
 }

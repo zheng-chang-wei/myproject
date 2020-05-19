@@ -23,7 +23,7 @@ public interface ComIdDataMapper extends CommonMapper<ComIdData> {
   List<String> getTableByTableName(String tableName);
 
   @Select(
-      "SELECT SUM(period_stability_p_h_m) period_stability_p_h_m,SUM(lost_rate_p_h_m) lost_rate_p_h_m,SUM(abnomal_lost_p_h_m) abnomal_lost_p_h_m,AVG((frame_cnt/window_time)*1000000) frame_cnt, ip,com_id from t_comid_data where date>=#{startTime} and date<=#{endTime} GROUP BY ip,com_id")
+      "SELECT SUM(period_stability_p_h_m) period_stability_p_h_m,SUM(lost_rate_p_h_m) lost_rate_p_h_m,SUM(abnomal_lost_p_h_m) abnomal_lost_p_h_m,AVG((frame_cnt/window_time)*1000000) frame_cnt, ip,com_id from t_comid_data where date>=#{startTime} and date<=#{endTime} GROUP BY ip,com_id order by com_id")
   List<ComIdDataOverview> getComIdDataOverview(CommonParms commonParms);
 
   @Cacheable(value = "comIdDataService", key = "'getTableData' +#p0")

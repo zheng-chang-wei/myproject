@@ -9,6 +9,7 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         :editable="false"
+        @change="timeChange"
       />
     </el-form-item>
     <el-form-item>
@@ -81,22 +82,29 @@ export default {
     }
   },
   created() {
-
+    this.$bus.$on('timeChange', (data) => {
+      this.retrieveForm.time = data
+    })
+  },
+  destroyed() {
+    this.$bus.$off('timeChange')
   },
   mounted() {
+    const time = localStorage.getItem('time')
+    if (time !== undefined && time !== null) {
+      this.retrieveForm.time = time.split(',')
+    }
   },
   methods: {
     getDatas() {
       this.$refs.queryForm.validate(valid => {
         if (valid) {
-          console.log(this.retrieveForm.time)
-
           this.$emit('getDatas', this.retrieveForm.time)
         }
       })
     },
     exportExcel() {
-      this.excelName = this.type + util.replaceTime(this.retrieveForm.time[0]) + ' - ' + util.replaceTime(this.retrieveForm.time[1]) + '.xlsx'
+      this.excelName = this.type + '数据总览' + util.replaceTime(this.retrieveForm.time[0]) + ' - ' + util.replaceTime(this.retrieveForm.time[1]) + '.xlsx'
       const keys = Object.keys(this.jsonFields)
       const head = [this.title]
       for (let index = 0; index < keys.length - 1; index++) {
@@ -112,7 +120,12 @@ export default {
         excelData.push(arr)
       })
       util.exportSpecialExcel(excelData, keys.length - 1, this.excelName, this.cols)
+    },
+    timeChange() {
+      this.$bus.$emit('timeChange', this.retrieveForm.time)
+      localStorage.setItem('time', this.retrieveForm.time)
     }
+
   }
 }
 </script>
