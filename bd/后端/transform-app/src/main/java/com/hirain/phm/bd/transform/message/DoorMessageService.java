@@ -6,7 +6,6 @@ package com.hirain.phm.bd.transform.message;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,8 +31,8 @@ import com.hirain.phm.bd.common.partition.IPartitioner;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DoorMessageService {
 
-	@Value("${message.processor.size}")
-	private int size;
+	@Autowired
+	private MessageProperties props;
 
 	@Autowired
 	private IPartitioner partitioner;
@@ -42,11 +41,11 @@ public class DoorMessageService {
 
 	@PostConstruct
 	public void init() {
-		processors = new IMessageProcessor[size];
+		processors = new IMessageProcessor[props.getProcessorSize()];
 	}
 
 	public void messageArrived(String topic, byte[] payload) {
-		int index = partitioner.partition(topic, size);
+		int index = partitioner.partition(topic, props.getProcessorSize());
 		IMessageProcessor processor = processors[index];
 		if (processor == null) {
 			processor = processor();

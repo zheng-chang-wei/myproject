@@ -1,0 +1,26 @@
+hdfs:
+  root: /temp
+hive:
+  druid:
+    driver-class-name: org.apache.hive.jdbc.HiveDriver
+    password: 123456
+    url: jdbc:hive2://192.168.40.34:10000/test
+    user: hive
+kafka:
+  consumer:
+    auto-commit-interval: 100
+    auto-offset-reset: latest
+    concurrency: 3
+    enable-auto-commit: true
+    group-id: packet-store-1
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    session-timeout: 6000
+    value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+spring:
+  profiles:
+    active: test
+store:
+  filter:
+    projects:
+    - 深圳7号线一期
+  topic-prefix: decode-message-

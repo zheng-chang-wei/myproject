@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.hirain.phm.bd.ground.subhealth.param.SubhealthWithSuggestionParams;
+import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailResponseParams;
 import com.hirain.phm.bd.ground.subhealth.service.SubhealthQueryService;
 import com.hirain.phm.bd.ground.util.RedisUtil;
 
@@ -42,14 +42,9 @@ public class TestDashboard {
 
 	@Test
 	public void testToday() {
-		List<SubhealthWithSuggestionParams> list = service.selectToday("", "");
-		System.out.println(list);
-	}
-
-	@Test
-	public void testToday4Bode() {
-		List<SubhealthWithSuggestionParams> list = service.selectToday();
+		List<SubhealthDetailResponseParams> list = service.selectToday();
 		System.out.println(list.size());
+		list.forEach(System.out::println);
 	}
 
 	@Test

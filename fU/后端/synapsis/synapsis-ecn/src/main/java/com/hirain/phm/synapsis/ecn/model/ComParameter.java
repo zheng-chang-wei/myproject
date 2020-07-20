@@ -54,4 +54,13 @@ public class ComParameter extends SheetAndLine {
 	@XmlAttribute(name = "ttl")
 	protected String ttl;
 
+	public ComParameter() {
+	}
+
+	public ComParameter(String id, String qos, String ttl, String retries) {
+		this.id = id;
+		this.qos = qos;
+		this.ttl = ttl;
+		this.retries = retries;
+	}
 }

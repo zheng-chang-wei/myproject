@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hirain.phm.bd.ground.GroundWebApplication;
@@ -39,16 +40,15 @@ import com.hirain.phm.bd.ground.train.domain.Train;
  */
 
 @RunWith(SpringRunner.class)
+@ActiveProfiles("test")
 @SpringBootTest(classes = GroundWebApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TestInsertLifeWarning {
-
 
 	@Autowired
 	LifeItemMapper lifeItemMapper;
 
 	@Autowired
 	LifeTrainInfoMapper lifeTrainInfoMapper;
-
 
 	@Autowired
 	ProjectMapper projectMapper;
@@ -62,7 +62,6 @@ public class TestInsertLifeWarning {
 	String[] items = { "到位开关", "紧急解锁开关", "隔离开关", "锁闭开关", "控制器", "电机", "导轨" };
 
 	Integer[] totalLifes = { 500 * 10000, 500 * 10000, 500 * 10000, 500 * 10000, 6 * 10000, 3000, 160 };
-
 
 	@Test
 	public void insertTest() {
@@ -92,6 +91,7 @@ public class TestInsertLifeWarning {
 			lifeProjectInfo.setLifeitemId(lifeItemId);
 		}
 	}
+
 	private void insert_LifeTrainInfo(int i, Integer lifeItemId) {
 		List<Train> trains = trainMapper.selectAll();
 		for (Train train : trains) {

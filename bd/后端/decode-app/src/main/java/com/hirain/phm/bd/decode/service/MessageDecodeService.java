@@ -13,7 +13,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.hirain.phm.bd.common.partition.IPartitioner;
+import com.hirain.phm.bd.decode.kafka.KafkaTopicProperties;
 import com.hirain.phm.bd.decode.message.MessageDecodeProcessor;
+import com.hirain.phm.bd.decode.util.DecodeProperties;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,11 +44,11 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class MessageDecodeService {
 
-	@Value("${kafka.producer.topic.prefix}")
-	private String topicPrefix;
+	@Autowired
+	private KafkaTopicProperties topicProperties;
 
-	@Value("${message.decode.processor.size}")
-	private int processorSize;
+	@Autowired
+	private DecodeProperties decodeProps;
 
 	@Autowired
 	private IPartitioner partitioner;
@@ -61,7 +62,7 @@ public class MessageDecodeService {
 	@PostConstruct
 	public void init() {
 		executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "decode service"));
-		processors = new MessageDecodeProcessor[processorSize];
+		processors = new MessageDecodeProcessor[decodeProps.getProcessorSize()];
 		process();
 	}
 
@@ -86,7 +87,7 @@ public class MessageDecodeService {
 					ConsumerRecord<String, Object> record = queue.take();
 					String key = record.topic() + "-" + record.key();
 					System.out.println(record.topic());
-					int partition = partitioner.partition(key, processorSize);
+					int partition = partitioner.partition(key, decodeProps.getProcessorSize());
 					MessageDecodeProcessor processor = processors[partition];
 					if (processor == null) {
 						processor = processor();
@@ -103,7 +104,7 @@ public class MessageDecodeService {
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public MessageDecodeProcessor processor() {
-		return new MessageDecodeProcessor(topicPrefix);
+		return new MessageDecodeProcessor(topicProperties.getPrefix());
 	}
 
 }

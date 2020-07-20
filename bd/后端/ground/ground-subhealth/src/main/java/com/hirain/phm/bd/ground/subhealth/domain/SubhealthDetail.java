@@ -37,7 +37,7 @@ public class SubhealthDetail implements Serializable {
 	@GeneratedValue(generator = "JDBC")
 	private Integer id;
 
-	private Integer subhealthTypeId;
+	private Integer subhealthInfoId;
 
 	private Date startTime;
 

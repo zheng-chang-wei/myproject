@@ -1,0 +1,19 @@
+
+    
+logging: 
+  level:  
+    #(TRACE, DEBUG, INFO, WARN,ERROR, FATAL, OFF)
+    com.hirain.qsy.shaft.dao: DEBUG
+    
+python:
+ url: http://localhost:5000/predict
+ 
+dataSource:
+ url: http://localhost:8082/listHistoryData
+ successCode: 0
+
+
+
+
+    
+

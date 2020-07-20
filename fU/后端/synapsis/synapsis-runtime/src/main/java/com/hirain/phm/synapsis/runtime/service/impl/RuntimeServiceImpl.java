@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -33,13 +32,13 @@ import com.hirain.phm.synapsis.communication.Message;
 import com.hirain.phm.synapsis.communication.impl.TransportMessage;
 import com.hirain.phm.synapsis.constant.ErrorCode;
 import com.hirain.phm.synapsis.constant.Program;
+import com.hirain.phm.synapsis.constant.RunState;
 import com.hirain.phm.synapsis.constant.SidConstant;
 import com.hirain.phm.synapsis.exception.SynapsisException;
 import com.hirain.phm.synapsis.runtime.message.ErrorNoticeRequest;
 import com.hirain.phm.synapsis.runtime.param.ActivateResponse;
 import com.hirain.phm.synapsis.runtime.param.ControlResponse;
 import com.hirain.phm.synapsis.runtime.param.SettingResponse;
-import com.hirain.phm.synapsis.runtime.param.UpdateResponse;
 import com.hirain.phm.synapsis.runtime.service.LaunchProgressManager;
 import com.hirain.phm.synapsis.runtime.service.RuntimeService;
 import com.hirain.phm.synapsis.runtime.service.StateService;
@@ -47,7 +46,6 @@ import com.hirain.phm.synapsis.setting.AlgorithmSetting;
 import com.hirain.phm.synapsis.setting.BoardSetting;
 import com.hirain.phm.synapsis.setting.Setting;
 import com.hirain.phm.synapsis.setting.Subsystem;
-import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.db.SettingDbService;
 import com.hirain.phm.synapsis.setting.support.SettingActivateSupporter;
 import com.hirain.phm.synapsis.setting.support.SettingUpdateSupporter;
@@ -55,10 +53,10 @@ import com.hirain.phm.synapsis.setting.support.SettingValidator;
 import com.hirain.phm.synapsis.setting.support.SettingViewSupporter;
 import com.hirain.phm.synapsis.setting.support.domain.ValidateResult;
 import com.hirain.phm.synapsis.setting.support.extend.SupportExtenderManager;
-import com.hirain.phm.synapsis.setting.support.impl.SettingProperties;
 import com.hirain.phm.synapsis.setting.support.param.AlgorithmSettingVO;
 import com.hirain.phm.synapsis.setting.support.param.BoardSettingVO;
 import com.hirain.phm.synapsis.setting.support.param.SettingVO;
+import com.hirain.phm.synapsis.util.SettingFileConfig;
 
 import cn.hutool.core.util.ZipUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -92,10 +90,7 @@ public class RuntimeServiceImpl implements RuntimeService {
 	private StateService stateService;
 
 	@Autowired
-	private SettingActivateSupporter supportService;
-
-	@Value("${setting.file.temporary}")
-	private String temporaryDirectory;// 存放资源文件的临时目录
+	private SettingActivateSupporter activateSupporter;
 
 	@Autowired
 	private BoardService boardService;
@@ -116,7 +111,7 @@ public class RuntimeServiceImpl implements RuntimeService {
 	private SettingViewSupporter settingParser;
 
 	@Autowired
-	private SettingProperties properties;
+	private SettingFileConfig config;
 
 	/**
 	 * 要导出的文件所在目录
@@ -140,7 +135,8 @@ public class RuntimeServiceImpl implements RuntimeService {
 				sendValidateResult(result);
 			} else {
 				stateService.loading();
-				BoardControlResponseMessage message = activate(current);
+				generateConfigFiles(current);
+				BoardControlResponseMessage message = startBoards(current);
 				if (!message.isSuccessed()) {
 					stateService.waiting("启动失败");
 					stateService.lauchError(new ControlResponse(message.getBoardStartStructures()));
@@ -193,7 +189,7 @@ public class RuntimeServiceImpl implements RuntimeService {
 		if (file.isEmpty()) {
 			throw new IOException("文件为空");
 		}
-		File temporary = new File(temporaryDirectory);
+		File temporary = new File(config.getTemp());
 		if (!temporary.exists()) {
 			temporary.mkdirs();
 		}
@@ -204,79 +200,10 @@ public class RuntimeServiceImpl implements RuntimeService {
 		return fileName;
 	}
 
-	/**
-	 * @see com.hirain.phm.synapsis.runtime.service.RuntimeService#saveSetting(com.hirain.phm.synapsis.setting.support.param.SettingVO)
-	 */
-	@Override
-	public UpdateResponse saveSetting(SettingVO frontSetting) throws Exception {
-		UpdateResponse updateResponse = new UpdateResponse();
-		Setting setting = updateSupporter.voToSetting(frontSetting);
-		ValidateResult validateResult = validator.validate(setting);
-		if (validateResult.isError()) {
-			updateResponse.validateError();
-			updateResponse.setValidateResult(validateResult);
-			return updateResponse;
-		}
-		updateSupporter.assignMulticastIP(setting);
-		updateSupporter.moveFromTempToSetting(setting);
-		settingService.saveOrUpdate(setting);
-		updateResponse.setSettingId(setting.getId());
-		return updateResponse;
-	}
-
 	private String getExtension(String filename) {
 		int lastIndexOf = filename.lastIndexOf(".");
 		String extension = filename.substring(lastIndexOf);
 		return extension;
-	}
-
-	@Override
-	public ActivateResponse launchCurrent() throws Exception {
-		Setting current = settingService.selectCurrent();
-		// if (current == null) {
-		// throw new SynapsisException("当前没有可使用的配置");
-		// }
-		return validateAndLaunch(current);
-	}
-
-	/**
-	 * @see com.hirain.phm.synapsis.runtime.service.RuntimeService#activeSetting()
-	 */
-	@Override
-	public ActivateResponse validateAndActivate(int settingId) throws Exception {
-		stateService.idle();
-		// 停止系统运算
-		ActivateResponse response = terminate();
-		if (!response.isSuccess()) {
-			return response;
-		}
-
-		Setting setting = settingService.selectWithDetail(settingId);
-		return validateAndLaunch(setting);
-	}
-
-	/**
-	 * @param setting
-	 * @return
-	 * @throws SynapsisException
-	 * @throws Exception
-	 */
-	public ActivateResponse validateAndLaunch(Setting setting) throws SynapsisException, Exception {
-		ActivateResponse response;
-		stateService.loading();
-		// 校验配置一致性
-		response = validate(setting);
-		if (!response.isSuccess()) {
-			ValidateResult validateResult = response.getValidateResult();
-			sendValidateResult(validateResult);
-			stateService.waiting(validateResult.getOutline());
-			return response;
-		}
-		response = launch(setting);
-		if (response.isSuccess()) {
-			launchManager.start();
-		}
-		return response;
 	}
 
 	@Override
@@ -293,6 +220,55 @@ public class RuntimeServiceImpl implements RuntimeService {
 			stateService.idle();
 		} catch (Exception e) {
 			throw new SynapsisException("系统停止失败! [" + e.getMessage() + "]", e);
+		}
+		return response;
+	}
+
+	@Override
+	public ActivateResponse launchCurrent() throws Exception {
+		Setting current = settingService.selectCurrent();
+		if (current == null) {
+			throw new SynapsisException("当前没有可使用的配置");
+		}
+		return validateAndLaunch(current);
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.runtime.service.RuntimeService#activeSetting()
+	 */
+	@Override
+	public ActivateResponse launchSetting(int settingId) throws Exception {
+		RunState state = stateService.getCurrentState();
+		if (state.equals(RunState.RUNNING)) {
+			ActivateResponse response = terminate();
+			if (!response.isSuccess()) {
+				return response;
+			}
+			stateService.idle();
+		}
+		Setting setting = settingService.selectWithDetail(settingId);
+		return validateAndLaunch(setting);
+	}
+
+	/**
+	 * @param setting
+	 * @return
+	 * @throws SynapsisException
+	 * @throws Exception
+	 */
+	private ActivateResponse validateAndLaunch(Setting setting) throws SynapsisException, Exception {
+		ActivateResponse response;
+		stateService.loading();
+		response = validate(setting);
+		if (!response.isSuccess()) {
+			ValidateResult validateResult = response.getValidateResult();
+			sendValidateResult(validateResult);
+			stateService.waiting(validateResult.getOutline());
+			return response;
+		}
+		response = launch(setting);
+		if (response.isSuccess()) {
+			launchManager.start();
 		}
 		return response;
 	}
@@ -319,11 +295,14 @@ public class RuntimeServiceImpl implements RuntimeService {
 	private ActivateResponse launch(Setting setting) throws Exception {
 		ActivateResponse response = new ActivateResponse();
 		try {
-			BoardControlResponseMessage message = activate(setting);
+			generateConfigFiles(setting);
+			settingService.changeCurrent(setting.getId());
+			BoardControlResponseMessage message = startBoards(setting);
 			if (!message.isSuccessed()) {
 				response.lauchFail();
 				response.setControlResponse(new ControlResponse(message.getBoardStartStructures()));
 				stateService.waiting("启动失败");
+				stateService.lauchError(response.getControlResponse());
 			} else {
 				publisher.publishEvent(setting);
 				stateService.running();
@@ -336,17 +315,23 @@ public class RuntimeServiceImpl implements RuntimeService {
 	}
 
 	/**
+	 * @param setting
+	 * @throws SynapsisException
+	 */
+	private void generateConfigFiles(Setting setting) throws SynapsisException {
+		try {
+			activateSupporter.acivate(setting);
+		} catch (Exception e) {
+			throw new SynapsisException("系统出错：生成配置文件失败", e);
+		}
+	}
+
+	/**
 	 * @param current
 	 * @return
 	 * @throws Exception
 	 */
-	public BoardControlResponseMessage activate(Setting setting) throws Exception {
-		try {
-			supportService.acivate(setting);
-		} catch (Exception e) {
-			throw new SynapsisException("系统出错：生成配置文件失败");
-		}
-		settingService.changeCurrent(setting.getId());
+	private BoardControlResponseMessage startBoards(Setting setting) throws Exception {
 		BoardControlResponseMessage message = boardService.start();
 		return message;
 	}
@@ -357,13 +342,13 @@ public class RuntimeServiceImpl implements RuntimeService {
 	@Override
 	public String deleteSetting(int settingId) throws Exception {
 		Setting current = settingService.selectCurrent();
-		if (current.getId().equals(settingId)) {
+		if (current != null && current.getId().equals(settingId)) {
 			throw new SynapsisException("不能删除已激活的配置");
 		}
 		Setting setting = settingService.selectById(settingId);
-		updateSupporter.deleteResources(setting);
 		settingService.delete(settingId);
 		extender.delete(settingId);
+		updateSupporter.deleteResources(setting);
 		return "删除成功";
 	}
 
@@ -378,9 +363,7 @@ public class RuntimeServiceImpl implements RuntimeService {
 		SettingResponse settingResponse = new SettingResponse();
 		if (setting != null) {
 			SettingVO settingVO = settingParser.settingToVO(setting);
-			List<VariableGroup> groups = settingParser.getVariableGroupsFromProtocol(setting);
 			settingResponse.setSetting(settingVO);
-			settingResponse.setVariableGroups(groups);
 		}
 		return settingResponse;
 	}
@@ -406,6 +389,7 @@ public class RuntimeServiceImpl implements RuntimeService {
 	public SettingResponse importFile(MultipartFile file) throws Exception {
 		// 带zip后缀的文件名称，如aa.zip
 		String uploadFileName = upload(file);
+		String temporaryDirectory = config.getTemp();
 		// zip文件绝对路径
 		String zipPath = temporaryDirectory + File.separator + uploadFileName;
 		if (zipPath.contains(".zip")) {
@@ -421,7 +405,7 @@ public class RuntimeServiceImpl implements RuntimeService {
 				SettingVO settingVO = settingResponse.getSetting();
 				List<BoardSettingVO> boardSettings = settingVO.getBoardSettings();
 				for (BoardSettingVO boardSettingVO : boardSettings) {
-					String extension = getExtension(boardSettingVO.getFileOriginalName());
+					String extension = getExtension(boardSettingVO.getOriginalName());
 					String fileName = UUID.randomUUID().toString() + extension;
 					String srcFilePath = zipFolderPath + File.separator + "board_" + boardSettingVO.getSlotId() + extension;
 					String destFilePath = temporaryDirectory + File.separator + fileName;
@@ -461,11 +445,11 @@ public class RuntimeServiceImpl implements RuntimeService {
 	 */
 	private void copyFileToExportFile(Setting setting) throws IOException {
 		// 设置对应的文件夹所在目录
-		String folderPath = properties.getResourceDirectory() + File.separator + setting.getName();
+		String folderPath = config.getResource() + File.separator + setting.getName();
 		List<BoardSetting> boardSettings = setting.getBoardSettings();
 		for (BoardSetting boardSetting : boardSettings) {
 			// 板卡对应的数据流文件名称
-			String fileName = boardSetting.getFilename();
+			String fileName = updateSupporter.getFilename(boardSetting);
 			if (!StringUtils.isEmpty(fileName)) {
 				// 将文件移动到files目录下
 				copyFile(folderPath + File.separator + fileName,
@@ -486,8 +470,10 @@ public class RuntimeServiceImpl implements RuntimeService {
 
 	private void copyFile(String srcFilePath, String destFilePath) throws IOException {
 		File srcFile = new File(srcFilePath);
-		File destFile = new File(destFilePath);
-		FileUtils.copyFile(srcFile, destFile);
+		if (srcFile.exists()) {
+			File destFile = new File(destFilePath);
+			FileUtils.copyFile(srcFile, destFile);
+		}
 	}
 
 	private void exportFile(HttpServletResponse response, String settingName)

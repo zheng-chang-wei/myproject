@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import com.hirain.phm.synapsis.communication.Message;
@@ -18,6 +18,9 @@ import com.hirain.phm.synapsis.message.SynapsisRequest;
 import com.hirain.phm.synapsis.message.SynapsisResponse;
 import com.hirain.phm.synapsis.udp.codec.MessageCodec;
 import com.hirain.phm.synapsis.udp.packet.UDPPacket;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @Version 1.0
@@ -33,12 +36,16 @@ import com.hirain.phm.synapsis.udp.packet.UDPPacket;
  *               Dec 2, 2019 jianwen.xin@hirain.com 1.0 create file
  */
 @Component
+@ConfigurationProperties("synapsis.control")
 public class ServiceMessageCodec implements MessageCodec {
 
-	@Value("${synapsis.control.port}")
-	private int controlPort;
+	@Setter
+	@Getter
+	private int port;
 
-	private String controlIp = "127.0.0.1";
+	@Setter
+	@Getter
+	private String ip = "127.0.0.1";
 
 	@Autowired
 	private Map<String, ResponseFactory> factories;
@@ -52,8 +59,8 @@ public class ServiceMessageCodec implements MessageCodec {
 	public UDPPacket encode(Message<?> message) {
 		Object data = message.getData();
 		UDPPacket packet = new UDPPacket();
-		packet.setPort(controlPort);
-		packet.setIp(controlIp);
+		packet.setPort(port);
+		packet.setIp(ip);
 		if (data instanceof SynapsisRequest) {
 			SynapsisRequest request = (SynapsisRequest) data;
 			packet.setSid(message.getSid());

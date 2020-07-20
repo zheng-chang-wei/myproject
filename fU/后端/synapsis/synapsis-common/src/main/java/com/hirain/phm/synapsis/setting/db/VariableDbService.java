@@ -32,5 +32,15 @@ public interface VariableDbService {
 	 */
 	default void delete(String string, Long variableId) {
 
-	};
+	}
+
+	/**
+	 * @param group
+	 */
+	void saveVariableGroup(VariableGroup group);
+
+	/**
+	 * @param groupId
+	 */
+	VariableGroup selectVariableGroup(Integer groupId);;
 }

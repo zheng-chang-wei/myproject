@@ -35,13 +35,16 @@ public class MqttEncryptProducerConfig {
 	@Autowired
 	private MqttProperties properties;
 
+	@Autowired
+	private MqttSslProperties sslProperties;
+
 	public MqttConnectOptions mqttConnectOptions() {
 		MqttConnectOptions options = new MqttConnectOptions();
-		options.setServerURIs(new String[] { properties.getSslUrl() });
+		options.setServerURIs(new String[] { sslProperties.getUrl() });
 		options.setKeepAliveInterval(2);
 		try {
-			options.setSocketFactory(SslUtil.getSocketFactory(properties.getCaFile(), properties.getClientFile(), properties.getKeyFile(),
-					properties.getSslPassword()));
+			options.setSocketFactory(SslUtil.getSocketFactory(sslProperties.getCaFile(), sslProperties.getClientFile(), sslProperties.getKeyFile(),
+					sslProperties.getPassword()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

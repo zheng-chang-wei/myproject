@@ -1,10 +1,15 @@
 package com.hirain.phm.bd.ground.fault.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.hirain.phm.bd.ground.dictionary.domain.Repair;
+import com.hirain.phm.bd.ground.dictionary.domain.Solution;
 
 import lombok.Data;
 
@@ -39,4 +44,9 @@ public class FaultInfo implements Serializable {
 
 	private Integer faultCode;
 
+	@Transient
+	private List<Repair> repairList;
+
+	@Transient
+	private List<Solution> solutionList;
 }

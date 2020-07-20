@@ -62,7 +62,7 @@ public class DataFileLoaderImpl implements DataFileLoader {
 	@Autowired
 	private DataFileCache cache;
 
-	private Comparator<Variable> comparator = (o1, o2) -> o1.getSignalName().compareTo(o2.getSignalName());
+	private Comparator<Variable> comparator = (o1, o2) -> o1.getName().compareTo(o2.getName());
 
 	public DataFileLoaderImpl() {
 
@@ -185,7 +185,7 @@ public class DataFileLoaderImpl implements DataFileLoader {
 		List<? extends Variable> variables2 = h2.variables;
 		if (variables1.size() == variables2.size()) {
 			for (int i = 0; i < variables1.size(); i++) {
-				if (!variables1.get(i).getSignalName().equals(variables2.get(i).getSignalName())) {
+				if (!variables1.get(i).getName().equals(variables2.get(i).getName())) {
 					return false;
 				}
 			}

@@ -1,9 +1,10 @@
 import axios from 'axios'
 import allApi from './allApi'
 import qs from 'qs'
+// axios.defaults.baseURL = process.env.VUE_APP_BASE_URL
 axios.defaults.baseURL = 'dev-api'
 import router from '../../router'
-import { Notify, Message } from 'element-ui'
+import { Message } from 'element-ui'
 var notifyList = []
 axios.defaults.withCredentials = true
 import { removeToken } from '@/utils/auth'
@@ -15,10 +16,10 @@ axios.interceptors.response.use(res => {
       if (notifyList.length !== 0) {
         notifyList[0].close()
       }
-      const notify = Notify({ title: '未登录', message: '自动返回登录页' })
-      notifyList[0] = notify
+      // const notify = Notify({ title: '未登录', message: '自动返回登录页' })
+      // notifyList[0] = notify
       router.push({
-        path: '/login'
+        path: '/'
       })
     } else {
       Message({
@@ -31,7 +32,7 @@ axios.interceptors.response.use(res => {
     return res.data
   }
 }, error => {
-  console.log('err')
+  console.log(error)
   return Promise.reject(error)
 })
 

@@ -16,6 +16,7 @@ package com.hirain.phm.bd.ground.subhealth.service.impl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,9 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hirain.phm.bd.ground.subhealth.dao.SubhealthQueryMapper;
+import com.hirain.phm.bd.ground.subhealth.domain.SubhealthInfo;
 import com.hirain.phm.bd.ground.subhealth.param.AnnualCountResponse;
 import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailParams;
-import com.hirain.phm.bd.ground.subhealth.param.SubhealthWithSuggestionParams;
+import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailResponseParams;
+import com.hirain.phm.bd.ground.subhealth.param.SubhealthInfoDTO;
+import com.hirain.phm.bd.ground.subhealth.service.SubhealthInfoService;
 import com.hirain.phm.bd.ground.subhealth.service.SubhealthQueryService;
 import com.hirain.phm.bd.ground.util.RedisUtil;
 
@@ -36,6 +40,9 @@ public class SubhealthQueryServiceImpl implements SubhealthQueryService {
 	private SubhealthQueryMapper queryMapper;
 
 	@Autowired
+	private SubhealthInfoService infoService;
+
+	@Autowired
 	private RedisUtil redis;
 
 	/*
@@ -44,24 +51,36 @@ public class SubhealthQueryServiceImpl implements SubhealthQueryService {
 	 * SubhealthDetailParams)
 	 */
 	@Override
-	public List<SubhealthWithSuggestionParams> selectByParams(SubhealthDetailParams subdeDetailParams) {
+	public List<SubhealthDetailResponseParams> selectByParams(SubhealthDetailParams subdeDetailParams) {
 		return queryMapper.selectByExample(subdeDetailParams);
 	}
 
-	@Override
-	public List<SubhealthWithSuggestionParams> selectToday(String project, String trainNo) {
-		return queryMapper.selectToday(project, trainNo);
-	}
-
-	/** 
+	/**
 	 * @see com.hirain.phm.bd.ground.subhealth.service.SubhealthQueryService#selectToday()
 	 */
 	@Override
-	public List<SubhealthWithSuggestionParams> selectToday() {
+	public List<SubhealthDetailResponseParams> selectToday() {
 		String todayDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now());
 		String startTime = todayDate + " 00:00:00";
 		String endTime = todayDate + " 23:59:59";
-		return queryMapper.selectToday4Bode(startTime, endTime);
+		List<SubhealthDetailResponseParams> details = queryMapper.selectToday(startTime, endTime);
+		getRepairAndSolution(details);
+		return details;
+	}
+
+	@Override
+	public void getRepairAndSolution(List<SubhealthDetailResponseParams> details) {
+		Map<Integer, SubhealthInfoDTO> map = new HashMap<>();
+		details.forEach(d -> {
+			SubhealthInfoDTO dto = map.get(d.getSubhealthInfoId());
+			if (dto == null) {
+				SubhealthInfo info = infoService.selectWithDetail(d.getSubhealthInfoId());
+				dto = SubhealthInfoDTO.valueOf(info);
+				map.put(info.getId(), dto);
+			}
+			d.setRepair(dto.getRepair());
+			d.setSolution(dto.getSolution());
+		});
 	}
 
 	@Override

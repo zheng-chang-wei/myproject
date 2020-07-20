@@ -5,6 +5,8 @@ package com.hirain.phm.synapsis.result.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import com.hirain.phm.synapsis.exception.SynapsisException;
 import com.hirain.phm.synapsis.parse.domain.FileHeader;
 import com.hirain.phm.synapsis.parse.domain.VariableData;
@@ -54,5 +56,29 @@ public interface ResultService {
 	 * @throws Exception
 	 */
 	List<VariableData> getVariableDatas(long l, List<VariableGroup> selected) throws Exception;
+
+	/**
+	 * 根据id删除数据库中的分析结果
+	 * 
+	 * @param id
+	 */
+	void deleteById(long id);
+
+	/**
+	 * 删除指定路径的文件
+	 * 
+	 * @param filePath
+	 * @return
+	 */
+	boolean deleteFile(String filePath);
+
+	/**
+	 * 下载文件到指定路径
+	 * 
+	 * @param sourceFilePath
+	 *            源文件路径
+	 * @return
+	 */
+	void downloadFile(HttpServletResponse response, String... sourceFilePath) throws Exception;
 
 }

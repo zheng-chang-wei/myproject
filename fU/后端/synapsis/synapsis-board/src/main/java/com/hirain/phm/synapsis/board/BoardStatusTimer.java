@@ -9,10 +9,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.hirain.phm.synapsis.board.service.BoardService;
+import com.hirain.phm.synapsis.board.service.impl.BoardConfig;
 
 /**
  * @Version 1.0
@@ -36,18 +36,18 @@ public class BoardStatusTimer {
 
 	private ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, getClass().getName()));
 
-	@Value("${synapsis.board.status.period:10000}")
-	private int period;
+	@Autowired
+	private BoardConfig config;
 
 	public void start() {
 		stop = new AtomicBoolean(false);
 		executor.submit(() -> {
 			while (!stop.get()) {
-				checkStatus();
 				try {
-					TimeUnit.MILLISECONDS.sleep(period);
+					TimeUnit.MILLISECONDS.sleep(config.getStatusPeriod());
 				} catch (InterruptedException e) {
 				}
+				checkStatus();
 			}
 		});
 	}

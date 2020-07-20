@@ -5,8 +5,6 @@ package com.hirain.phm.bd.ground.digital.service.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,15 +13,15 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hirain.phm.bd.ground.digital.controller.ResultQueryRequest;
 import com.hirain.phm.bd.ground.digital.dao.DigitalTwinParamMapper;
 import com.hirain.phm.bd.ground.digital.dao.DigitalTwinResultMapper;
 import com.hirain.phm.bd.ground.digital.domain.DigitalTwinPacket;
 import com.hirain.phm.bd.ground.digital.domain.DigitalTwinParam;
 import com.hirain.phm.bd.ground.digital.domain.DigitalTwinResult;
-import com.hirain.phm.bd.ground.digital.response.DayValue;
-import com.hirain.phm.bd.ground.digital.response.ParamResult;
-import com.hirain.phm.bd.ground.digital.response.ResultQueryResponse;
+import com.hirain.phm.bd.ground.digital.param.DayValue;
+import com.hirain.phm.bd.ground.digital.param.ParamResult;
+import com.hirain.phm.bd.ground.digital.param.ResultQueryRequest;
+import com.hirain.phm.bd.ground.digital.param.ResultQueryResponse;
 import com.hirain.phm.bd.ground.digital.service.DigitalTwinService;
 import com.hirain.phm.bd.ground.train.controller.TrainGateWay;
 
@@ -122,7 +120,7 @@ public class DigitalTwinServiceImpl implements DigitalTwinService {
 	}
 
 	/**
-	 * @see com.hirain.phm.bd.ground.digital.service.DigitalTwinService#getAllResults(com.hirain.phm.bd.ground.digital.controller.ResultQueryRequest)
+	 * @see com.hirain.phm.bd.ground.digital.service.DigitalTwinService#getAllResults(ResultQueryResult)
 	 */
 	@Override
 	public ResultQueryResponse getAllResults(ResultQueryRequest request) {
@@ -148,12 +146,11 @@ public class DigitalTwinServiceImpl implements DigitalTwinService {
 	}
 
 	private Map<DigitalTwinParam, List<DigitalTwinResult>> getResultMap(ResultQueryRequest request, List<DigitalTwinParam> params) {
-		Date start = getStartDate(request);
-		DigitalTwinResult condition = getQueryCondition(request, start);
+		DigitalTwinResult condition = getQueryCondition(request);
 		Map<DigitalTwinParam, List<DigitalTwinResult>> resultMap = new HashMap<>();
 		params.forEach(param -> {
 			condition.setParamId(param.getId());
-			List<DigitalTwinResult> results = resultMapper.selectByCondition(condition);
+			List<DigitalTwinResult> results = resultMapper.selectByCondition(condition, request.getStart(), request.getEnd());
 			resultMap.put(param, results);
 		});
 		return resultMap;
@@ -161,14 +158,12 @@ public class DigitalTwinServiceImpl implements DigitalTwinService {
 
 	/**
 	 * @param request
-	 * @param start
 	 * @return
 	 */
-	private DigitalTwinResult getQueryCondition(ResultQueryRequest request, Date start) {
+	private DigitalTwinResult getQueryCondition(ResultQueryRequest request) {
 		DigitalTwinResult condition = new DigitalTwinResult();
 		condition.setCarId(request.getCarId());
 		condition.setDoorId(request.getDoorId());
-		condition.setTimestamp(start);
 		condition.setTrainId(getTrainId(request.getProject(), request.getTrain()));
 		return condition;
 	}
@@ -203,16 +198,6 @@ public class DigitalTwinServiceImpl implements DigitalTwinService {
 			values.add(value);
 		});
 		return values;
-	}
-
-	/**
-	 * @param request
-	 * @return
-	 */
-	private Date getStartDate(ResultQueryRequest request) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.MONTH, 0 - request.getLastMonth());
-		return calendar.getTime();
 	}
 
 }

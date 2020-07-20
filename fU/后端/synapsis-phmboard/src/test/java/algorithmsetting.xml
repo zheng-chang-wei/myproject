@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PHMAlgorithmSetting>
+    <retryIp>224.255.255.255</retryIp>
+    <algorithmSettings>
+        <!-- <algorithmSetting enable="true" slotId="4">
+            <name>Algo_1</name>
+            <code>1</code>
+            <type>1</type>
+            <filename>UDP_T_V5.py</filename>
+            <variableGroups>
+                <variableGroup type="MVB" consumptionId="5" slotId="1">
+                    <multicastIp>225.0.0.5</multicastIp>
+                    <multicastPort>65535</multicastPort>
+                    <variables>
+                        <MVBVariable device="1" deviceName="device_01" carriage="carriage_01" system="system_01" port="1" fcode="4" dataType="1" byteOffset="1" bitOffset="0" bitLen="8" name="speed" unit="km/h" signalName="速度"/>
+                    </variables>
+                </variableGroup>
+                <variableGroup type="ECN" consumptionId="6" slotId="2">
+                    <multicastIp>225.0.0.6</multicastIp>
+                    <multicastPort>65535</multicastPort>
+                    <variables>
+                        <ECNVariable sourceIp="192.168.0.4" comId="10000" dataType="1" byteOffset="1" bitOffset="0" bitLen="8" name="AirPressure" unit="Pa" signalName="气压"/>
+                    </variables>
+                </variableGroup>
+                <variableGroup type="AD" consumptionId="7" slotId="3">
+                    <multicastIp>225.0.0.7</multicastIp>
+                    <multicastPort>65535</multicastPort>
+                    <variables>
+                        <ADVariable chnId="1" sampleRate="0.3" signalName="addName"/>
+                    </variables>
+                </variableGroup>
+            </variableGroups>
+        </algorithmSetting> -->
+		<algorithmSetting enable="true" slotId="4">
+            <name>Algo_2</name>
+            <code>2</code>
+            <type>2</type>
+            <filename>AlgoDemo.elf</filename>
+            <variableGroups>
+                <variableGroup type="MVB" consumptionId="5" slotId="1">
+                    <multicastIp>225.0.0.5</multicastIp>
+                    <multicastPort>65535</multicastPort>
+                    <variables>
+                        <MVBVariable device="1" deviceName="device_01" carriage="carriage_01" system="system_01" port="1" fcode="4" dataType="1" byteOffset="1" bitOffset="0" bitLen="8" name="speed" unit="km/h" signalName="速度"/>
+                    </variables>
+                </variableGroup>
+                <variableGroup type="ECN" consumptionId="6" slotId="2">
+                    <multicastIp>225.0.0.6</multicastIp>
+                    <multicastPort>65535</multicastPort>
+                    <variables>
+                        <ECNVariable sourceIp="192.168.0.4" comId="10000" dataType="1" byteOffset="1" bitOffset="0" bitLen="8" name="AirPressure" unit="Pa" signalName="气压"/>
+                    </variables>
+                </variableGroup>
+                <variableGroup type="AD" consumptionId="7" slotId="3">
+                    <multicastIp>225.0.0.7</multicastIp>
+                    <multicastPort>65535</multicastPort>
+                    <variables>
+                        <ADVariable chnId="1" sampleRate="0.3" signalName="addName"/>
+                    </variables>
+                </variableGroup>
+            </variableGroups>
+        </algorithmSetting>
+    </algorithmSettings>
+</PHMAlgorithmSetting>

@@ -3,24 +3,21 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.setting.support.impl;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hirain.phm.synapsis.constant.BoardType;
-import com.hirain.phm.synapsis.exception.SynapsisException;
-import com.hirain.phm.synapsis.protocol.ParseResult;
-import com.hirain.phm.synapsis.protocol.ProtocolService;
 import com.hirain.phm.synapsis.setting.AlgorithmSetting;
 import com.hirain.phm.synapsis.setting.BoardSetting;
 import com.hirain.phm.synapsis.setting.Setting;
-import com.hirain.phm.synapsis.setting.Variable;
+import com.hirain.phm.synapsis.setting.StoreSetting;
+import com.hirain.phm.synapsis.setting.TimeSetting;
+import com.hirain.phm.synapsis.setting.Variable.VariableType;
 import com.hirain.phm.synapsis.setting.VariableGroup;
+import com.hirain.phm.synapsis.setting.property.BoardProperty;
+import com.hirain.phm.synapsis.setting.support.BoardPropertyHandler;
 import com.hirain.phm.synapsis.setting.support.SettingViewSupporter;
 import com.hirain.phm.synapsis.setting.support.param.ADGroupVO;
 import com.hirain.phm.synapsis.setting.support.param.AlgorithmSettingVO;
@@ -28,13 +25,10 @@ import com.hirain.phm.synapsis.setting.support.param.BoardSettingVO;
 import com.hirain.phm.synapsis.setting.support.param.ECNGroupVO;
 import com.hirain.phm.synapsis.setting.support.param.MVBGroupVO;
 import com.hirain.phm.synapsis.setting.support.param.SettingVO;
-import com.hirain.phm.synapsis.setting.support.param.StoreVariablesVO;
-import com.hirain.phm.synapsis.setting.support.param.TimeVariablesVO;
+import com.hirain.phm.synapsis.setting.support.param.StoreSettingVO;
+import com.hirain.phm.synapsis.setting.support.param.TimeSettingVO;
 import com.hirain.phm.synapsis.setting.support.param.VariableGroupVO;
-import com.hirain.phm.synapsis.setting.support.variable.VariableConvertManager;
 import com.hirain.phm.synapsis.setting.support.variable.VariableGroupConverter;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Version 1.0
@@ -49,104 +43,81 @@ import lombok.extern.slf4j.Slf4j;
  *               Dec 12, 2019 jianwen.xin@hirain.com 1.0 create file
  */
 @Service
-@Slf4j
 public class SettingViewSupporterImpl implements SettingViewSupporter {
 
 	@Autowired
 	private VariableGroupConverter converter;
 
 	@Autowired
-	private SettingProperties properties;
-
-	@Autowired
-	private VariableConvertManager manger;
-
-	@Autowired
-	private ProtocolService parseService;
+	private BoardPropertyHandler propertyHandler;
 
 	/**
 	 * @see com.hirain.phm.synapsis.setting.support.SettingViewSupporter#settingToVO(com.hirain.phm.synapsis.setting.Setting)
 	 */
 	@Override
 	public SettingVO settingToVO(Setting setting) {
-		SettingVO frontSetting = new SettingVO();
-		frontSetting.setName(setting.getName());
-		frontSetting.setLine(setting.getLine());
-		frontSetting.setTrain(setting.getTrain());
-		frontSetting.setRawSpace(setting.getRawSpace());
-		frontSetting.setRawStrategy(setting.getRawStrategy());
-		frontSetting.setResultSpace(setting.getResultSpace());
-		frontSetting.setResultStrategy(setting.getResultStrategy());
-		frontSetting.setTimeOn(setting.getTimeOn());
-		frontSetting.setTimeVariables(getTimeVariables(setting.getTimeVariables()));
-		frontSetting.setStoreVariables(getStoreVariables(setting.getStoreVariables()));
-		frontSetting.setBoardSettings(getBoardSettings(setting.getBoardSettings()));
-		frontSetting.setAlgorithmSettings(getAlgorithmSettings(setting.getAlgorithmSettings()));
-		return frontSetting;
-	}
-
-	/**
-	 * @see com.hirain.phm.synapsis.setting.support.SettingViewSupporter#getVariableGroupsFromProtocol(com.hirain.phm.synapsis.setting.Setting)
-	 */
-	@Override
-	public List<VariableGroup> getVariableGroupsFromProtocol(Setting setting) {
-		List<VariableGroup> variableGroup = new ArrayList<>();
-		String folerPath = properties.getResourceDirectory() + File.separator + setting.getName();
-		for (BoardSetting boardSetting : setting.getBoardSettings()) {
-			if (boardSetting.getFilename() != null) {
-				BoardType boardType = BoardType.valueOf(boardSetting.getType());
-				VariableGroup group = new VariableGroup();
-				group.setSlotId(boardSetting.getSlotId());
-				group.setType(boardType.getType());
-				try {
-					ParseResult result = parseService.parse(boardType.getType(), folerPath + File.separator + boardSetting.getFilename());
-					if (result.getCode() == ParseResult.SUCCESS) {
-						List<? extends Variable> variables = manger.convert(boardType.getType(), result.getData());
-						if (variables != null) {
-							group.setVariables(variables);
-							variableGroup.add(group);
-						}
-					}
-				} catch (SynapsisException e) {
-					log.error(e.getMessage(), e);
-				}
-			}
+		SettingVO vo = new SettingVO();
+		vo.setName(setting.getName());
+		vo.setLine(setting.getLine());
+		vo.setTrain(setting.getTrain());
+		TimeSetting timeSetting = setting.getTimeSetting();
+		if (timeSetting != null) {
+			vo.setTimeSetting(getTimeVariables(timeSetting));
 		}
-		return variableGroup;
+		StoreSetting storeSetting = setting.getStoreSetting();
+		if (storeSetting != null) {
+			vo.setStoreSetting(getStoreVariables(storeSetting));
+		}
+		List<BoardSetting> boardSettings = setting.getBoardSettings();
+		if (boardSettings != null) {
+			vo.setBoardSettings(getBoardSettings(boardSettings));
+		}
+		List<AlgorithmSetting> algorithmSettings = setting.getAlgorithmSettings();
+		if (algorithmSettings != null) {
+			vo.setAlgorithmSettings(getAlgorithmSettings(algorithmSettings));
+		}
+		return vo;
 	}
 
 	/**
-	 * @param timeGroup
+	 * @param timeSetting
 	 * @return
 	 */
-	private TimeVariablesVO getTimeVariables(VariableGroup timeGroup) {
-		if (timeGroup != null) {
-			TimeVariablesVO timeVariables = new TimeVariablesVO();
-			VariableGroupVO frontGroup = converter.convertToVO(timeGroup);
+	private TimeSettingVO getTimeVariables(TimeSetting timeSetting) {
+		TimeSettingVO vo = new TimeSettingVO();
+		vo.setType(timeSetting.getType());
+
+		VariableGroup timeVariables = timeSetting.getTimeVariables();
+		if (timeVariables != null) {
+			VariableGroupVO frontGroup = converter.convertToVO(timeVariables);
 			if (frontGroup instanceof MVBGroupVO) {
-				timeVariables.setMvbGroup((MVBGroupVO) frontGroup);
+				vo.setMvbGroup((MVBGroupVO) frontGroup);
 			} else if (frontGroup instanceof ECNGroupVO) {
-				timeVariables.setEcnGroup((ECNGroupVO) frontGroup);
+				vo.setEcnGroup((ECNGroupVO) frontGroup);
 			}
-			return timeVariables;
 		}
-		return null;
+
+		return vo;
 	}
 
 	/**
+	 * @param storeSetting
 	 * @param storeVariables
 	 * @return
 	 */
-	private StoreVariablesVO getStoreVariables(List<VariableGroup> groups) {
-		StoreVariablesVO storeVariables = new StoreVariablesVO();
+	private StoreSettingVO getStoreVariables(StoreSetting storeSetting) {
+		StoreSettingVO vo = new StoreSettingVO();
+		vo.setRawSpace(storeSetting.getRawSpace());
+		vo.setRawStrategy(storeSetting.getRawStrategy());
+		vo.setResultSpace(storeSetting.getResultSpace());
+		vo.setResultStrategy(storeSetting.getResultStrategy());
 		ArrayList<MVBGroupVO> mvbGroups = new ArrayList<>();
 		ArrayList<ADGroupVO> adGroups = new ArrayList<>();
 		ArrayList<ECNGroupVO> ecnGroups = new ArrayList<>();
-		convert(groups, mvbGroups, adGroups, ecnGroups);
-		storeVariables.setAdGroups(adGroups);
-		storeVariables.setMvbGroups(mvbGroups);
-		storeVariables.setEcnGroups(ecnGroups);
-		return storeVariables;
+		convert(storeSetting.getStoreVariables(), mvbGroups, adGroups, ecnGroups);
+		vo.setMvbGroups(mvbGroups);
+		vo.setEcnGroups(ecnGroups);
+		return vo;
 	}
 
 	/**
@@ -155,27 +126,13 @@ public class SettingViewSupporterImpl implements SettingViewSupporter {
 	 */
 	private List<BoardSettingVO> getBoardSettings(List<BoardSetting> boardSettings) {
 		List<BoardSettingVO> settings = new ArrayList<>();
-		for (BoardSetting board : boardSettings) {
-			BoardSettingVO boardSetting = new BoardSettingVO();
-			boardSetting.setSlotId(board.getSlotId());
-			boardSetting.setEnable(board.getEnable());
-			boardSetting.setFilename(board.getFilename());
-			boardSetting.setFileOriginalName(board.getFileOriginalName());
-			boardSetting.setIp(board.getIp());
-			boardSetting.setType(board.getType());
-			settings.add(boardSetting);
-			BoardType boardType = BoardType.valueOf(board.getType());
-			if (boardType.getType().equals("AD")) {
-				List<VariableGroup> groups = board.getVariableGroups();
-				ADGroupVO adGroup = new ADGroupVO();
-				adGroup.setSlotId(boardSetting.getSlotId());
-				adGroup.setVariables(new ArrayList<>());
-				for (VariableGroup group : groups) {
-					VariableGroupVO frontGroup = converter.convertToVO(group);
-					adGroup.getVariables().addAll(((ADGroupVO) frontGroup).getVariables());
-				}
-				boardSetting.setVariables(adGroup.getVariables());
-			}
+		for (BoardSetting boardSetting : boardSettings) {
+			BoardSettingVO vo = new BoardSettingVO();
+			vo.setSlotId(boardSetting.getSlotId());
+			vo.setEnable(boardSetting.getEnable());
+			vo.setType(boardSetting.getType());
+			propertyHandler.fillVOProperty(boardSetting, vo);
+			settings.add(vo);
 		}
 		return settings;
 	}
@@ -196,12 +153,13 @@ public class SettingViewSupporterImpl implements SettingViewSupporter {
 			frontSetting.setSlotId(algorithmSetting.getSlotId());
 			frontSetting.setSubsystemId(algorithmSetting.getSubsystemId());
 			frontSetting.setType(algorithmSetting.getType());
+			frontSetting.setVideoIp(algorithmSetting.getVideoIp());
+			frontSetting.setVideoUrl(algorithmSetting.getVideoUrl());
 			settings.add(frontSetting);
 			ArrayList<MVBGroupVO> mvbGroups = new ArrayList<>();
 			ArrayList<ADGroupVO> adGroups = new ArrayList<>();
 			ArrayList<ECNGroupVO> ecnGroups = new ArrayList<>();
 			convert(algorithmSetting.getVariableGroups(), mvbGroups, adGroups, ecnGroups);
-			frontSetting.setAdGroups(adGroups);
 			frontSetting.setMvbGroups(mvbGroups);
 			frontSetting.setEcnGroups(ecnGroups);
 		}
@@ -216,25 +174,128 @@ public class SettingViewSupporterImpl implements SettingViewSupporter {
 	 */
 	private void convert(List<VariableGroup> groups, ArrayList<MVBGroupVO> mvbGroups, ArrayList<ADGroupVO> adGroups,
 			ArrayList<ECNGroupVO> ecnGroups) {
-		Map<Integer, ADGroupVO> map = new HashMap<>();
 		for (VariableGroup group : groups) {
 			VariableGroupVO frontGroup = converter.convertToVO(group);
 			if (frontGroup instanceof MVBGroupVO) {
 				mvbGroups.add((MVBGroupVO) frontGroup);
 			} else if (frontGroup instanceof ECNGroupVO) {
 				ecnGroups.add((ECNGroupVO) frontGroup);
-			} else if (frontGroup instanceof ADGroupVO) {
-				ADGroupVO adGroup = map.get(frontGroup.getSlotId());
-				if (adGroup == null) {
-					adGroup = new ADGroupVO();
-					adGroup.setSlotId(frontGroup.getSlotId());
-					adGroup.setVariables(new ArrayList<>());
-					map.put(adGroup.getSlotId(), adGroup);
-				}
-				adGroup.getVariables().addAll(((ADGroupVO) frontGroup).getVariables());
 			}
 		}
-		adGroups.addAll(map.values());
 	}
 
+	/**
+	 * @see com.hirain.phm.synapsis.setting.support.SettingViewSupporter#parseBoardSettingVO(java.util.List)
+	 */
+	@Override
+	public List<BoardSetting> parseBoardSettingVO(List<BoardSettingVO> boardVOList) {
+		List<BoardSetting> boardSettings = new ArrayList<>();
+		for (BoardSettingVO vo : boardVOList) {
+			BoardSetting setting = new BoardSetting();
+			setting.setEnable(vo.getEnable());
+			setting.setSlotId(vo.getSlotId());
+			setting.setType(vo.getType());
+			BoardProperty property = propertyHandler.generateProperty(vo);
+			setting.setProperty(property);
+			boardSettings.add(setting);
+		}
+		return boardSettings;
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.setting.support.SettingViewSupporter#parseAlgorithmSettingVO(java.util.List)
+	 */
+	@Override
+	public List<AlgorithmSetting> parseAlgorithmSettingVO(List<AlgorithmSettingVO> algorithmVOList) {
+		List<AlgorithmSetting> algorithmSettings = new ArrayList<>();
+		if (algorithmVOList.isEmpty()) {
+			return algorithmSettings;
+		}
+		int index = 1;
+		for (AlgorithmSettingVO vo : algorithmVOList) {
+			AlgorithmSetting algorithmSetting = new AlgorithmSetting();
+			algorithmSetting.setCode(index++);
+			algorithmSetting.setEnable(vo.getEnable());
+			algorithmSetting.setFilename(vo.getFilename());
+			algorithmSetting.setFileOriginalName(vo.getFileOriginalName());
+			algorithmSetting.setName(vo.getName());
+			algorithmSetting.setSlotId(vo.getSlotId());
+			algorithmSetting.setSubsystemId(vo.getSubsystemId());
+			algorithmSetting.setType(vo.getType());
+			algorithmSetting.setVideoIp(vo.getVideoIp());
+			algorithmSetting.setVideoUrl(vo.getVideoUrl());
+			algorithmSetting.setVariableGroups(new ArrayList<>());
+
+			algorithmSetting.getVariableGroups().addAll(getMVBGroups(vo.getMvbGroups()));
+			algorithmSetting.getVariableGroups().addAll(getECNGroups(vo.getEcnGroups()));
+			algorithmSettings.add(algorithmSetting);
+		}
+		return algorithmSettings;
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.setting.support.SettingViewSupporter#parseStoreSettingVO(com.hirain.phm.synapsis.setting.support.param.StoreSettingVO)
+	 */
+	@Override
+	public StoreSetting parseStoreSettingVO(StoreSettingVO vo) {
+		StoreSetting setting = new StoreSetting();
+		setting.setRawSpace(vo.getRawSpace());
+		setting.setRawStrategy(vo.getRawStrategy());
+		setting.setResultSpace(vo.getResultSpace());
+		setting.setResultStrategy(vo.getResultStrategy());
+		List<VariableGroup> groups = new ArrayList<>();
+		groups.addAll(getMVBGroups(vo.getMvbGroups()));
+		groups.addAll(getECNGroups(vo.getEcnGroups()));
+		setting.setStoreVariables(groups);
+		return setting;
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.setting.support.SettingViewSupporter#parseTimeSettingVO(com.hirain.phm.synapsis.setting.support.param.TimeSettingVO)
+	 */
+	@Override
+	public TimeSetting parseTimeSettingVO(TimeSettingVO vo) {
+		TimeSetting setting = new TimeSetting();
+		setting.setType(vo.getType());
+		if (vo.getEcnGroup() != null && !vo.getEcnGroup().getVariables().isEmpty()) {
+			setting.setTimeVariables(converter.convertToDomain(vo.getEcnGroup(), VariableType.ECN));
+		} else if (vo.getMvbGroup() != null && !vo.getMvbGroup().getVariables().isEmpty()) {
+			setting.setTimeVariables(converter.convertToDomain(vo.getMvbGroup(), VariableType.MVB));
+		}
+		return setting;
+	}
+
+	/**
+	 * @param mvbGroups
+	 * @return
+	 */
+	private List<VariableGroup> getMVBGroups(List<MVBGroupVO> mvbGroups) {
+		List<VariableGroup> groups = new ArrayList<>();
+		if (mvbGroups != null && !mvbGroups.isEmpty()) {
+			for (MVBGroupVO frontMVBGroup : mvbGroups) {
+				if (!frontMVBGroup.getVariables().isEmpty()) {
+					VariableGroup mvbVariableGroup = converter.convertToDomain(frontMVBGroup, VariableType.MVB);
+					groups.add(mvbVariableGroup);
+				}
+			}
+		}
+		return groups;
+	}
+
+	/**
+	 * @param ecnGroups
+	 * @return
+	 */
+	private List<VariableGroup> getECNGroups(List<ECNGroupVO> ecnGroups) {
+		List<VariableGroup> groups = new ArrayList<>();
+		if (ecnGroups != null && !ecnGroups.isEmpty()) {
+			for (ECNGroupVO frontECNGroup : ecnGroups) {
+				if (!frontECNGroup.getVariables().isEmpty()) {
+					VariableGroup ecnVariableGroup = converter.convertToDomain(frontECNGroup, VariableType.ECN);
+					groups.add(ecnVariableGroup);
+				}
+			}
+		}
+		return groups;
+	}
 }

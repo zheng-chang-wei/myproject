@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 
-import com.hirain.phm.bd.data.impala.dao.DataQueryMapper;
+import com.hirain.phm.bd.data.impala.dao.DataMapper;
 import com.hirain.phm.bd.message.data.MetaDataEvent;
 
 /**
@@ -27,7 +27,7 @@ import com.hirain.phm.bd.message.data.MetaDataEvent;
 public class MetaDataEventHandler {
 
 	@Autowired
-	private DataQueryMapper mapper;
+	private DataMapper mapper;
 
 	@EventListener
 	@Async

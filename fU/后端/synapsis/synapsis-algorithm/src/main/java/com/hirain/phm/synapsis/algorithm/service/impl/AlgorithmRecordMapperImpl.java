@@ -52,7 +52,7 @@ public class AlgorithmRecordMapperImpl implements RecordMapper {
 		Record record = new Record();
 		record.setTimestamp(new Date());
 		String message = algorithm.getName() + "【" + algorithm.getSlotId() + "】";
-		message += newStatus == null ? RunStatus.Idle : newStatus.getEvent();
+		message += newStatus == null ? RunStatus.Idle.getEvent() : newStatus.getEvent();
 		record.setMessage(message);
 		add(record);
 	}

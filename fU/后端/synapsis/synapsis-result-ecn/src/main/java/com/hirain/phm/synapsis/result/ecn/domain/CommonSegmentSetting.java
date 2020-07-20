@@ -52,6 +52,9 @@ public class CommonSegmentSetting {
 	@XmlAttribute
 	private Integer dataLength;
 
+	@XmlAttribute
+	private String endian;
+
 	@Transient
 	@XmlElement
 	private VariableGroup subscribeGroup;

@@ -5,7 +5,8 @@ package com.hirain.phm.bd.transform.mqtt.client;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -25,23 +26,18 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  */
 @Configuration
 @EnableAsync
+@ConfigurationProperties("executor.thread")
 public class MqttTaskExecutorPool {
 
-	@Value("${executor.thread.core}")
-	private int corePoolSize;
-
-	@Value("${executor.thread.max}")
-	private int maxPoolSize;
-
-	@Value("${executor.thread.capacity}")
-	private int queueCapacity;
+	@Autowired
+	private ExecutorProperties props;
 
 	@Bean(name = "mqttConnect")
 	public ThreadPoolTaskExecutor kafkaExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(corePoolSize);
-		executor.setMaxPoolSize(maxPoolSize);
-		executor.setQueueCapacity(queueCapacity);
+		executor.setCorePoolSize(props.getCorePoolSize());
+		executor.setMaxPoolSize(props.getMaxPoolSize());
+		executor.setQueueCapacity(props.getQueueCapacity());
 		executor.setThreadNamePrefix("mqtt connect - ");
 		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 		executor.initialize();

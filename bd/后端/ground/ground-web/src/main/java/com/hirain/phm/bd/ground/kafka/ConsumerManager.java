@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -21,8 +21,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.hirain.phm.bd.common.pinyin.PinyinUtil;
+import com.hirain.phm.bd.ground.common.kafka.KafkaConsumerManager;
 import com.hirain.phm.bd.message.header.MessageHeader;
 import com.hirain.phm.bd.message.train.RegisterMessage;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @Version 1.0
@@ -38,7 +42,8 @@ import com.hirain.phm.bd.message.train.RegisterMessage;
  */
 @Component
 @Configuration
-public class ConsumerManager {
+@ConfigurationProperties("kafka")
+public class ConsumerManager implements KafkaConsumerManager {
 
 	@Autowired
 	private KafkaConsumerProperties properties;
@@ -46,7 +51,8 @@ public class ConsumerManager {
 	@Autowired
 	private ConsumerFactory<String, Object> consumerFactory;
 
-	@Value("${kafka.topic.realtime}")
+	@Getter
+	@Setter
 	private String topicPrefix;
 
 	private Map<String, AbstractMessageListenerContainer<?, ?>> kafkaContainerMap = new ConcurrentHashMap<>();
@@ -60,12 +66,17 @@ public class ConsumerManager {
 	}
 
 	public void createAndStart(MessageHeader header) {
-		String pingYin = PinyinUtil.getFullSpell(header.getCity());
-		String topic = topicPrefix + pingYin + "-" + header.getLine();
+		createAndStart(header.getCity(), header.getLine());
+	}
+
+	@Override
+	public void createAndStart(String city, String line) {
+		String pingYin = PinyinUtil.getFullSpell(city);
+		String topic = topicPrefix + pingYin + "-" + line;
 		if (kafkaContainerMap.keySet().contains(topic)) {
 			return;
 		}
-		String groupId = properties.getPrefix() + pingYin + "-" + header.getLine();
+		String groupId = properties.getGroupPrefix() + pingYin + "-" + line;
 		AbstractMessageListenerContainer<String, Object> container = kafkaContanier(topic, groupId);
 		kafkaContainerMap.put(topic, container);
 		container.start();
@@ -76,7 +87,7 @@ public class ConsumerManager {
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public AbstractMessageListenerContainer<String, Object> kafkaContanier(String topic, String groupId) {
 		ContainerProperties containerProperties = new ContainerProperties(topic);
-		containerProperties.setGroupId(properties.getPrefix() + groupId);
+		containerProperties.setGroupId(properties.getGroupPrefix() + groupId);
 		containerProperties.setMessageListener(listener());
 		ConcurrentMessageListenerContainer<String, Object> kafkaContainer = new ConcurrentMessageListenerContainer<>(consumerFactory,
 				containerProperties);

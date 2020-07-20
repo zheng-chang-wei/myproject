@@ -5,14 +5,10 @@ package com.hirain.phm.synapsis.setting.ad;
 
 import java.io.File;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hirain.phm.synapsis.exception.SynapsisException;
 import com.hirain.phm.synapsis.protocol.ParseResult;
 import com.hirain.phm.synapsis.protocol.ProtocolStream;
-import com.hirain.phm.synapsis.setting.VariableGroup;
-import com.hirain.phm.synapsis.setting.service.VariableGroupService;
 
 /**
  * @Version 1.0
@@ -29,9 +25,6 @@ import com.hirain.phm.synapsis.setting.service.VariableGroupService;
 @Component("AD")
 public class ADVariablesParser implements ProtocolStream {
 
-	@Autowired
-	private VariableGroupService service;
-
 	/**
 	 * @see com.hirain.phm.synapsis.protocol.ProtocolStream#read(java.io.File)
 	 */
@@ -46,17 +39,17 @@ public class ADVariablesParser implements ProtocolStream {
 	@Override
 	public ParseResult read(String filename) throws Exception {
 		ParseResult result = new ParseResult();
-		File file = new File(filename);
-		String name = file.getName();
-		try {
-			Integer groupId = Integer.parseInt(name);
-			VariableGroup group = service.select(groupId);
-			result.setData(group);
-		} catch (NumberFormatException e) {
-			result.setCode(ParseResult.FAIL);
-		} catch (Exception e) {
-			throw new SynapsisException("ad变量查询失败", e);
-		}
+		// File file = new File(filename);
+		// String name = file.getName();
+		// try {
+		// Integer groupId = Integer.parseInt(name);
+		// VariableGroup group = service.select(groupId);
+		// result.setData(group);
+		// } catch (NumberFormatException e) {
+		// result.setCode(ParseResult.FAIL);
+		// } catch (Exception e) {
+		// throw new SynapsisException("ad变量查询失败", e);
+		// }
 		return result;
 	}
 }

@@ -10,6 +10,8 @@ import com.hirain.phm.synapsis.algorithm.domain.RunStatus;
 import com.hirain.phm.synapsis.algorithm.param.AlgorithmPacket;
 import com.hirain.phm.synapsis.algorithm.param.AlgorithmStatisticsResponse;
 import com.hirain.phm.synapsis.algorithm.param.Record;
+import com.hirain.phm.synapsis.page.QueryRequest;
+import com.hirain.phm.synapsis.response.PageResultBean;
 import com.hirain.phm.synapsis.setting.AlgorithmSetting;
 
 /**
@@ -26,7 +28,7 @@ import com.hirain.phm.synapsis.setting.AlgorithmSetting;
  */
 public interface AlgorithmService {
 
-	List<AlgorithmPacket> list();
+	PageResultBean<List<AlgorithmPacket>> list(QueryRequest request);
 
 	/**
 	 * 根据配置初始化算法对象
@@ -36,9 +38,10 @@ public interface AlgorithmService {
 	void init(List<AlgorithmSetting> settings);
 
 	/**
+	 * @param slotId
 	 * @param statusMap
 	 */
-	void update(Map<Integer, RunStatus> statusMap);
+	void update(int slotId, Map<Integer, RunStatus> statusMap);
 
 	/**
 	 * 获得算法状态汇总信息

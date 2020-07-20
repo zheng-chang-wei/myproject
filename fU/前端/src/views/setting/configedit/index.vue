@@ -1,20 +1,22 @@
 <template>
-  <div style="position: relative">
+  <div id="configEdit">
     <el-steps :active="myActive" finish-status="success" align-center>
       <el-step title="基本配置" />
       <el-step title="板卡配置" />
       <el-step title="算法配置" />
+      <el-step title="输出配置" />
       <el-step title="存储配置" />
       <el-step title="时间来源配置" />
     </el-steps>
-    <basicConfig v-if="myActive===0" class="common-config" :style="commonStyle" :basic-info="basicInfo" @nextStep="nextStep" @cancel="cancel" @importFile="importFile" />
+    <basicConfig v-if="myActive===0" class="common-config" :style="commonStyle" :basic-info="basicInfo" @nextStep="nextStep" @cancel="cancel" @importFile="importFile" @basicSaveSuccess="basicSaveSuccess" />
     <boardConfig
       v-if="myActive===1"
       class="common-config"
-      :style="commonStyle"
+      :style="boardStyle"
       :board-settings="boardSettings"
       @previousStep="previousStep"
       @toAlgorithmConfig="toAlgorithmConfig"
+      @uploadSuccess="uploadSuccess"
       @cancel="cancel"
     />
     <algorithmConfig
@@ -22,28 +24,43 @@
       class="common-config"
       :style="commonStyle"
       :algorithm-settings="algorithmSettings"
+      :board-settings="boardSettings"
+      :all-variables="allVariables"
+      @previousStep="previousStep"
+      @nextStep="nextStep"
+      @cancel="cancel"
+    />
+    <outputconfig
+      v-if="myActive===3"
+      class="common-config"
+      :style="commonStyle"
+      :clock-config-info="clockConfigInfo"
+      :algorithm-settings="algorithmSettings"
+      :output-settings="outputSettings"
+      :mvb-variables="mvbVariables"
+      :ecn-variables="ecnVariables"
+      :ad-variables="adVariables"
       @previousStep="previousStep"
       @nextStep="nextStep"
       @cancel="cancel"
     />
     <storeConfig
-      v-if="myActive===3"
+      v-if="myActive===4"
       class="common-config"
       :style="commonStyle"
       :store-config="storeConfig"
-      :variables="algorithmSettings.variables"
+      :all-variables="allVariables"
       @previousStep="previousStep"
       @nextStep="nextStep"
       @cancel="cancel"
     />
     <clockConfig
-      v-if="myActive===4"
+      v-if="myActive===5"
       class="common-config"
       :style="commonStyle"
       :clock-config-info="clockConfigInfo"
-      :variables="algorithmSettings.variables"
+      :variables="allVariables"
       @previousStep="previousStep"
-      @save="save"
       @cancel="cancel"
     />
   </div>
@@ -53,14 +70,17 @@
 import basicConfig from './configforms/basicconfig'
 import boardConfig from './configforms/boardconfig/index'
 import algorithmConfig from './configforms/algorithmconfig/index'
+import outputconfig from './configforms/outputconfig'
 import storeConfig from './configforms/storeconfig'
 import clockConfig from './configforms/clockconfig'
 import app from '@/common/js/app'
+const types = ['CHAR8', 'BOOLEAN', 'UINT8', 'INT8', 'UINT16', 'INT16', 'UINT32', 'INT32', 'FLOAT', 'DOUBLE', 'LONG', 'BITS']
 export default {
   components: {
     basicConfig,
     boardConfig,
     algorithmConfig,
+    outputconfig,
     storeConfig,
     clockConfig
   },
@@ -74,6 +94,10 @@ export default {
       default: null
     },
     algorithmSettings: {
+      type: Array,
+      default: null
+    },
+    outputSettings: {
       type: Object,
       default: null
     },
@@ -84,32 +108,36 @@ export default {
     clockConfigInfo: {
       type: Object,
       default: null
-    },
-    active: {
-      type: Number,
-      default: 0
     }
   },
   data() {
     return {
-      myActive: this.active,
-      commonStyle: {}
+      myActive: 0,
+      commonStyle: {},
+      boardStyle: {},
+      allVariables: [],
+      mvbVariables: [],
+      ecnVariables: [],
+      adVariables: [],
+      variablesCount: 0,
+      currentCount: 0
     }
   },
   mounted() {
     // 页面改变时,更改尺寸
     window.addEventListener('resize', this.changeHeight)
     this.changeHeight()
-    this.$bus.$on('changeActive', (data) => {
-      this.myActive = data
-    })
   },
   destroyed() {
-    this.$root.Bus.$off('changeActive')
+    window.removeEventListener('resize', this.changeHeight)
   },
   methods: {
+    setActive(active) {
+      this.myActive = active
+    },
     changeHeight() {
-      this.commonStyle = { height: document.body.offsetHeight - 145 + 'px' }
+      this.commonStyle = { height: document.body.offsetHeight - 130 + 'px' }
+      this.boardStyle = { height: document.body.offsetHeight - 355 + 'px' }
     },
     cancel() {
       this.$emit('cancel')
@@ -117,65 +145,104 @@ export default {
     importFile(result) {
       this.$emit('importFile', result)
     },
+    // 数据流文件上传成功
+    uploadSuccess(type) {
+      switch (type) {
+        case 'ECN':
+          this.algorithmSettings.forEach(element => {
+            element.ecnGroups = []
+          })
+          this.storeConfig.ecnGroups = []
+          this.clockConfigInfo.ecnGroup = []
+          this.outputSettings.commonSegments = []
+          break
+        case 'MVB':
+          this.algorithmSettings.forEach(element => {
+            element.mvbGroups = []
+          })
+          this.storeConfig.mvbGroups = []
+          this.clockConfigInfo.mvbGroup = []
+          break
+
+        default:
+          break
+      }
+    },
     // 上一步
     previousStep() {
       this.myActive--
+      this.$emit('isShowChassis', this.myActive === 1)
     },
     // 下一步
     nextStep() {
       this.myActive++
+      this.$emit('isShowChassis', this.myActive === 1)
     },
-    // 跳转到算法配置
-    toAlgorithmConfig(boardSettings) {
-      this.myActive++
-      this.boardSettings = boardSettings
-      this.algorithmSettings.variables = []
-      for (let i = 0; i < this.boardSettings.length; i++) {
-        const variables = this.boardSettings[i].variables
-        if (variables && variables.length > 0) {
-          const btaElement = {
-            type: this.boardSettings[i].type,
-            slotId: parseInt(this.boardSettings[i].slotId),
-            variables: variables
-          }
-          this.algorithmSettings.variables.push(btaElement)
-        }
-      }
-      this.algorithmSettings.variables.sort((a, b) => b.type.charCodeAt(0) - a.type.charCodeAt(0))
-    },
-    save() {
-      for (let i = 0; i < this.boardSettings.length; i++) {
-        const type = this.boardSettings[i].type
-        if (type.indexOf('AD') === -1) {
-          this.boardSettings[i].variables = null
-        }
-      }
-      const param = {
-        name: this.basicInfo.name,
-        line: this.basicInfo.line,
-        train: this.basicInfo.train,
-        rawStrategy: this.storeConfig.rawStrategy,
-        rawSpace: this.storeConfig.rawSpace,
-        resultStrategy: this.storeConfig.resultStrategy,
-        resultSpace: 100 - this.storeConfig.rawSpace,
-        timeOn: this.clockConfigInfo.timeOn,
-        boardSettings: this.boardSettings,
-        algorithmSettings: this.algorithmSettings.algorithms,
-        timeVariables: {
-          mvbGroup: this.clockConfigInfo.mvbGroup,
-          ecnGroup: this.clockConfigInfo.ecnGroup
-        },
-        storeVariables: this.storeConfig.storeVariables
-      }
-      app.postData('save_protocol', param).then(data => {
-        if (data.code === 0) {
-          this.$emit('saveSuccess')
-          this.$message({
-            message: '保存成功',
-            type: 'success'
-          })
+
+    toAlgorithmConfig() {
+      this.$emit('isShowChassis', false)
+      this.allVariables = []
+      this.mvbVariables = []
+      this.ecnVariables = []
+      this.adVariables = []
+      const settingId = localStorage.getItem('settingId')
+      this.variablesCount = 0
+      this.currentCount = 0
+      this.boardSettings.forEach(boardSetting => {
+        if (boardSetting.type === 'MVB' || boardSetting.type === 'ECN' || boardSetting.type.indexOf('AD') !== -1) {
+          this.variablesCount++
         }
       })
+      if (this.variablesCount === 0) {
+        this.myActive++
+        return
+      }
+      for (let index = 0; index < this.boardSettings.length; index++) {
+        const boardSetting = this.boardSettings[index]
+        let parm = null
+        if (boardSetting.type === 'MVB' || boardSetting.type === 'ECN') {
+          parm = {
+            settingId: settingId,
+            type: boardSetting.type
+          }
+        } else if (boardSetting.type.indexOf('AD') !== -1) {
+          parm = {
+            settingId: settingId,
+            type: 'AD'
+          }
+        }
+        if (parm === null) {
+          continue
+        }
+        app.get('list_variables', parm).then(response => {
+          if (response.code === 0) {
+            const element = response.data[0]
+            element.variables.forEach(variable => {
+              variable['dataTypeAlias'] = types[parseInt(variable.dataType)]
+            })
+            const btaElement = {
+              type: element.type,
+              slotId: element.slotId,
+              variables: element.variables
+            }
+            if (boardSetting.type === 'MVB') {
+              this.mvbVariables.push(btaElement)
+            } else if (boardSetting.type === 'ECN') {
+              this.ecnVariables.push(btaElement)
+            } else if (boardSetting.type.indexOf('AD')) {
+              this.adVariables.push(btaElement)
+            }
+            this.allVariables.push(btaElement)
+            this.currentCount++
+            if (this.currentCount === this.variablesCount) {
+              this.myActive++
+            }
+          }
+        })
+      }
+    },
+    basicSaveSuccess() {
+      this.$emit('saveSuccess')
     }
   }
 }
@@ -185,11 +252,22 @@ export default {
 .el-steps {
   margin-top: 10px;
 }
-
+#configEdit .el-step__icon {
+    width: 19px;
+    height: 19px;
+    font-size: 10px;
+}
+#configEdit .el-step__title{
+  font-size: 12px;
+  line-height: 20px;
+}
+#configEdit .el-form-item__label {
+    font-size: 12px;
+}
 .common-config {
   margin: 10px auto;
   width: 98%;
-  border: 1px solid #CCCCCC;
+  /* border: 1px solid #CCCCCC; */
   border-radius: 2px;
   padding: 10px;
   overflow: auto;

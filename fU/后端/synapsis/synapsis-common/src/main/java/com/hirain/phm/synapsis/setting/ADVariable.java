@@ -9,7 +9,6 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
@@ -32,7 +31,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @XmlRootElement(name = "ADVariable")
-@XmlType(propOrder = { "chnId", "sampleRate", "clockSrc", "frequenceFactor", })
 public class ADVariable extends Variable {
 
 	@Id

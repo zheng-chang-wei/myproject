@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,25 +50,30 @@ public class DataFileListTest {
 	/**
 	 * 
 	 */
-	// @BeforeClass
+	@BeforeClass
 	public static void init() {
+		FileUtils.deleteQuietly(new File(root));
 		File rootFile = new File(root);
 		if (!rootFile.exists()) {
 			rootFile.mkdirs();
 		}
-		File folder1 = new File(rootFile, "2019年11月");
+		File folder1 = new File(rootFile, "201911");
 		if (!folder1.exists()) {
 			folder1.mkdirs();
 		}
-		File folder2 = new File(rootFile, "2019年12月");
+		File folder2 = new File(rootFile, "201912");
 		if (!folder2.exists()) {
 			folder2.mkdirs();
 		}
-		File folder21 = new File(folder2, "18日");
+		File folder21 = new File(folder2, "18");
 		if (!folder21.exists()) {
 			folder21.mkdirs();
 		}
-		File file = new File(folder21, "20191218150000.rt");
+		File folder22 = new File(folder21, "150000");
+		if (!folder22.exists()) {
+			folder22.mkdirs();
+		}
+		File file = new File(folder22, "20191218150000.rt");
 		if (!file.exists()) {
 			try {
 				file.createNewFile();
@@ -90,7 +98,7 @@ public class DataFileListTest {
 
 	@Test
 	public void testList() throws SynapsisException {
-		String folerPath = root + File.separator + "2019年12月";
+		String folerPath = root + File.separator + "201912";
 		List<FileTreeNode> folders = service.listNodes(folerPath, NodeLevel.Month);
 		assertNotNull(folders);
 		File folder = new File(folerPath);
@@ -101,7 +109,7 @@ public class DataFileListTest {
 
 	@Test
 	public void testListLeaf() throws SynapsisException {
-		String folderPath = root + File.separator + "2019年12月" + File.separator + "18日";
+		String folderPath = root + File.separator + "201912" + File.separator + "18";
 		List<FileTreeNode> nodes = service.listNodes(folderPath, NodeLevel.Date);
 		assertEquals(NodeLevel.Leaf, nodes.get(0).getLevel());
 		nodes.forEach(System.out::println);
@@ -109,12 +117,12 @@ public class DataFileListTest {
 
 	@Test(expected = SynapsisException.class)
 	public void testNoFile() throws SynapsisException {
-		String folderPath = root + File.separator + "2019年10月";
+		String folderPath = root + File.separator + "201910";
 		service.listNodes(folderPath, NodeLevel.Month);
 	}
 
-	// @AfterClass
-	// public static void tearDown() {
-	// FileUtils.deleteQuietly(new File(root));
-	// }
+	@AfterClass
+	public static void tearDown() {
+		// FileUtils.deleteQuietly(new File(root));
+	}
 }

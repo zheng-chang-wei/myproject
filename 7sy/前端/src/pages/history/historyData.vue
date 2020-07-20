@@ -300,13 +300,11 @@ export default {
 			}
 			this.setTitle()
 			this.clearData()
-			vm.retrieveForm.starttime=util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss")
-			vm.retrieveForm.endtime=util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss")
 			let param = {
 				trainType:vm.retrieveForm.type,
 				trainNum: vm.retrieveForm.num,
-				startDate: vm.retrieveForm.starttime,
-				endDate: vm.retrieveForm.endtime,
+				startDate: util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss"),
+				endDate: util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss"),
 				axleNum:vm.activeName
 			};
 			this.dataloading = true;

@@ -1,65 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<device host-name="board1" leader-name="m" type="b">
-    <device-configuration memory-size="1"/>
+<device host-name="ccu" endian="little">
     <bus-interface-list>
-        <bus-interface host-ip="10.0.1.215" leader-ip="1.1.1.1" name="WTD" network-id="1">
-            <trdp-process blocking="no" priority="1" traffic-shaping="on"/>
-            <pd-com-parameter callback="off" marshall="off" port="17224" qos="1" timeout-value="1" ttl="1" validity-behavior="zero"/>
-            <md-com-parameter callback="off" confirm-timeout="1" connect-timeout="1" marshall="off" num-sessions="1000" protocol="UDP" qos="0" reply-timeout="1" tcp-port="17225" ttl="1" udp-port="17225"/>
-            <telegram com-id="12096" com-parameter-id="1" data-set-id="1" name="WTD_SEND">
-                <md-parameter callback="off" confirm-timeout="1" marshall="off" protocol="UDP" reply-timeout="5000000"/>
-                <pd-parameter callback="off" cycle="500" marshall="off" offset-address="c" redundant="0" timeout-value="0" validity-behavior="zero"/>
-                <source id="1" name="WTD" uri1="10.0.1.215" uri2="1.1.1.1"/>
-                <destination id="1" name="CCU" uri="10.0.0.201"/>
+        <bus-interface host-ip="10.0.1.101" name="ccu_port1" network-id="1">
+            <trdp-process blocking="no" cycle-time="1000" traffic-shaping="on"/>
+            <pd-com-parameter callback="off" marshall="off" port="17224" qos="5" timeout-value="100000" ttl="64" validity-behavior="zero"/>
+            <md-com-parameter callback="on" confirm-timeout="1000000" connect-timeout="6000000" marshall="off" num-sessions="1000" protocol="UDP" qos="3" reply-timeout="5000000" tcp-port="17225" ttl="64" udp-port="17225"/>
+            <telegram com-id="21304" com-parameter-id="1" data-set-id="1000" name="CCU_SEND">
+                <md-parameter callback="on" confirm-timeout="100000" marshall="off" protocol="UDP" reply-timeout="5000000"/>
+                <pd-parameter callback="off" cycle="30" marshall="off" timeout-value="100000" validity-behavior="zero"/>
+                <source id="1" name="CCU2" uri1="10.0.0.203"/>
+                <destination id="1" name="ALL2" uri="239.255.1.103"/>
             </telegram>
             <telegram com-id="21304" com-parameter-id="1" data-set-id="1000" name="CCU_SEND">
-                <md-parameter callback="off" confirm-timeout="0" marshall="off" protocol="UDP" reply-timeout="5000000"/>
-                <pd-parameter callback="off" cycle="30" marshall="off" offset-address="e" redundant="0" timeout-value="100000" validity-behavior="zero"/>
-                <source id="1" name="CCU" uri1="10.0.0.201" uri2="10.0.0.201"/>
-                <source id="2" name="CCU" uri1="10.0.0.201" uri2="1.1.1.1"/>
-                <destination id="1" name="WTD" uri="10.0.1.215"/>
-                <destination id="2" name="MVB" uri="10.0.1.215"/>
+                <md-parameter callback="on" confirm-timeout="100000" marshall="off" protocol="UDP" reply-timeout="5000000"/>
+                <pd-parameter callback="off" cycle="20" marshall="off" timeout-value="100000" validity-behavior="zero"/>
+                <source id="1" name="CCU" uri1="10.0.0.201"/>
+                <destination id="1" name="ALL" uri="239.255.1.101"/>
             </telegram>
         </bus-interface>
     </bus-interface-list>
     <com-parameter-list>
         <com-parameter id="1" qos="5" retries="3" ttl="64"/>
-        <com-parameter id="2" qos="1" retries="3" ttl="64"/>
+        <com-parameter id="2" qos="3" retries="3" ttl="64"/>
+        <com-parameter id="4" qos="4" retries="3" ttl="2"/>
     </com-parameter-list>
     <data-set-list>
-        <data-set id="1" name="wtd_send">
-            <element array-size="16" name="data" type="CHAR8"/>
-            <element array-size="84" name="reserve" type="CHAR8"/>
+        <data-set id="1000" name="ccu_all">
+            <element array-size="8" name="data1" type="INT32"/>
+            <element array-size="8" name="data2" type="INT32"/>
+            <element array-size="8" name="data3" type="INT32"/>
         </data-set>
-        <data-set id="2" name="ciom1_send">
-            <element array-size="32" name="data1" offset="11" scale="1" type="CHAR8" unit="1" byteOffset="1" bitOffset="1" bitLen="2" signal="1"/>
-            <element array-size="32" name="data2" type="CHAR8"/>
-            <element array-size="136" name="reserve" type="CHAR8"/>
-        </data-set>
-        <data-set id="1000" name="ccu">
-            <element array-size="1300" name="data" offset="1" scale="1" type="CHAR8" unit="1" byteOffset="1" bitOffset="1" bitLen="2" signal="1"/>
-        </data-set>
-        <data-set id="1001" name="ccu_all">
-            <element array-size="32" name="data" offset="1" scale="1" type="CHAR8" unit="1" byteOffset="1" bitOffset="1" bitLen="2" signal="1"/>
-            <element array-size="1268" name="reserve" type="CHAR8"/>
-        </data-set>
-        <data-set id="1002" name="ccu_ciom1">
-            <element array-size="32" name="data1" type="CHAR8"/>
-            <element array-size="336" name="reserve1" type="CHAR8"/>
-            <element array-size="8" name="data2" type="CHAR8"/>
-            <element array-size="924" name="reserve2" type="CHAR8"/>
-        </data-set>
-        <data-set id="1003" name="ccu_ciom2">
-            <element array-size="32" name="data1" type="CHAR8"/>
-            <element array-size="338" name="reserve1" type="CHAR8"/>
-            <element array-size="8" name="data2" type="CHAR8"/>
-            <element array-size="922" name="reserve2" type="CHAR8"/>
-        </data-set>
-        <data-set id="1004" name="ccu_ioma1">
-            <element array-size="32" name="data1" type="CHAR8"/>
-            <element array-size="344" name="reserve1" type="CHAR8"/>
-            <element array-size="8" name="data2" type="CHAR8"/>
-            <element array-size="916" name="reserve2" type="CHAR8"/>
+        <data-set id="1" name="int32_4_all_100">
+            <element array-size="1" name="data4" type="INT32"/>
         </data-set>
     </data-set-list>
 </device>

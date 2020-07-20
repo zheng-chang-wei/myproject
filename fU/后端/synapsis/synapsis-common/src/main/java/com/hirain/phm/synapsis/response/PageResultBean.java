@@ -5,6 +5,7 @@ package com.hirain.phm.synapsis.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * @Version 1.0
@@ -20,6 +21,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class PageResultBean<T> extends ResultBean<T> {
 
 	private long total;

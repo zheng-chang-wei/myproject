@@ -9,7 +9,6 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -56,17 +55,8 @@ public class RegisterHandlerImpl implements IRegisterHandler {
 	@Autowired
 	private ApplicationEventPublisher publisher;
 
-	@Value("${mqtt.ssl.file.cert}")
-	private String caCert;
-
-	@Value("${mqtt.ssl.file.client}")
-	private String clientCert;
-
-	@Value("${mqtt.ssl.file.key}")
-	private String key;
-
-	@Value("${mqtt.ssl.password}")
-	private String password;
+	@Autowired
+	private MqttSslProperties mqttProps;
 
 	private class VerifyResult {
 
@@ -141,7 +131,7 @@ public class RegisterHandlerImpl implements IRegisterHandler {
 		response.setError(result.getError());
 		if (message.isSsl()) {
 			setSSLFile(response);
-			response.setPassword(password);
+			response.setPassword(mqttProps.getPassword());
 		}
 		Train train = trainService.select(message.getProject(), message.getTrain());
 		response.setState(train.getTrainStatus());
@@ -190,9 +180,9 @@ public class RegisterHandlerImpl implements IRegisterHandler {
 
 	private void setSSLFile(RegisterResponse response) {
 		try {
-			response.setCaCert(FileUtils.readFileToString(new File(caCert), Charset.defaultCharset()));
-			response.setCert(FileUtils.readFileToString(new File(clientCert), Charset.defaultCharset()));
-			response.setKey(FileUtils.readFileToString(new File(key), Charset.defaultCharset()));
+			response.setCaCert(FileUtils.readFileToString(new File(mqttProps.getCertFile()), Charset.defaultCharset()));
+			response.setCert(FileUtils.readFileToString(new File(mqttProps.getClientFile()), Charset.defaultCharset()));
+			response.setKey(FileUtils.readFileToString(new File(mqttProps.getKeyFile()), Charset.defaultCharset()));
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}

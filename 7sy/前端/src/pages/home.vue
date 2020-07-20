@@ -99,9 +99,7 @@ export default {
 			if (row.exceptionCount===0) {
 				return '无'
 			}
-			return (row.lastExceptionDate = row.lastExceptionDate ?
-				util.formatDate(new Date(row.lastExceptionDate), "yyyy-MM-dd hh:mm:ss") :
-				"");
+			return  row.lastExceptionDate 
 		},
 
 		//动态更改表格最大高度
@@ -136,13 +134,13 @@ export default {
 					vm.retrieveForm.type = "";
 					vm.getStatisticsTrainNum();
 				}
-			});
+			}).catch(() => {});
 		},
 		//车型选择器改变时执行
 		getStatisticsTrainNum() {
 			let vm = this;
 			let param = {
-				trainType: vm.retrieveForm.type
+				trainType: vm.retrieveForm.type,
 			};
 			app.get("get_trainNum_by_type", param).then(data => {
 				if (data.msg.length > 0) {
@@ -159,7 +157,7 @@ export default {
 					}
 					vm.retrieveForm.num = vm.numOptions[0].value;
 				}
-			});
+			}).catch(() => {})
 		},
 		queryBtnChecked(){
 			this.currentPage=1
@@ -180,7 +178,7 @@ export default {
 					vm.total = d.msg.total;
 					this.listLoading = false;
 				}
-			});
+			}).catch(() => {});
 		},
 		changeToDetection(index, row) {
 			vm.$root.Bus.$emit("menuActive", "/detection/detectionByCar");

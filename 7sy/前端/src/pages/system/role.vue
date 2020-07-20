@@ -334,7 +334,7 @@ export default {
         let param = {
           id: vm.roleSelect[0].roleId
         };
-        app.post("toUpdate_role", param).then(data => {
+        app.get("toUpdate_role", param).then(data => {
           if (data.msg) {
             vm.editRoleVisible = true;
             setTimeout(function() {

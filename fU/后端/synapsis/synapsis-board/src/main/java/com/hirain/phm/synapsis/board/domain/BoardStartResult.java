@@ -6,25 +6,34 @@ package com.hirain.phm.synapsis.board.domain;
 import lombok.Getter;
 
 /**
- * @Version 1.0   
- * @Author zepei.tao@hirain.com  
- * @Created Dec 4, 2019 5:47:01 PM  
+ * @Version 1.0
+ * @Author zepei.tao@hirain.com
+ * @Created Dec 4, 2019 5:47:01 PM
  * @Description
- * <p>
+ *              <p>
  * @Modification
- * <p>Date         Author      Version     Description  
- * <p>Dec 4, 2019     zepei.tao@hirain.com             1.0        create file 
+ *               <p>
+ *               Date Author Version Description
+ *               <p>
+ *               Dec 4, 2019 zepei.tao@hirain.com 1.0 create file
  */
 public enum BoardStartResult {
-	SUCCESSFUL(0), //成功
-	CONFIG_FAULT(1), //配置失败
-	START_FAULT(2);//启动失败
+
+	SUCCESSFUL(0, "成功"), // 成功
+
+	CONFIG_FAULT(1, "配置失败"), // 配置失败
+
+	START_FAULT(2, "启动失败");// 启动失败
 
 	@Getter
 	private int code;
 
-	private BoardStartResult(int code) {
+	@Getter
+	private String message;
+
+	private BoardStartResult(int code, String message) {
 		this.code = code;
+		this.message = message;
 	}
 
 }

@@ -5,6 +5,7 @@ package com.hirain.phm.bd.ground.maintenance.service;
 
 import java.util.List;
 
+import com.hirain.phm.bd.ground.common.page.QueryRequest;
 import com.hirain.phm.bd.ground.maintenance.domain.WorkSheet;
 import com.hirain.phm.bd.ground.maintenance.domain.WorkStep;
 import com.hirain.phm.bd.ground.maintenance.param.FaultType;
@@ -29,7 +30,7 @@ public interface FlowReadService {
 
 	WorkStep findLastSameStep(Long sheetId, String state);
 
-	List<WorkSheetRecord> listWorkSheets(WorkSheetQueryParam param);
+	List<WorkSheetRecord> listWorkSheets(WorkSheetQueryParam param, QueryRequest queryRequest);
 
 	List<WorkSheet> listWorkSheetsWithDetail(WorkSheetQueryParam param);
 
@@ -41,4 +42,10 @@ public interface FlowReadService {
 	SheetCountResponse countSheets();
 
 	List<FaultType> getFaultTypes();
+
+	/**
+	 * @param param
+	 * @return
+	 */
+	Integer countWorkSheets(WorkSheetQueryParam param);
 }

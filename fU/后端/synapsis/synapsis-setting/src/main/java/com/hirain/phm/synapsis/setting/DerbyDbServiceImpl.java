@@ -3,15 +3,22 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.setting;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hirain.phm.synapsis.constant.BoardType;
+import com.hirain.phm.synapsis.exception.SynapsisException;
 import com.hirain.phm.synapsis.setting.db.SettingDbService;
 import com.hirain.phm.synapsis.setting.db.SubsystemService;
 import com.hirain.phm.synapsis.setting.db.VariableDbService;
+import com.hirain.phm.synapsis.setting.service.AlgorithmSettingService;
+import com.hirain.phm.synapsis.setting.service.BoardSettingService;
 import com.hirain.phm.synapsis.setting.service.SettingService;
+import com.hirain.phm.synapsis.setting.service.StoreSettingService;
+import com.hirain.phm.synapsis.setting.service.TimeSettingService;
 import com.hirain.phm.synapsis.setting.service.VariableGroupService;
 import com.hirain.phm.synapsis.setting.service.VariableManager;
 
@@ -42,20 +49,29 @@ public class DerbyDbServiceImpl implements SettingDbService, VariableDbService {
 	@Autowired
 	private VariableManager variableManager;
 
+	@Autowired
+	private BoardSettingService boardService;
+
+	@Autowired
+	private AlgorithmSettingService algorithmService;
+
+	@Autowired
+	private TimeSettingService timeService;
+
+	@Autowired
+	private StoreSettingService storeService;
+
 	/**
+	 * @throws SynapsisException
 	 * @see com.hirain.phm.synapsis.setting.db.SettingDbService#selectCurrent()
 	 */
 	@Override
-	public Setting selectCurrent() {
-		return settingService.selectCurrent();
-	}
-
-	/**
-	 * @see com.hirain.phm.synapsis.setting.db.SettingDbService#saveOrUpdate(com.hirain.phm.synapsis.setting.Setting)
-	 */
-	@Override
-	public void saveOrUpdate(Setting setting) {
-		settingService.saveOrUpdate(setting);
+	public Setting selectCurrent() throws SynapsisException {
+		Setting setting = settingService.selectCurrent();
+		if (setting == null) {
+			return null;
+		}
+		return selectWithDetail(setting.getId());
 	}
 
 	/**
@@ -63,7 +79,32 @@ public class DerbyDbServiceImpl implements SettingDbService, VariableDbService {
 	 */
 	@Override
 	public Setting selectWithDetail(int settingId) {
-		return settingService.selectWithDetail(settingId);
+		Setting setting = settingService.selectWithDetail(settingId);
+		List<BoardSetting> boardSettings = boardService.selectBySettingId(settingId);
+		setting.setBoardSettings(boardSettings);
+		TimeSetting timeSetting = setting.getTimeSetting();
+		if (timeSetting != null && timeSetting.getTimeVariables() != null) {
+			groupService.fillVariableGroup(timeSetting.getTimeVariables());
+		}
+		StoreSetting storeSetting = setting.getStoreSetting();
+		if (storeSetting != null) {
+			groupService.fillVariableGroups(storeSetting.getStoreVariables());
+		}
+		postAlgorithm(setting.getAlgorithmSettings());
+		return setting;
+	}
+
+	/**
+	 * 算法配置后处理
+	 *
+	 * @param algorithmSettings
+	 */
+	private void postAlgorithm(List<AlgorithmSetting> algorithmSettings) {
+		if (algorithmSettings != null) {
+			for (AlgorithmSetting algorithmSetting : algorithmSettings) {
+				groupService.fillVariableGroups(algorithmSetting.getVariableGroups());
+			}
+		}
 	}
 
 	/**
@@ -88,6 +129,14 @@ public class DerbyDbServiceImpl implements SettingDbService, VariableDbService {
 	@Override
 	public void delete(int settingId) {
 		settingService.delete(settingId);
+		boardService.deleteBySettingId(settingId);
+		algorithmService.deleteBySettingId(settingId);
+
+		timeService.deleteBySettingId(settingId);
+		groupService.deleteTimeVariables(settingId);
+
+		storeService.deleteBySettingId(settingId);
+		groupService.deleteStoreVariables(settingId);
 	}
 
 	/**
@@ -110,8 +159,22 @@ public class DerbyDbServiceImpl implements SettingDbService, VariableDbService {
 	 * @see com.hirain.phm.synapsis.setting.db.VariableDbService#saveGroups(int, java.util.List)
 	 */
 	@Override
+	@Deprecated
 	public void saveGroups(int boardId, List<VariableGroup> groups) {
 		groupService.saveBoardVariables(boardId, groups);
+	}
+
+	@Override
+	public void saveVariableGroup(VariableGroup group) {
+		groupService.insertVariables(Arrays.asList(group));
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.setting.db.VariableDbService#selectVariableGroup(java.lang.Integer)
+	 */
+	@Override
+	public VariableGroup selectVariableGroup(Integer groupId) {
+		return groupService.select(groupId);
 	}
 
 	/**
@@ -128,6 +191,35 @@ public class DerbyDbServiceImpl implements SettingDbService, VariableDbService {
 	@Override
 	public void delete(String type, Long variableId) {
 		variableManager.delete(type, variableId);
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.setting.db.SettingDbService#selectAlgorithmBySubsystemId(java.lang.Integer)
+	 */
+	@Override
+	public List<AlgorithmSetting> selectAlgorithmBySubsystemId(Integer subsystemId) {
+		return algorithmService.selectBySubsystemId(subsystemId);
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.setting.db.SettingDbService#selectByName(java.lang.String)
+	 */
+	@Override
+	public Setting selectByName(String name) {
+		return settingService.selectByName(name);
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.setting.db.SettingDbService#findBoardSetting(java.lang.Integer, java.lang.String)
+	 */
+	@Override
+	public BoardSetting findBoardSetting(Integer settingId, String type) {
+		List<BoardSetting> boardSetting = boardService.selectBySettingId(settingId);
+		BoardSetting setting = boardSetting.stream().filter(b -> {
+			BoardType boardType = BoardType.valueOf(b.getType());
+			return boardType.getType().equals(type);
+		}).findFirst().get();
+		return setting;
 	}
 
 }

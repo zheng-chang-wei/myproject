@@ -93,7 +93,7 @@ export default {
           if (response.code === 0) {
             this.$message({
               type: 'success',
-              message: '删除成功'
+              message: '删除成功,刷新页面方能启用'
             })
             this.getCondition()
           }

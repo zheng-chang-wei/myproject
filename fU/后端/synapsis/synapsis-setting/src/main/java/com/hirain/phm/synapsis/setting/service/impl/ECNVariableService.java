@@ -44,7 +44,12 @@ public class ECNVariableService implements VariableService {
 	 */
 	@Override
 	public int insertVariables(int groupId, List<? extends Variable> variables) {
-		return mapper.insertVariables(groupId, variables);
+		variables.forEach(v -> {
+			ECNVariable ecn = (ECNVariable) v;
+			ecn.setGroupId(groupId);
+			mapper.insertGenerateKey(ecn);
+		});
+		return variables.size();
 	}
 
 	/**
@@ -65,6 +70,8 @@ public class ECNVariableService implements VariableService {
 	 */
 	@Override
 	public void delete(Long variableId) {
-		mapper.deleteByPrimaryKey(variableId);
+		if (variableId != null) {
+			mapper.deleteByPrimaryKey(variableId);
+		}
 	}
 }

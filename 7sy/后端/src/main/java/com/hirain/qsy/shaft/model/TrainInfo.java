@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Table(name = "t_train_info")
@@ -30,6 +31,7 @@ public class TrainInfo implements Serializable {
 	@Column(name = "train_type")
 	private String trainType;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "CREATE_TIME")
 	private Date createTime;
 

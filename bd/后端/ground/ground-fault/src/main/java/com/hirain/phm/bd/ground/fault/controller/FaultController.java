@@ -4,6 +4,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -18,7 +20,8 @@ import com.hirain.phm.bd.ground.common.exception.SafeRunner;
 import com.hirain.phm.bd.ground.common.model.ResponseBo;
 import com.hirain.phm.bd.ground.common.page.PageService;
 import com.hirain.phm.bd.ground.common.page.QueryRequest;
-import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParms;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailResponseParams;
 import com.hirain.phm.bd.ground.fault.service.FaultDataService;
 import com.hirain.phm.bd.ground.fault.service.FaultDetailService;
 import com.hirain.phm.bd.ground.fault.service.FaultInfoService;
@@ -56,10 +59,16 @@ public class FaultController {
 	@Autowired
 	private FaultDataService faultDataService;
 
-	@GetMapping("/findFaultDetailsByParams")
-	public ResponseBo findFaultDetailsByParams(QueryRequest request, FaultDetailRequestParms faultDetails) {
+	@GetMapping("/list")
+	public ResponseBo findFaultDetailsByParams(QueryRequest request, FaultDetailRequestParams faultDetails) {
 		try {
-			return ResponseBo.ok(pageService.selectByPageNumSize(request, () -> faultDetailService.findFaultDetailsByParams(faultDetails)));
+			Map<String, Object> pageObject = pageService.selectByPageNumSize(request,
+					() -> faultDetailService.findFaultDetailsByParams(faultDetails));
+			@SuppressWarnings("unchecked")
+			List<FaultDetailResponseParams> list = (List<FaultDetailResponseParams>) pageObject.get("rows");
+			faultDetailService.getRepairAndSolution(list);
+			pageObject.put("rows", list);
+			return ResponseBo.ok(pageObject);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseBo.error("系统异常");
@@ -79,7 +88,7 @@ public class FaultController {
 		}
 	}
 
-	@GetMapping("/findFaultInfoByProject")
+	@GetMapping("/faultInfo")
 	public ResponseBo findFaultInfoByProject(String project) {
 		return SafeRunner.run(() -> ResponseBo.ok(faultInfoService.findFaultInfoByProject(project)), ResponseBo.error("获取故障信息失败"));
 	}
@@ -106,14 +115,14 @@ public class FaultController {
 		}, ResponseBo.error("查询失败"));
 	}
 
-	@GetMapping("/dashboard/today")
-	public ResponseBo selectToday(String project, String trainNo) {
-		return SafeRunner.run(() -> ResponseBo.ok(faultDetailService.selectToday(project, trainNo)), ResponseBo.error("查询今日故障失败"));
-	}
-
 	@GetMapping("/dashboard/annual")
 	public ResponseBo selectAnnualCounts(int year) {
 		return SafeRunner.run(() -> ResponseBo.ok(faultDetailService.selectYearCounts(year)), ResponseBo.error("查询故障统计数据失败"));
+	}
+
+	@GetMapping("/dashboard/today/bode")
+	public ResponseBo selectToday() {
+		return SafeRunner.run(() -> ResponseBo.ok(faultDetailService.selectToday()), ResponseBo.error("查询今日故障失败"));
 	}
 
 	@GetMapping("/dashboard/month")

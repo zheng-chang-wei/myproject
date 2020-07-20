@@ -5,10 +5,10 @@ package com.hirain.phm.synapsis.result.ecn.service;
 
 import java.util.List;
 
-import com.hirain.phm.synapsis.result.ecn.domain.AlgorithmIndexSetting;
 import com.hirain.phm.synapsis.result.ecn.domain.CommonSegmentSetting;
 import com.hirain.phm.synapsis.result.ecn.vo.AlgorithmOutputVO;
 import com.hirain.phm.synapsis.setting.Setting;
+import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.support.domain.ValidateResult;
 
 /**
@@ -35,13 +35,6 @@ public interface ResultSettingService {
 	/**
 	 * @param setting
 	 * @param output
-	 * @return
-	 */
-	List<AlgorithmIndexSetting> genearteAlgorithmIndexSetting(Setting setting, AlgorithmOutputVO output);
-
-	/**
-	 * @param setting
-	 * @param output
 	 */
 	void save(Integer settingId, AlgorithmOutputVO output);
 
@@ -52,9 +45,10 @@ public interface ResultSettingService {
 
 	/**
 	 * @param settingId
+	 * @param groups
 	 * @throws Exception
 	 */
-	void genearteSettingFile(int settingId) throws Exception;
+	void genearteSettingFile(int settingId, List<VariableGroup> groups) throws Exception;
 
 	/**
 	 * @param settingId
@@ -67,5 +61,11 @@ public interface ResultSettingService {
 	 * @param settingId
 	 */
 	void delete(int settingId);
+
+	/**
+	 * @param settingId
+	 * @return
+	 */
+	List<VariableGroup> getVariableGroups(int settingId);
 
 }

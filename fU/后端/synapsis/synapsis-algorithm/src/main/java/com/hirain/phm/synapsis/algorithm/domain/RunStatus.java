@@ -25,7 +25,7 @@ public enum RunStatus {
 
 	Stop("停止运行"),
 
-	Err("异常运行");
+	Err("发生异常");
 
 	@Getter
 	private String event;

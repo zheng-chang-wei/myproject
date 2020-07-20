@@ -5,10 +5,7 @@ package com.hirain.phm.synapsis.setting.db;
 
 import java.util.List;
 
-import com.hirain.phm.synapsis.page.QueryRequest;
-import com.hirain.phm.synapsis.response.PageResultBean;
 import com.hirain.phm.synapsis.setting.Subsystem;
-import com.hirain.phm.synapsis.setting.SubsystemGroupItem;
 
 /**
  * @Version 1.0
@@ -26,7 +23,7 @@ public interface SubsystemService {
 
 	List<Subsystem> selectAllSubsystems();
 
-	PageResultBean<List<SubsystemGroupItem>> listSubsystemByParms(QueryRequest request, String name);
+	List<Subsystem> selectByLikeName(String name);
 
 	boolean isRepeat(Subsystem subsystem);
 
@@ -35,4 +32,7 @@ public interface SubsystemService {
 	void update(Subsystem subsystem);
 
 	void deleteById(Integer[] ids);
+
+	void save(List<Subsystem> subsystems);
+
 }

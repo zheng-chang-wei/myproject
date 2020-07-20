@@ -38,10 +38,10 @@
 				<el-table-column type="selection" width="55" align="center"> </el-table-column>
 				<el-table-column prop="trainType" label="车型" align="center" sortable> </el-table-column>
 				<el-table-column prop="trainNum" label="车号" align="center" sortable> </el-table-column>
-				<el-table-column prop="earliestTime" label="最早数据时间" :formatter="formatEarliestTime" align="center"
+				<el-table-column prop="earliestTime" label="最早数据时间"  align="center"
 					sortable>
 				</el-table-column>
-				<el-table-column prop="latestTime" label="最新数据时间" :formatter="formatLatestTime" align="center" sortable>
+				<el-table-column prop="latestTime" label="最新数据时间"  align="center" sortable>
 				</el-table-column>
 				<el-table-column prop="details" label="操作" align="center">
 					<template slot-scope="scope">
@@ -58,7 +58,7 @@
 					style="margin-left:5%;">
 					<el-form-item prop="deadline " label="截止日期">
 						<el-date-picker v-model="deleteForm.deadline" type="datetime" placeholder="请选择要删除的截止日期"
-							@change="formatDeadline" :editable="false">
+							 :editable="false">
 						</el-date-picker>
 					</el-form-item>
 				</el-form>
@@ -107,15 +107,7 @@ export default {
 				callback();
 			}
 		};
-		const checkDeadline = (rule, value, callback) => {
-			let sTime = new Date(this.retrieveForm.starttime).getTime(),
-				eTime = new Date(value).getTime();
-			if (eTime < sTime) {
-				callback(new Error("结束时间早于开始时间"));
-			} else {
-				callback();
-			}
-		};
+
 		return {
 			//车号
 			numOptions: [{
@@ -159,33 +151,25 @@ export default {
 				}]
 			},
 			deleteRules: {
-				deadline: [{
-					validator: checkDeadline,
-					trigger: "change"
-				}]
+				deadline: [
+					      {
+            required: true,
+            message: "必填",
+            trigger: "change"
+          }]
 			},
 			tableMaxHeight: document.body.offsetHeight - 280,
 		};
 	},
 	mounted() {
 		this.getTrainInfos();
-
 		this.getStorage();
 		this.getDatas();
 		//页面改变时,更改尺寸
 		$(window).on("resize", this.changeTableMaxHeight);
 		this.changeTableMaxHeight();
-		this.$root.Bus.$on('deleteData', (data) => {
-			this.handleDeleteResponse(data);
-		})
-	},
-	beforeDestroy() {
-			this.$root.Bus.$off();
-	},
-	components: {
 	},
 	methods: {
-
 		//获取所有车型信息
 		getTrainInfos() {
 			let vm = this;
@@ -255,7 +239,7 @@ export default {
 				trainNum: vm.retrieveForm.num,
 				pageNum: vm.pageNum,
 				pageSize: vm.pageSize
-			};
+			}
 			app.get("get_datas", param).then(d => {
 				if (d) {
 					vm.datas = d.msg.rows;
@@ -268,15 +252,8 @@ export default {
 		deleteBtnChecked() {
 			this.$refs.deleteForm.validate(valid => {
 				if (valid) {
-					if (this.deleteForm.deadline.length == 0) {
-						this.$message({
-							message: "请选择日期",
-							type: "error"
-						});
-						return;
-					}
+					const endTime=util.formatDate(new Date(this.deleteForm.deadline), "yyyy-MM-dd hh:mm:ss")
 					this.deleteSuccessCount=0;
-					this.deleteForm.deadline = util.formatDate(new Date(this.deleteForm.deadline), "yyyy-MM-dd hh:mm:ss");
 					//批量删除
 					if (this.isBatchRemove) {
 						let maxTime = this.sels[0].earliestTime;
@@ -286,7 +263,7 @@ export default {
 								maxTime = this.sels[i].earliestTime;
 							}
 						}
-						if (this.deleteForm.deadline < maxTime) {
+						if (endTime < maxTime) {
 							this.$message({
 								message: "请选择晚于所有最早数据时间的日期",
 								type: "error"
@@ -294,7 +271,7 @@ export default {
 							return;
 						}
 						for (let i = 0; i < this.sels.length; i++) {
-							if (this.deleteForm.deadline > this.sels[i].latestTime) {
+							if (endTime > this.sels[i].latestTime) {
 								let param = {
 									trainId: this.sels[i].id,
 								};
@@ -302,7 +279,7 @@ export default {
 							}else{
 								let param = {
 									trainId: this.sels[i].id,
-									deadline: this.deleteForm.deadline
+									deadline: endTime
 								};
 								this.sendDeleteRequest('delete_datas', param)
 							}
@@ -310,7 +287,7 @@ export default {
 					} else {
 						//单个删除
 						this.deleteCount=1;
-						if (this.deleteForm.deadline < this.row.earliestTime) {
+						if (endTime < this.row.earliestTime) {
 							this.$message({
 								message: "请选择晚于最早数据时间的日期",
 								type: "error"
@@ -319,9 +296,10 @@ export default {
 						}
 						let param = {
 							trainId: this.row.id,
-							deadline: this.deleteForm.deadline
-						};
-						if (this.deleteForm.deadline > this.row.latestTime) {
+							deadline:endTime
+						}
+						
+						if (endTime > this.row.latestTime) {
 							this.sendDeleteRequest('drop_table', param)
 						}else{
 							this.sendDeleteRequest('delete_datas', param)
@@ -334,12 +312,12 @@ export default {
 		sendDeleteRequest(url, param) {
 			this.deleteLoading = true;
 			app.post(url, param).then(data => {
-	
+		    this.handleDeleteResponse(data)
 			});
 		},
 		handleDeleteResponse(data) {
 			this.deleteSuccessCount++;
-			if (this.deleteSuccessCount === this.deleteCount * 2) {
+			if (this.deleteSuccessCount === this.deleteCount ) {
 				this.deleteLoading = false;
 				this.deleteFormVisible = false;
 				if (data.code === 0) {
@@ -412,45 +390,6 @@ export default {
 					vm.percentage = parseInt(num.toFixed(0));
 				}
 			});
-		},
-				//格式化创建时间
-		formatEarliestTime(row, column) {
-			return (row.earliestTime = row.earliestTime ?
-				util.formatDate(new Date(row.earliestTime), "yyyy-MM-dd hh:mm:ss") :
-				"");
-		},
-		//格式化创建时间
-		formatLatestTime(row, column) {
-			return (row.latestTime = row.latestTime ?
-				util.formatDate(new Date(row.latestTime), "yyyy-MM-dd hh:mm:ss") :
-				"");
-		},
-		//格式化时间控件
-		formatDeadline(val) {
-			this.deleteForm.deadline = util.formatDate(new Date(val), "yyyy-MM-dd hh:mm:ss");
-			if (this.isBatchRemove) {
-				let maxTime = this.sels[0].earliestTime;
-				for (let i = 0; i < this.sels.length; i++) {
-					if (maxTime < this.sels[i].earliestTime) {
-						maxTime = this.sels[i].earliestTime;
-					}
-				}
-				if (this.deleteForm.deadline < maxTime) {
-					this.$message({
-						message: "请选择晚于最早数据时间的日期",
-						type: "error"
-					});
-					return;
-				}
-			} else {
-				if (this.deleteForm.deadline < this.row.earliestTime) {
-					this.$message({
-						message: "请选择晚于最早数据时间的日期",
-						type: "error"
-					});
-					return;
-				}
-			}
 		},
 		//列表选中的选项
 		selsChange(sels) {

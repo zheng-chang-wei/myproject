@@ -12,9 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hirain.phm.synapsis.board.domain.Board;
 import com.hirain.phm.synapsis.runtime.param.ActivateResponse;
 import com.hirain.phm.synapsis.runtime.param.SettingResponse;
-import com.hirain.phm.synapsis.runtime.param.UpdateResponse;
 import com.hirain.phm.synapsis.setting.Subsystem;
-import com.hirain.phm.synapsis.setting.support.param.SettingVO;
 
 /**
  * @Version 1.0
@@ -38,14 +36,6 @@ public interface RuntimeService {
 	void init(List<Board> boards);
 
 	/**
-	 * 保存或更新配置
-	 * 
-	 * @param settingRequest
-	 * @return
-	 */
-	UpdateResponse saveSetting(SettingVO settingRequest) throws Exception;
-
-	/**
 	 * 上传文件
 	 * 
 	 * @param file
@@ -60,7 +50,7 @@ public interface RuntimeService {
 	 * @param settingId
 	 * @return
 	 */
-	ActivateResponse validateAndActivate(int settingId) throws Exception;
+	ActivateResponse launchSetting(int settingId) throws Exception;
 
 	/**
 	 * @param settingId

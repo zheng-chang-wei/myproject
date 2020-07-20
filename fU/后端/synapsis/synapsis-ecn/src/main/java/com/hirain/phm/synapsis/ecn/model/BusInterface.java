@@ -55,13 +55,13 @@ import lombok.EqualsAndHashCode;
 public class BusInterface extends SheetAndLine {
 
 	@XmlElement(name = "trdp-process")
-	protected TrdpProcess trdpProcess;
+	protected TrdpProcess trdpProcess = new TrdpProcess();
 
 	@XmlElement(name = "pd-com-parameter")
-	protected PdComParameter pdComParameter;
+	protected PdComParameter pdComParameter = new PdComParameter();
 
 	@XmlElement(name = "md-com-parameter")
-	protected MdComParameter mdComParameter;
+	protected MdComParameter mdComParameter = new MdComParameter();
 
 	@XmlElement()
 	protected List<Telegram> telegram;

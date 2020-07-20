@@ -17,8 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hirain.phm.bd.ground.fault.dao.FaultDetailMapper;
-import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParms;
-import com.hirain.phm.bd.ground.fault.param.FaultDetailWithSuggestionParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailResponseParams;
 
 /**
  * @Version 1.0
@@ -42,19 +42,19 @@ public class TestMapper {
 
 	@Test
 	public void test() {
-		List<FaultDetailWithSuggestionParams> details = detailMapper.findFaultDetailsByParms(new FaultDetailRequestParms());
+		List<FaultDetailResponseParams> details = detailMapper.findFaultDetailsByParms(new FaultDetailRequestParams());
 		assertNotNull(details);
 		assertFalse(details.isEmpty());
 		if (details.size() > 1) {
-			FaultDetailWithSuggestionParams d1 = details.get(0);
-			FaultDetailWithSuggestionParams d2 = details.get(1);
+			FaultDetailResponseParams d1 = details.get(0);
+			FaultDetailResponseParams d2 = details.get(1);
 			assertNotNull(d1.getFaultTime());
 			assertNotNull(d2.getFaultTime());
 			assertTrue(d1.getFaultTime().compareTo(d2.getFaultTime()) > 0);
 		}
 		details.forEach(System.out::println);
 
-		assertNotNull(details.get(0).getSolution());
+		// assertNotNull(details.get(0).getSolution());
 	}
 
 }

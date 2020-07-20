@@ -34,6 +34,7 @@ type int,
 enable bool,
 filename varchar(255),
 subsystem_id int,
+video_ip varchar(20),
 PRIMARY KEY(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

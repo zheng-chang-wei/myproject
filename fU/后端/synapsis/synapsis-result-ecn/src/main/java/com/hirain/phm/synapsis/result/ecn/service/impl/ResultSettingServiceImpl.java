@@ -6,23 +6,20 @@ package com.hirain.phm.synapsis.result.ecn.service.impl;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.hirain.phm.synapsis.constant.BoardType;
 import com.hirain.phm.synapsis.ecn.ECNVariableQuery;
 import com.hirain.phm.synapsis.ecn.impl.ECNGroupConverter;
+import com.hirain.phm.synapsis.ecn.impl.ECNProcotolStream;
 import com.hirain.phm.synapsis.ecn.model.Device;
-import com.hirain.phm.synapsis.exception.SynapsisException;
 import com.hirain.phm.synapsis.file.FileGenerator;
 import com.hirain.phm.synapsis.protocol.ParseResult;
-import com.hirain.phm.synapsis.protocol.ProtocolService;
 import com.hirain.phm.synapsis.result.ecn.domain.AlgorithmIndex;
 import com.hirain.phm.synapsis.result.ecn.domain.AlgorithmIndexSetting;
 import com.hirain.phm.synapsis.result.ecn.domain.CommonSegment;
@@ -34,6 +31,7 @@ import com.hirain.phm.synapsis.result.ecn.service.ResultSettingService;
 import com.hirain.phm.synapsis.result.ecn.vo.AlgorithmIndexVO;
 import com.hirain.phm.synapsis.result.ecn.vo.AlgorithmOutputVO;
 import com.hirain.phm.synapsis.result.ecn.vo.CommonSegmentVO;
+import com.hirain.phm.synapsis.result.service.ResultSegmentService;
 import com.hirain.phm.synapsis.setting.AlgorithmSetting;
 import com.hirain.phm.synapsis.setting.BoardSetting;
 import com.hirain.phm.synapsis.setting.ECNVariable;
@@ -42,11 +40,9 @@ import com.hirain.phm.synapsis.setting.Variable.VariableType;
 import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.db.AlgorithmSettingQuery;
 import com.hirain.phm.synapsis.setting.db.SettingDbService;
-import com.hirain.phm.synapsis.setting.db.VariableDbService;
-import com.hirain.phm.synapsis.setting.support.MulticastAssigner;
+import com.hirain.phm.synapsis.setting.support.SettingUpdateSupporter;
 import com.hirain.phm.synapsis.setting.support.domain.ValidateResult;
-
-import lombok.Setter;
+import com.hirain.phm.synapsis.util.SettingFileConfig;
 
 /**
  * @Version 1.0
@@ -63,39 +59,22 @@ import lombok.Setter;
 @Service
 public class ResultSettingServiceImpl implements ResultSettingService {
 
-	@Value("${setting.file.root}")
-	@Setter
-	private String rootDirectory;// 配置生效时的文件根目录
-
-	@Value("${setting.file.resource}")
-	private String resourceDirectory;// 配置保存时的资源文件根目录
+	@Autowired
+	private SettingFileConfig config;
 
 	@Autowired
-	@Setter
-	private MulticastAssigner assigner;
-
-	@Autowired
-	@Setter
 	private CommonHeaderService headerService;
 
 	@Autowired
-	@Setter
 	private AlgorithmIndexSettingService indexService;
 
 	@Autowired
-	@Setter
-	private VariableDbService groupService;
-
-	@Autowired
-	@Setter
 	private AlgorithmSettingQuery algorithmSettingQuery;
 
 	@Autowired
-	@Setter
 	private SettingDbService dbService;
 
 	@Autowired
-	@Setter
 	private FileGenerator fileGenerator;
 
 	@Autowired
@@ -105,7 +84,13 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 	private ECNVariableQuery query;
 
 	@Autowired
-	private ProtocolService protocolService;
+	private SettingUpdateSupporter supporter;
+
+	@Autowired
+	private ECNProcotolStream protocolStream;
+
+	@Autowired
+	private ResultSegmentService resultSegmentService;
 
 	/**
 	 * @see com.hirain.phm.synapsis.result.ecn.service.ResultSettingService#save(Setting,
@@ -115,47 +100,47 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 	public void save(Integer settingId, AlgorithmOutputVO output) {
 		Setting setting = dbService.selectWithDetail(settingId);
 		BoardSetting board = getEcnBoard(setting);
-		CommonSegmentSetting commonSegment = generateCommonSegmentSetting(setting.getId(), board.getSlotId(), output);
-		List<AlgorithmIndexSetting> algorithmIndexSetting = genearteAlgorithmIndexSetting(setting, output);
-		groupService.saveGroups(board.getId(), Arrays.asList(commonSegment.getSubscribeGroup()));
-		commonSegment.setGroupId(commonSegment.getSubscribeGroup().getId());
-		headerService.save(commonSegment);
-		indexService.save(algorithmIndexSetting);
+		if (board != null) {
+			Device device = getDevice(setting);
+			CommonSegmentSetting commonSegment = generateCommonSegmentSetting(setting.getId(), board.getSlotId(), output);
+			String endian = query.getEndian(device);
+			commonSegment.setEndian(endian);
+			headerService.save(commonSegment);
+			List<AlgorithmIndexSetting> algorithmIndexSetting = genearteAlgorithmIndexSetting(setting, output, device);
+			indexService.delete(settingId);
+			if (algorithmIndexSetting.size() > 0) {
+				indexService.save(algorithmIndexSetting);
+			}
+		}
+
+	}
+
+	/**
+	 * @param setting
+	 * @throws Exception
+	 */
+	public Device getDevice(Setting setting) {
+		String filepath = supporter.getECNProtocolFilepath(setting);
+
+		try {
+			ParseResult result = protocolStream
+					.read(config.getResource() + File.separator + setting.getName() + File.separator + "boards" + File.separator + filepath);
+			return (Device) result.getData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
 	 * @param setting
 	 * @param output
+	 * @param device
 	 * @return
 	 */
-	@Override
-	public List<AlgorithmIndexSetting> genearteAlgorithmIndexSetting(Setting setting, AlgorithmOutputVO output) {
-		Map<Long, String> map = getComIdCycle(setting);
+	private List<AlgorithmIndexSetting> genearteAlgorithmIndexSetting(Setting setting, AlgorithmOutputVO output, Device device) {
+		Map<Long, String> map = query.getComIdCycle(device);
 		return generateAlgorithmIndexSetting(setting.getId(), setting.getAlgorithmSettings(), map, output);
-	}
-
-	/**
-	 * @param setting
-	 */
-	private Map<Long, String> getComIdCycle(Setting setting) {
-		Map<Long, String> map = new HashMap<>();
-		Device device = null;
-		for (BoardSetting boardSetting : setting.getBoardSettings()) {
-			if (boardSetting.getType().equals(BoardType.ECN.getType())) {
-				String filename = boardSetting.getFilename();
-				String filepath = resourceDirectory + File.separator + setting.getName() + File.separator + filename;
-				try {
-					ParseResult result = protocolService.parse(boardSetting.getType(), filepath);
-					device = (Device) result.getData();
-				} catch (SynapsisException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		if (device != null) {
-			map.putAll(query.getComIdCycle(device));
-		}
-		return map;
 	}
 
 	/**
@@ -205,14 +190,11 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 	 */
 	private VariableGroup generateSubscribeGroup(Integer slotId, List<CommonSegment> segments) {
 		VariableGroup group = new VariableGroup();
-		group.setConsumptionId(assigner.nextConsumption());
-		group.setMulticastIp(assigner.nextIp());
-		group.setMulticastPort(assigner.nextPort());
 		group.setType(VariableType.ECN.name());
 		group.setSlotId(slotId);
 		List<ECNVariable> variables = new ArrayList<>();
 		for (CommonSegment source : segments) {
-			if (source.getType() == CommonSegment.SOURCE_BUS) {
+			if (source.getType().equals("bus")) {
 				variables.add(source.getSource());
 			}
 		}
@@ -231,7 +213,7 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 		List<CommonSegment> segments = new ArrayList<>();
 		for (CommonSegmentVO vo : segmentsVO) {
 			CommonSegment segment = new CommonSegment();
-			segment.setType(vo.getType());
+			segment.setType(vo.getType() == CommonSegment.SOURCE_BUS ? "bus" : "local");
 			if (vo.getType() == CommonSegment.SOURCE_BUS) {
 				segment.setSource(converter.converFrom(vo.getSource()));
 			} else {
@@ -261,7 +243,7 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 			AlgorithmIndexSetting indexSetting = new AlgorithmIndexSetting();
 			indexSetting.setComId(vo.getComId());
 			indexSetting.setSettingId(settingId);
-			indexSetting.setCycle(cycles.get(vo.getComId()));
+			indexSetting.setCycleTime(cycles.get(vo.getComId()));
 			List<AlgorithmIndex> indexList = new ArrayList<>();
 			List<String> names = vo.getAlgorithms();
 			for (int i = 0; i < names.size(); i++) {
@@ -283,7 +265,7 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 	 * @param name
 	 * @return
 	 */
-	public boolean isSpace(String name) {
+	private boolean isSpace(String name) {
 		return name != null && !name.isEmpty();
 	}
 
@@ -293,12 +275,14 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 	@Override
 	public AlgorithmOutputVO getResultSetting(Integer settingId) {
 		CommonSegmentSetting commonSegmentSetting = headerService.selectBy(settingId);
-		List<AlgorithmIndexSetting> indexSetting = indexService.selectBy(settingId);
 		AlgorithmOutputVO vo = new AlgorithmOutputVO();
-		vo.setCommonLength(commonSegmentSetting.getLength());
-		vo.setDataLength(commonSegmentSetting.getDataLength());
-		vo.setCommonSegments(getCommonVO(commonSegmentSetting.getSegments()));
-		vo.setAlgorithms(getIndexVO(indexSetting));
+		if (commonSegmentSetting != null) {
+			List<AlgorithmIndexSetting> indexSetting = indexService.selectBy(settingId);
+			vo.setCommonLength(commonSegmentSetting.getLength());
+			vo.setDataLength(commonSegmentSetting.getDataLength());
+			vo.setCommonSegments(getCommonVO(commonSegmentSetting.getSegments()));
+			vo.setAlgorithms(getIndexVO(indexSetting));
+		}
 		return vo;
 	}
 
@@ -316,9 +300,12 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 			for (AlgorithmIndex index : indexSetting.getAlgorithms()) {
 				while (i < index.getIndex()) {
 					names.add("");
+					i++;
 				}
 				AlgorithmSetting algorithmSetting = algorithmSettingQuery.getAlgorithmSetting(indexSetting.getSettingId(), index.getCode());
-				names.add(algorithmSetting.getName());
+				if (algorithmSetting != null) {
+					names.add(algorithmSetting.getName());
+				}
 			}
 			vo.setAlgorithms(names);
 			voList.add(vo);
@@ -339,7 +326,7 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 			vo.setDataType(segment.getDataType());
 			vo.setIndex(segment.getIndex());
 			vo.setName(segment.getName());
-			vo.setType(segment.getType());
+			vo.setType(segment.getType().equals("bus") ? CommonSegment.SOURCE_BUS : CommonSegment.SOURCE_SYSTEM);
 			if (vo.getType() == CommonSegment.SOURCE_BUS) {
 				vo.setSource(converter.parseFrom(segment.getSource()));
 			}
@@ -350,19 +337,29 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 
 	/**
 	 * @throws Exception
-	 * @see com.hirain.phm.synapsis.result.ecn.service.ResultSettingService#genearteSettingFile(int)
+	 * @see com.hirain.phm.synapsis.result.ecn.service.ResultSettingService#genearteSettingFile(int, List)
 	 */
 	@Override
-	public void genearteSettingFile(int settingId) throws Exception {
+	public void genearteSettingFile(int settingId, List<VariableGroup> groups) throws Exception {
 		CommonSegmentSetting segmentSetting = headerService.selectBy(settingId);
 		List<AlgorithmIndexSetting> indexSettings = indexService.selectBy(settingId);
-		if (segmentSetting == null && indexSettings == null) {
-			return;
-		}
 		XmlResultRoot root = new XmlResultRoot();
-		root.setHeaderSetting(segmentSetting);
-		root.setIndexSettings(indexSettings);
-		fileGenerator.generate(rootDirectory + File.separator + "resultsetting", root);
+		if (segmentSetting == null && (indexSettings == null || indexSettings.isEmpty())) {
+			root.setEnable(false);
+			CommonSegmentSetting segmentSetting1 = new CommonSegmentSetting();
+			int length = resultSegmentService.getHeaderSegments().getLength();
+			segmentSetting1.setLength(length);
+			root.setHeaderSetting(segmentSetting1);
+		} else {
+			Stream<VariableGroup> filter = groups.stream().filter(g -> g.getId().equals(segmentSetting.getGroupId()));
+			VariableGroup group = filter.findFirst().get();
+			segmentSetting.setSubscribeGroup(group);
+
+			root.setEnable(true);
+			root.setHeaderSetting(segmentSetting);
+			root.setIndexSettings(indexSettings);
+		}
+		fileGenerator.generate(config.getRoot() + File.separator + "resultsetting", root);
 	}
 
 	/**
@@ -381,6 +378,18 @@ public class ResultSettingServiceImpl implements ResultSettingService {
 	public void delete(int settingId) {
 		headerService.delete(settingId);
 		indexService.delete(settingId);
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.result.ecn.service.ResultSettingService#getVariableGroups(int)
+	 */
+	@Override
+	public List<VariableGroup> getVariableGroups(int settingId) {
+		CommonSegmentSetting segmentSetting = headerService.selectBy(settingId);
+		if (segmentSetting == null || segmentSetting.getSubscribeGroup() == null) {
+			return new ArrayList<>();
+		}
+		return Arrays.asList(segmentSetting.getSubscribeGroup());
 	}
 
 }

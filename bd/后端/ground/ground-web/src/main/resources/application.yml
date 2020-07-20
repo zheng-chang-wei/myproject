@@ -1,0 +1,62 @@
+hdfs:
+  username: hdfs
+impala:
+  driver-class-name: com.cloudera.impala.jdbc41.Driver
+  password: ''
+  url: jdbc:impala://192.168.40.34:21050/test
+  user: ''
+kafka:
+  consumer:
+    auto-commit-interval: 100
+    auto-offset-reset: latest
+    concurrency: 3
+    enable-auto-commit: true
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    max-records: 10
+    session-timeout: 6000
+    value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+  producer:
+    acks: 1
+    batch-size: 4096
+    buffer-memory: 40960
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    linger: 1
+    retries: 1
+    value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+  topic-prefix: decode-realtime-
+logging:
+  level:
+    com:
+      hirain:
+        phm:
+          bd:
+            ground:
+              dao: DEBUG
+mqtt:
+  ssl:
+    password: 123456
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+server:
+  port: 8082
+spring:
+  application:
+    name: ground-app
+  datasource:
+    druid:
+      db-type: com.alibaba.druid.pool.DruidDataSource
+      password: 123456
+      username: root
+  profiles:
+    active: local
+  redis:
+    database: 1
+    password: 123456
+    port: 6379
+    timeout: 1000
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: 10MB

@@ -40,9 +40,11 @@ public interface WorkDetailMapper extends CommonMapper<WorkDetail> {
 	@SelectProvider(type = WorkDetailMapperProvider.class, method = "getTopFiveProjectFaultByParms")
 	List<CommonStatisticsResult> getTopFiveProjectFaultByParms(FaultStatisticsRequestParm parm);
 
-	@Select("select twd.*, twm.mode_name fault_mode, tdy.door_type_name door_type, te.effect_name effect, ts.stage_name stage "
+	@Select("select twd.*,tp.name project, twm.mode_name fault_mode, tdy.name door_type, te.effect_name effect, ts.stage_name stage,tlo.name level_one,tlt.name level_two "
 
 			+ "from t_workdetail twd "
+
+			+ "left join t_project tp on tp.id=twd.project_id "
 
 			+ "left join t_mode twm on twm.id=twd.mode_id "
 
@@ -51,6 +53,10 @@ public interface WorkDetailMapper extends CommonMapper<WorkDetail> {
 			+ "left join t_effect te on te.id=twd.effect_id "
 
 			+ "left join t_stage ts on ts.id=twd.stage_id "
+
+			+ "left join t_level_one tlo on tlo.id=twd.level_one_id "
+
+			+ "left join t_level_two tlt on tlt.id=twd.level_two_id "
 
 			+ "where twd.id=#{detailId}")
 	WorkDetail selectDetail(long detailId);

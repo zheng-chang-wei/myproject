@@ -17,7 +17,6 @@ import com.hirain.qsy.shaft.common.util.RedisService;
 import com.hirain.qsy.shaft.model.AttributeMappingConfigurationData;
 import com.hirain.qsy.shaft.model.ExceptionData;
 import com.hirain.qsy.shaft.model.StatisticsChartDataRow;
-import com.hirain.qsy.shaft.service.ExceptionDataService;
 import com.hirain.qsy.shaft.service.RedisCacheService;
 
 @Service
@@ -25,9 +24,6 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
 	@Autowired
 	private RedisService redisService;
-
-	@Autowired
-	private ExceptionDataService exceptionDataService;
 
 	@Override
 	public void cache(List<ExceptionData> exceptionDataList, Integer trainId) throws Exception {
@@ -37,7 +33,7 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 			String stringDay = DateUtil.date2StringDay(acquisitionTime);
 			for (Map.Entry<String, String> entry : map.entrySet()) {
 				String exceptionDataString = BeanUtils.getProperty(exceptionData, entry.getKey());
-				if (exceptionDataService.isException(exceptionDataString)) {
+				if (isException(exceptionDataString)) {
 					saveExceptionCount(trainId, entry.getValue(), stringDay);
 					saveLastestExceptionTime(acquisitionTime, trainId);
 				}
@@ -212,4 +208,17 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 		return key;
 	}
 
+	/**
+	 * 判断是否存在异常
+	 */
+	private boolean isException(String exception) {
+		String data[] = exception.split(",");
+		if (data.length >= 4) {
+			// 1表示有异常
+			if (data[3].toString().equals("1")) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -9,13 +9,14 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import com.alibaba.druid.pool.DruidDataSource;
 
+import lombok.Data;
 import tk.mybatis.mapper.autoconfigure.MybatisProperties;
 
 /**
@@ -31,21 +32,18 @@ import tk.mybatis.mapper.autoconfigure.MybatisProperties;
  *               Mar 11, 2020 jianwen.xin@hirain.com 1.0 create file
  */
 @Configuration
+@Data
+@ConfigurationProperties("spring.datasource.druid")
 public class MySqlDataSourceConfig {
 
-	@Value("${spring.datasource.druid.db-type}")
-	private String type;
+	private String dbType;
 
-	@Value("${spring.datasource.druid.username}")
 	private String username;
 
-	@Value("${spring.datasource.druid.password}")
 	private String password;
 
-	@Value("${spring.datasource.druid.url}")
 	private String url;
 
-	@Value("${spring.datasource.druid.driver-class-name}")
 	private String driverClassName;
 
 	@Bean(name = "mysqlDataSource")

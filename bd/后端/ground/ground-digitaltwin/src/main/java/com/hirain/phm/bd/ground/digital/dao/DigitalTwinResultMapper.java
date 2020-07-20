@@ -3,6 +3,7 @@
  ******************************************************************************/
 package com.hirain.phm.bd.ground.digital.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.SelectProvider;
@@ -25,17 +26,22 @@ import com.hirain.phm.bd.ground.digital.domain.DigitalTwinResult;
 public interface DigitalTwinResultMapper extends CommonMapper<DigitalTwinResult> {
 
 	@SelectProvider(type = ResultMapperProvider.class, method = "selectByRequest")
-	List<DigitalTwinResult> selectByCondition(DigitalTwinResult condition);
+	List<DigitalTwinResult> selectByCondition(DigitalTwinResult condition, Date start, Date end);
 
 	class ResultMapperProvider {
 
-		public String selectByRequest(DigitalTwinResult condition) {
+		public String selectByRequest(DigitalTwinResult condition, Date start, Date end) {
 			String sql = "select timestamp,param_value from t_digital_twins";
-			sql += " where train_id=#{trainId}";
-			sql += " and car_id=#{carId}";
-			sql += " and door_id=#{doorId}";
-			sql += " and timestamp>=#{timestamp}";
-			sql += " and param_id=#{paramId}";
+			sql += " where train_id=#{condition.trainId}";
+			sql += " and car_id=#{condition.carId}";
+			sql += " and door_id=#{condition.doorId}";
+			if (start != null) {
+				sql += " and timestamp>=#{start}";
+			}
+			if (end != null) {
+				sql += " and timestamp<=#{end}";
+			}
+			sql += " and param_id=#{condition.paramId}";
 			sql += " order by timestamp";
 			return sql;
 		}

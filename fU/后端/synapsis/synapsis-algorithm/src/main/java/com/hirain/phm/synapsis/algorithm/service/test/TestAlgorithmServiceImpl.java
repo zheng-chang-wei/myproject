@@ -4,7 +4,6 @@
 package com.hirain.phm.synapsis.algorithm.service.test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,8 @@ import com.hirain.phm.synapsis.algorithm.param.Record;
 import com.hirain.phm.synapsis.algorithm.param.SubsystemCount;
 import com.hirain.phm.synapsis.algorithm.service.AlgorithmService;
 import com.hirain.phm.synapsis.algorithm.service.RecordMapper;
+import com.hirain.phm.synapsis.page.QueryRequest;
+import com.hirain.phm.synapsis.response.PageResultBean;
 import com.hirain.phm.synapsis.setting.AlgorithmSetting;
 
 /**
@@ -48,10 +49,10 @@ public class TestAlgorithmServiceImpl implements AlgorithmService {
 	private RecordMapper recordMapper;
 
 	/**
-	 * @see com.hirain.phm.synapsis.algorithm.service.AlgorithmService#list()
+	 * @see com.hirain.phm.synapsis.algorithm.service.AlgorithmService#list(QueryRequest)
 	 */
 	@Override
-	public List<AlgorithmPacket> list() {
+	public PageResultBean<List<AlgorithmPacket>> list(QueryRequest request) {
 		if (algorithms.isEmpty()) {
 			for (int i = 0; i < 4; i++) {
 				Algorithm algorithm = new Algorithm();
@@ -60,6 +61,7 @@ public class TestAlgorithmServiceImpl implements AlgorithmService {
 				algorithm.setName("算法" + (i + 1));
 				algorithm.setStatus(RunStatus.values()[i]);
 				algorithm.setSubsystem("受电弓");
+				algorithm.setEnable(i <= 2);
 				AlgorithmPacket packet = new AlgorithmPacket();
 				packet.setData(algorithm);
 				Map<String, Integer> map = new HashMap<>();
@@ -70,7 +72,7 @@ public class TestAlgorithmServiceImpl implements AlgorithmService {
 				algorithms.add(packet);
 			}
 		}
-		return algorithms;
+		return new PageResultBean<>(algorithms, algorithms.size());
 	}
 
 	/**
@@ -82,10 +84,10 @@ public class TestAlgorithmServiceImpl implements AlgorithmService {
 	}
 
 	/**
-	 * @see com.hirain.phm.synapsis.algorithm.service.AlgorithmService#update(java.util.Map)
+	 * @see com.hirain.phm.synapsis.algorithm.service.AlgorithmService#update(int, java.util.Map)
 	 */
 	@Override
-	public void update(Map<Integer, RunStatus> statusMap) {
+	public void update(int slotId, Map<Integer, RunStatus> statusMap) {
 
 	}
 
@@ -99,11 +101,18 @@ public class TestAlgorithmServiceImpl implements AlgorithmService {
 		response.setRunning(1);
 		response.setStopped(1);
 		response.setTotal(4);
+		List<SubsystemCount> list = new ArrayList<>();
+
+		// for (int i = 0; i < 15; i++) {
 		SubsystemCount count = new SubsystemCount();
 		count.setRunning(1);
 		count.setTotal(4);
 		count.setSubsystem("受电弓");
-		response.setSubsystems(Arrays.asList(count));
+		list.add(count);
+		// }
+
+		response.setSubsystems(list);
+
 		return response;
 	}
 

@@ -11,10 +11,11 @@ import java.util.List;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hirain.phm.synapsis.constant.BoardType;
 import com.hirain.phm.synapsis.setting.dao.BoardSettingMapper;
 import com.hirain.phm.synapsis.setting.db.BoardSettingQuery;
-import com.hirain.phm.synapsis.setting.service.BoardSettingService;
+import com.hirain.phm.synapsis.setting.property.BoardProperty;
 
 /**
  * @Version 1.0
@@ -34,9 +35,6 @@ public class BoardTest extends BaseTest {
 	private BoardSettingQuery query;
 
 	@Autowired
-	private BoardSettingService service;
-
-	@Autowired
 	private BoardSettingMapper mapper;
 
 	@Test
@@ -50,25 +48,28 @@ public class BoardTest extends BaseTest {
 	}
 
 	@Test
-	public void testVariables() {
-		List<VariableGroup> variables = service.getVariables(1);
-		assertNotNull(variables);
-	}
-
-	@Test
 	public void testInsert() {
 		BoardSetting setting = new BoardSetting();
 		setting.setEnable(true);
-		setting.setFilename("xxx");
-		setting.setIp("11111");
 		setting.setSettingId(1);
 		setting.setSlotId(2);
 		setting.setType(BoardType.AD1.name());
-		// mapper.insert(setting);
+		setting.setContent("{ip1:'127.0.0.1'}");
 		mapper.insertGenerateKey(setting);
 		BoardSetting result = mapper.selectByPrimaryKey(setting.getId());
 
 		assertNotNull(result.getType());
+	}
+
+	@Test
+	public void testProperty() throws ClassNotFoundException {
+		List<BoardSetting> boards = TestObjectUtils.getBoards();
+		BoardProperty property = boards.get(0).getProperty();
+		String json = JSONObject.toJSONString(property);
+		System.out.println(json);
+
+		BoardProperty result = JSONObject.parseObject(json, BoardProperty.class);
+		System.out.println(result);
 	}
 
 }

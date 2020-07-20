@@ -49,22 +49,22 @@ public class MdParameter extends SheetAndLine {
 	@XmlAttribute(name = "callback")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String callback;
+	protected String callback = "on";
 
 	@XmlAttribute(name = "confirm-timeout")
-	protected String confirmTimeOut;
+	protected String confirmTimeOut = "100000";
 
 	@XmlAttribute(name = "marshall")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String marshall;
+	protected String marshall = "off";
 
 	@XmlAttribute(name = "protocol")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String protocol;
+	protected String protocol = "UDP";
 
 	@XmlAttribute(name = "reply-timeout")
-	protected String replyTimeOut;
+	protected String replyTimeOut = "5000000";
 
 }

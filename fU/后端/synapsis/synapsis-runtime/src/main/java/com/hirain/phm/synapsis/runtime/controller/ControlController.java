@@ -12,6 +12,7 @@ import com.hirain.phm.synapsis.response.ResultBean;
 import com.hirain.phm.synapsis.runtime.param.ActivateResponse;
 import com.hirain.phm.synapsis.runtime.param.ControlResponse;
 import com.hirain.phm.synapsis.runtime.param.LaunchStepResponse;
+import com.hirain.phm.synapsis.runtime.param.StateResponse;
 import com.hirain.phm.synapsis.runtime.service.LaunchProgressManager;
 import com.hirain.phm.synapsis.runtime.service.RuntimeService;
 import com.hirain.phm.synapsis.runtime.service.StateService;
@@ -58,5 +59,10 @@ public class ControlController {
 	@GetMapping("/state")
 	public ResultBean<String> getCurrentState() {
 		return new ResultBean<>(stateService.getCurrentState().name());
+	}
+
+	@GetMapping("/states")
+	public ResultBean<StateResponse> getStates() {
+		return new ResultBean<>(stateService.getStates());
 	}
 }

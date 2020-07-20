@@ -66,7 +66,7 @@ public class SubhealthAnalyseServiceImpl implements SubhealthAnalyseService {
 			detail.setTrainId(train.getId());
 			detail.setCarNo(packet.getCarID());
 			detail.setDoorAddr(packet.getDoorID());
-			detail.setSubhealthTypeId(item);
+			detail.setSubhealthInfoId(item);
 			detail.setStartTime(packet.getStartTime());
 			detail.setEndTime(packet.getEndTime());
 			detail.setDebugMode(packet.isDebug());
@@ -97,9 +97,9 @@ public class SubhealthAnalyseServiceImpl implements SubhealthAnalyseService {
 		record.setType(FaultTopType.SubHealth);
 		record.setId(Long.valueOf(subhealthDetail.getId()));
 		record.setTime(subhealthDetail.getStartTime());
-		SubhealthInfo info = subhealthInfoService.selectByKey(subhealthDetail.getSubhealthTypeId());
-		record.setFaultName(info.getTypeName());
-		record.setCode(info.getTypeCode());
+		SubhealthInfo info = subhealthInfoService.selectByKey(subhealthDetail.getSubhealthInfoId());
+		record.setFaultName(info.getSubhealthName());
+		record.setCode(info.getSubhealthCode());
 		Train train = trainGW.findTrainById(subhealthDetail.getTrainId());
 		record.setTrainId(train.getTrainNo());
 		record.setProjectId(train.getProjectId());

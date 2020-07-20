@@ -10,14 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hirain.phm.bd.ground.bigdata.param.DeleteDataParam;
+import com.hirain.phm.bd.data.bean.DataParam;
 import com.hirain.phm.bd.ground.bigdata.param.GroundDataParam;
 import com.hirain.phm.bd.ground.bigdata.service.DataManageService;
 import com.hirain.phm.bd.ground.common.annotation.Log;
-import com.hirain.phm.bd.ground.common.exception.SafeRunner;
 import com.hirain.phm.bd.ground.common.model.ResponseBo;
-import com.hirain.phm.bd.ground.common.page.PageService;
-import com.hirain.phm.bd.ground.common.page.QueryRequest;
 
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +40,6 @@ public class DataManageController {
 	@Autowired
 	private DataManageService manageService;
 
-	@Autowired
-	private PageService pageService;
-
 	@GetMapping("/space")
 	public ResponseBo getSpace() {
 		try {
@@ -56,15 +50,10 @@ public class DataManageController {
 		}
 	}
 
-	@GetMapping("/project")
-	public ResponseBo getProjectSpace() {
-		return SafeRunner.run(() -> ResponseBo.ok(manageService.getProjectSpace()), ResponseBo.error("项目存储空间查询错误"));
-	}
-
 	@GetMapping("/train")
-	public ResponseBo listTrainData(QueryRequest query, GroundDataParam param) {
+	public ResponseBo listTrainData(GroundDataParam param) {
 		try {
-			return ResponseBo.ok(pageService.selectByPageNumSize(query, () -> manageService.selectTrainData(param)));
+			return ResponseBo.ok(manageService.selectTrainData(param));
 		} catch (Exception e) {
 			log.error("地面端数据管理，数据查询错误", e);
 			return ResponseBo.error("系统异常");
@@ -73,7 +62,7 @@ public class DataManageController {
 
 	@PostMapping("/train/delete")
 	@Log("地面端数据管理删除标记项")
-	public ResponseBo deleteTrainData(@RequestBody DeleteDataParam param) {
+	public ResponseBo deleteTrainData(@RequestBody DataParam param) {
 		System.out.println(param);
 		try {
 			return ResponseBo.ok(manageService.delete(param));

@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hirain.phm.bd.ground.common.model.ResultBean;
-import com.hirain.phm.bd.ground.digital.response.ResultQueryResponse;
+import com.hirain.phm.bd.ground.digital.param.ResultQueryRequest;
+import com.hirain.phm.bd.ground.digital.param.ResultQueryResponse;
 import com.hirain.phm.bd.ground.digital.service.DigitalTwinService;
 
 /**

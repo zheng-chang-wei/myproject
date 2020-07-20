@@ -38,28 +38,31 @@ public class DataServiceImpl implements DataService {
 	@Override
 	public Map<String, Object> getList(QueryRequest request, String trainType, String trainNum) {
 		List<TrainInfo> trainInfoList = trainInfoService.findList(trainType, trainNum);
+		int totle = trainInfoList.size();
 		List<DataResponse> dataResponses = new ArrayList<>();
-		int pageNum = request.getPageNum();
-		int pageSize = request.getPageSize();
-		for (int i = (pageNum - 1) * pageSize; i < (pageNum - 1) * pageSize + pageSize; i++) {
-			if (i >= trainInfoList.size()) {
-				break;
-			}
-			TrainInfo trainInfo = trainInfoList.get(i);
-			Map<String, Object> initialDataMap = initialDataService.findMaxAndMinTime(trainInfo.getId());
-			if (initialDataMap != null && !initialDataMap.isEmpty()) {
-				DataResponse dataResponse = new DataResponse();
-				dataResponse.setId(trainInfo.getId());
-				dataResponse.setTrainNum(trainInfo.getTrainNum());
-				dataResponse.setTrainType(trainInfo.getTrainType());
-				dataResponse.setEarliestTime(initialDataMap.get("min").toString());
-				dataResponse.setLatestTime(initialDataMap.get("max").toString());
-				dataResponses.add(dataResponse);
+		if (totle != 0) {
+			int pageNum = request.getPageNum();
+			int pageSize = request.getPageSize();
+			for (int i = (pageNum - 1) * pageSize; i < (pageNum - 1) * pageSize + pageSize; i++) {
+				if (i >= trainInfoList.size()) {
+					break;
+				}
+				TrainInfo trainInfo = trainInfoList.get(i);
+				Map<String, Object> initialDataMap = initialDataService.findMaxAndMinTime(trainInfo.getId());
+				if (initialDataMap != null && !initialDataMap.isEmpty()) {
+					DataResponse dataResponse = new DataResponse();
+					dataResponse.setId(trainInfo.getId());
+					dataResponse.setTrainNum(trainInfo.getTrainNum());
+					dataResponse.setTrainType(trainInfo.getTrainType());
+					dataResponse.setEarliestTime(initialDataMap.get("min").toString());
+					dataResponse.setLatestTime(initialDataMap.get("max").toString());
+					dataResponses.add(dataResponse);
+				}
 			}
 		}
 		Map<String, Object> map = new HashMap<>();
 		map.put("rows", dataResponses);
-		map.put("total", trainInfoList.size());
+		map.put("total", totle);
 		return map;
 	}
 

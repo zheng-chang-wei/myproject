@@ -10,7 +10,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,7 +31,6 @@ import lombok.Data;
 @AllArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "PHMAlgorithmSetting")
-@XmlType(propOrder = { "retryIp", "algorithmSettings" })
 public class PHMAlgorithmSetting {
 
 	@XmlElementWrapper(name = "algorithmSettings")

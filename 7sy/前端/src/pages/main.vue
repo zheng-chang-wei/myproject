@@ -1,74 +1,121 @@
-<template lang="pug">
-	#app
-		#top(style="overflow:hidden")
-			div.left
-			img(src="../assets/qsy-Corp-2.jpg"  )
-									
-			ul.right
-				li
-					el-button(type='primary', @click='uploadFileBtnClicked') 上传本地文件
-					el-button(type='primary' icon="el-icon-info" @click='checkUploadFileResponse')
-				li(style="cursor: pointer")
-					span(@click='modifyUserInfo()') 欢迎, {{username}} {{dataObj.roleName}}
-				//- li {{dataObj.roleName}}
-					//- i.iconfont.icon-admin(style="font-size:60px;color:rgb(217,181,93);margin-left:-27px;margin-top:4px")
-				li(style="cursor: pointer")
-					.log-out
-					i.iconfont.icon-login-out(@click="logout")
-		#bottom
-			#left-menu
-				el-menu(ref="menu" @select="handleSelect" @open="handleOpen" :default-active="menuActive")
-					el-menu-item(index="/home" v-show="homePage" style="padding-left:20px !important;")
-						i.iconfont(class="icon-home")
-						span 首页
-					el-menu-item(index="/history/historyData"  style="padding-left:20px !important;")
-						i.iconfont(class="el-icon-data-line")
-						span 历史数据查阅
-					el-menu-item(index="/detection/detectionByCar"  style="padding-left:20px !important;")
-						i.iconfont(class="el-icon-first-aid-kit")
-						span 轴温异常检测
-					template(v-for="(sub, index) in nav")
-						el-menu-recur(:root="sub", :index="index+''")
-			#router-view
-				keep-alive
-					router-view(v-if="$route.meta.keepAlive")
-				router-view(v-if="!$route.meta.keepAlive")
-		el-dialog(title='上传本地文件', width="40%" :visible.sync='dialogVisible', :before-close="handleClose" :close-on-click-modal='false' )
-			el-upload(ref='upload', :action='uploadUrl()', :limit="2000" multiple, accept=".xls,.xlsx" :file-list='fileList',:auto-upload="false", :on-change="addFile", :http-request="uploadFile",:before-upload="beforeUpload",:on-exceed="onExceed")
-				el-button(slot='trigger', size='small', type='primary') 选取文件
-				el-button(style="margin-left: 10px;" size="small" type="success" @click="submitUpload" ) 上传到服务器
-				.el-upload__tip(slot='tip') 只能上传excel文件
-				.el-upload-list__item-name(slot='tip') {{fileName}}
-			span.dialog-footer(slot='footer')
-				el-button(type='primary', @click='close') 清空列表数据
+<template>
+	<div id="app">
+		<div id="top" style="overflow:hidden">
+			<img src="../assets/qsy-Corp-2.jpg">
+			<ul class="right">
+				<!-- <li>
+					<el-button type='primary' @click='test'>导入远程数据</el-button>
+					<el-button type='primary' @click='uploadFileBtnClicked'>上传本地文件</el-button>
+					<el-button type='primary' @click='checkUploadFileResponse' icon="el-icon-info"></el-button>
+				</li> -->
+				<li style="cursor: pointer">
+					<span @click='modifyUserInfo'>欢迎, {{username}} {{dataObj.roleName}}</span>
+				</li>
+				<li style="cursor: pointer">
+					<i class="iconfont icon-login-out" @click="logout"></i>
+				</li>
+			</ul>
 
-		el-dialog(title='上传文件反馈结果', width="40%" :visible.sync='uploadFileResponseDialogVisible', :close-on-click-modal='false' )
-			template(v-for="item in uploadFileResponseList")
-				el-row(:style="rowStyle(item)") {{item.msg}}
+		</div>
+		<div id="bottom">
+			<div id="left-menu">
+				<el-menu ref="menu" @select="handleSelect" @open="handleOpen" :default-active="menuActive">
+					<el-menu-item index="/home" v-show="homePage" style="padding-left:20px !important;">
+						<i class="iconfont icon-home"></i>
+						<span>首页</span>
+					</el-menu-item>
+					<el-menu-item index="/history/historyData" style="padding-left:20px !important;">
+						<i class="iconfont el-icon-data-line"></i>
+						<span>历史数据查阅</span>
+					</el-menu-item>
+					<el-menu-item index="/detection/detectionByCar" style="padding-left:20px !important;">
+						<i class="iconfont el-icon-first-aid-kit"></i>
+						<span>轴温异常检测</span>
+					</el-menu-item>
+					<template v-for="(sub, index) in nav">
+						<el-menu-recur :key="index" :root="sub" :index="index+''"></el-menu-recur>
+					</template>
+				</el-menu>
 
-		el-dialog(id="edit" width="47%" title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false" )
-			el-tabs(v-model="activeName")
-				el-tab-pane(label="修改基本信息" name="first")
-					el-form(:rules="editRules2" :model="editForm2" label-width="80px" ref="editForm2" style="margin-left:5%;")
-						el-form-item(label="用户名" prop="username"  size="small")
-							el-input( v-model="editForm2.username" auto-complete="off" placeholder="请输入用户名" :maxlength="20")
-						el-form-item(label="姓名" prop="name"  size="small")
-							el-input( v-model="editForm2.name" auto-complete="off" placeholder="请输入姓名" :maxlength="20")
-						el-form-item(label="部门名称" prop="deptName"  size="small")
-							el-input( v-model="editForm2.deptName" auto-complete="off" placeholder="请输入部门名称" :maxlength="20")
-						el-form-item(label="证件号码" prop="idNum"  size="small")
-							el-input( v-model="editForm2.idNum" auto-complete="off" placeholder="请输入证件号码" :maxlength="20")
-				el-tab-pane(label="修改密码" name="second") 
-					el-form(:rules="editRules1" :model="editForm1" label-width="80px" ref="editForm1" style="margin-left:5%;min-width:550px")
-						el-form-item(label="旧密码" prop="oldPassword"  size="small")
-							el-input( v-model="editForm1.oldPassword" show-password auto-complete="off"  placeholder="请输入密码" :maxlength="20")
-						el-form-item(label="新密码" prop="password"  size="small")
-							el-input( v-model="editForm1.password" show-password auto-complete="off"  placeholder="请输入密码" :maxlength="20")
-						el-form-item(label="确认密码" prop="passwordConfirm"  size="small")
-							el-input( v-model="editForm1.passwordConfirm" show-password auto-complete="off"  placeholder="请输入确认密码" :maxlength="20")
-			span.dialog-footer(slot='footer')
-				el-button(type='primary'  @click='editSubmit' style="width:90px;") 提交
-				el-button(type='cancel' @click='editFormVisible = false' style="width:90px;") 取消
+			</div>
+			<div id="router-view">
+				<keep-alive>
+					<router-view v-if="$route.meta.keepAlive"></router-view>
+				</keep-alive>
+				<router-view v-if="!$route.meta.keepAlive"></router-view>
+			</div>
+		</div>
+		<el-dialog title='上传本地文件' width="40%" :visible.sync='dialogVisible' :before-close="handleClose"
+			:close-on-click-modal='false'>
+			<el-upload ref='upload' :action='uploadUrl()' :limit="2000" multiple accept=".xls,.xlsx"
+				:file-list='fileList' :auto-upload="false" :on-change="addFile" :http-request="uploadFile"
+				:before-upload="beforeUpload" :on-exceed="onExceed">
+				<el-button slot='trigger' size='small' type='primary'>选取文件</el-button>
+				<el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器
+				</el-button>
+				<div class="el-upload__tip" slot='tip'>只能上传excel文件</div>
+				<div class="el-upload-list__item-name" slot='tip'>{{fileName}}</div>
+			</el-upload>
+			<span class="dialog-footer" slot='footer'>
+				<el-button type='primary' @click='close'>清空列表数据</el-button>
+			</span>
+		</el-dialog>
+		<el-dialog title='上传文件反馈结果' width="40%" :visible.sync='uploadFileResponseDialogVisible'
+			:close-on-click-modal='false'>
+			<template v-for="(item,index) in uploadFileResponseList">
+				<el-row :key="index" :style="rowStyle(item)"> {{item.msg}}</el-row>
+			</template>
+		</el-dialog>
+
+		<el-dialog id="edit" width="47%" title="编辑个人信息" :visible.sync="editFormVisible" :close-on-click-modal="false">
+			<el-tabs v-model="activeName">
+				<el-tab-pane label="修改基本信息" name="first">
+					<el-form :rules="editRules2" :model="editForm2" label-width="80px" ref="editForm2"
+						style="margin-left:5%;">
+						<el-form-item label="用户名" prop="username" size="small">
+							<el-input v-model="editForm2.username" auto-complete="off" placeholder="请输入用户名"
+								:maxlength="20"></el-input>
+						</el-form-item>
+						<el-form-item label="姓名" prop="name" size="small">
+							<el-input v-model="editForm2.name" auto-complete="off" placeholder="请输入姓名" :maxlength="20">
+							</el-input>
+						</el-form-item>
+						<el-form-item label="部门名称" prop="deptName" size="small">
+							<el-input v-model="editForm2.deptName" auto-complete="off" placeholder="请输入部门名称"
+								:maxlength="20"></el-input>
+						</el-form-item>
+						<el-form-item label="证件号码" prop="idNum" size="small">
+							<el-input v-model="editForm2.idNum" auto-complete="off" placeholder="请输入证件号码"
+								:maxlength="20"></el-input>
+						</el-form-item>
+					</el-form>
+				</el-tab-pane>
+				<el-tab-pane label="修改密码" name="second">
+					<el-form :rules="editRules1" :model="editForm1" label-width="80px" ref="editForm1"
+						style="margin-left:5%;">
+						<el-form-item label="旧密码" prop="oldPassword" size="small">
+							<el-input v-model="editForm1.oldPassword" show-password auto-complete="off"
+								placeholder="请输入密码" :maxlength="20"></el-input>
+						</el-form-item>
+						<el-form-item label="新密码" prop="password" size="small">
+							<el-input v-model="editForm1.password" show-password auto-complete="off" placeholder="请输入密码"
+								:maxlength="20"></el-input>
+						</el-form-item>
+						<el-form-item label="确认密码" prop="passwordConfirm" size="small">
+							<el-input v-model="editForm1.passwordConfirm" show-password auto-complete="off"
+								placeholder="请输入确认密码" :maxlength="20"></el-input>
+						</el-form-item>
+					</el-form>
+				</el-tab-pane>
+			</el-tabs>
+			<span class="dialog-footer" slot='footer'>
+				<el-button type='primary' @click='editSubmit' style="width:90px;">提交</el-button>
+				<el-button type='cancel' @click='editFormVisible = false' style="width:90px;">取消</el-button>
+			</span>
+		</el-dialog>
+	</div>
+
+
 </template>
 <script>
 import app from 'common/js/app'
@@ -88,6 +135,9 @@ export default {
 		};
 
 		const checkPassWord = (rule, value, callback) => {
+			if (!/[a-z]/.test(value) || !/[A-Z]/.test(value) || !/[0-9]/.test(value)){
+        callback(new Error("密码必须包含英文大小写字母和数字"));
+      }
 			if (value.length === 21) {
 				callback(new Error("密码长度限制20字符"));
 			} else if (this.editForm1.password != this.editForm1.passwordConfirm && this.editForm1.password != "" && this.editForm1.passwordConfirm != "") {
@@ -214,7 +264,7 @@ export default {
 	mounted() {
 		this.initMenuActive();
 		this.getLeftMenus();
-		//监听menu.vue上面的刷新菜单
+		// //监听menu.vue上面的刷新菜单
 		this.$root.Bus.$on('refreshMenu', () => {
 			this.getLeftMenus();
 		})
@@ -228,6 +278,7 @@ export default {
 			this.closeLoading();
 		})
 		this.getRoleName();
+		this.getCurrentUser()
 		this.initWebSocket();
 	},
 	destroyed() {
@@ -244,6 +295,11 @@ export default {
 		},
 	},
 	methods: {
+		test(){
+					this.$router.push({
+							path: '/test'
+						});
+		},
 		initMenuActive(){
 			if (localStorage.getItem('menuActive')!=="null") {
 				this.menuActive=localStorage.getItem('menuActive');
@@ -252,20 +308,24 @@ export default {
 			}
 		},
 		initWebSocket() {
-			if ("WebSocket" in window) {
-				this.websocket = new WebSocket("ws://" + apiDomain.ip + "/websocket");
-				//连接错误
-				this.websocket.onerror = this.setErrorMessage;
-				// 连接成功
-				this.websocket.onopen = this.setOnopenMessage;
-				//收到消息的回调
-				this.websocket.onmessage = this.setOnmessageMessage;
-				//连接关闭的回调
-				this.websocket.onclose = this.setOncloseMessage;
-				//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
-				window.onbeforeunload = this.onbeforeunload;
-			} else {
-				alert("当前浏览器 Not support websocket");
+			try {
+				if ("WebSocket" in window) {
+					this.websocket = new WebSocket("ws://" + apiDomain.ip + "/websocket");
+					//连接错误
+					this.websocket.onerror = this.setErrorMessage;
+					// 连接成功
+					this.websocket.onopen = this.setOnopenMessage;
+					//收到消息的回调
+					this.websocket.onmessage = this.setOnmessageMessage;
+					//连接关闭的回调
+					this.websocket.onclose = this.setOncloseMessage;
+					//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+					window.onbeforeunload = this.onbeforeunload;
+				} else {
+					alert("当前浏览器 Not support websocket");
+				}
+			} catch (error) {
+				console.log(error);
 			}
 		},
 		setErrorMessage() {
@@ -298,8 +358,6 @@ export default {
 						});
 					}
 				});
-			}else if (data.msg==='删除成功') {
-				this.$root.Bus.$emit("deleteData", data);
 			}else  {
 				this.handleFileUploadResult(data);
 			}
@@ -334,7 +392,7 @@ export default {
 		getLeftMenus() {
 			app.get('findLeftTree_menu').then(d => {
 				this.nav = d.msg
-			})
+			}).catch(() => {})
 		},
 		getRoleName() {
 			this.username = localStorage.getItem('username');
@@ -342,7 +400,16 @@ export default {
 				this.dataObj = {}; //真正实现数据更新的是这行代码
 				this.dataObj['roleName'] = d.msg;
 				localStorage.setItem('roleName', d.msg);
-			})
+			}).catch(() => {})
+		},
+		getCurrentUser() {
+			app.get('get_current_user').then(response => {
+				if (response.code === 0) {
+					if (response.msg.tSysUser.isFirstLogin) {
+						this.modifyUserInfo()
+					}
+				}
+			}).catch(() => {})
 		},
 		changeMenuActive(index){
 			this.menuActive=index
@@ -505,7 +572,6 @@ export default {
 		handleEdit() {
 			let vm = this;
 			app.get("get_current_user").then(data => {
-				vm.editFormVisible = true;
 				let editData = data.msg.tSysUser;
 				if (data.msg) {
 					vm.editForm1.id = editData.id;
@@ -517,7 +583,7 @@ export default {
 					// vm.editForm1.passwordConfirm = Base64.decode(editData.password);
 					vm.editForm2.idNum = editData.idNum;
 				}
-			});
+			}).catch(() => {})
 		},
 		//编辑
 		editSubmit() {
@@ -548,10 +614,10 @@ export default {
 									vm.editFormVisible = false;
 									app.post('logOut').then(d => {
 
-									})
+									}).catch(() => {})
 								}
-							});
-						}).catch(() => {});
+							}).catch(() => {})
+						}).catch(() => {})
 					}
 				});
 			} else {
@@ -579,8 +645,8 @@ export default {
 									vm.$refs["editForm2"].resetFields();
 									vm.editFormVisible = false;
 								}
-							});
-						}).catch(() => {});
+							}).catch(() => {})
+						}).catch(() => {})
 					}
 				});
 			}

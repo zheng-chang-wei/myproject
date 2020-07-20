@@ -36,8 +36,26 @@ public class ControllerAopConfig {
 
 	}
 
+	@Pointcut("execution(public com.hirain.phm.synapsis.response.PageResultBean *(..))")
+	public void pageController() {
+
+	}
+
 	@Around("controller()")
 	public Object doAround(ProceedingJoinPoint jp) {
+		return process(jp);
+	}
+
+	@Around("pageController()")
+	public Object doAroundOfPage(ProceedingJoinPoint jp) {
+		return process(jp);
+	}
+
+	/**
+	 * @param jp
+	 * @return
+	 */
+	public Object process(ProceedingJoinPoint jp) {
 		try {
 			Object result = jp.proceed();
 			doAfterReturning(result);

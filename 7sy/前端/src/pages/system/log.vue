@@ -39,7 +39,7 @@
 				<el-table-column prop="operation" label="行为描述" align="center" sortable width="120"> </el-table-column>
 				<el-table-column prop="params" label="参数" align="center" sortable> </el-table-column>
 				<el-table-column prop="ip" label="IP地址" align="center" sortable width="120"> </el-table-column>
-				<el-table-column prop="createTime" label="创建时间" :formatter="formatCreatetime" align="center" sortable
+				<el-table-column prop="createTime" label="创建时间"  align="center" sortable
 					width="200">
 				</el-table-column>
 			</el-table>

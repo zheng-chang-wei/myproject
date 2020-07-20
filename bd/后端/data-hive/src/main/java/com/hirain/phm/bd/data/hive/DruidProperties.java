@@ -3,8 +3,10 @@
  ******************************************************************************/
 package com.hirain.phm.bd.data.hive;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
+
+import lombok.Data;
 
 /**
  * @Version 1.0
@@ -19,89 +21,40 @@ import org.springframework.stereotype.Service;
  *               Mar 11, 2020 jianwen.xin@hirain.com 1.0 create file
  */
 @Service
+@Data
+@ConfigurationProperties("hive.druid")
 public class DruidProperties {
 
-	@Value("${hive.druid.initial-size:1}")
-	private int initialSeize;
+	private String url;// jdbc:hive2://192.168.0.130:10000/default
 
-	@Value("${hive.druid.min-idle:3}")
-	private int minIdle;
+	private String user;
 
-	@Value("${hive.druid.max-active:20}")
-	private int maxActive;
+	private String password;
 
-	@Value("${hive.druid.max-wait:60000}")
-	private int maxWait;
+	private String driverClassName;// org.apache.hive.jdbc.HiveDriver
 
-	@Value("${hive.druid.time-between-eviction-runs-millis:60000}")
-	private int timeBetweenEvictionRunsMillis;
+	private int initialSeize = 1;
 
-	@Value("${hive.druid.min-evictable-idle-time-mills:30000}")
-	private int minEvictableIdleTimeMillis;
+	private int minIdle = 3;
 
-	@Value("${hive.druid.validation-query:select 1}")
+	private int maxActive = 20;
+
+	private int maxWait = 60000;
+
+	private int timeBetweenEvictionRunsMillis = 60000;
+
+	private int minEvictableIdleTimeMillis = 30000;
+
 	private String validationQuery = "select 1";
 
-	@Value("${hive.druid.test-while-idle:true}")
-	private boolean testWhilteIdle;
+	private boolean testWhilteIdle = true;
 
-	@Value("${hive.druid.test-on-borrow:false}")
-	private boolean testOnBorrow;
+	private boolean testOnBorrow = false;
 
-	@Value("${hive.druid.test-on-return:false}")
-	private boolean testOnReturn;
+	private boolean testOnReturn = false;
 
-	@Value("${hive.druid.pool-prepared-stats:true}")
-	private boolean poolPreparedStatements;
+	private boolean poolPreparedStatements = true;
 
-	@Value("${hive.druid.max-pool-size:20}")
 	private int maxPoolSize = 20;
 
-	public int getInitialSeize() {
-		return initialSeize;
-	}
-
-	public int getMinIdle() {
-		return minIdle;
-	}
-
-	public int getMaxActive() {
-		return maxActive;
-	}
-
-	public int getMaxWait() {
-		return maxWait;
-	}
-
-	public int getTimeBetweenEvictionRunsMillis() {
-		return timeBetweenEvictionRunsMillis;
-	}
-
-	public int getMinEvictableIdleTimeMillis() {
-		return minEvictableIdleTimeMillis;
-	}
-
-	public String getValidationQuery() {
-		return validationQuery;
-	}
-
-	public boolean isTestWhilteIdle() {
-		return testWhilteIdle;
-	}
-
-	public boolean isTestOnBorrow() {
-		return testOnBorrow;
-	}
-
-	public boolean isTestOnReturn() {
-		return testOnReturn;
-	}
-
-	public boolean isPoolPreparedStatements() {
-		return poolPreparedStatements;
-	}
-
-	public int getMaxPoolSize() {
-		return maxPoolSize;
-	}
 }

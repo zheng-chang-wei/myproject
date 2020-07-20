@@ -4,6 +4,7 @@
 package com.hirain.phm.bd.data.hive.event;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 
 import com.hirain.phm.bd.data.hive.dao.DataRecordMapper;
 import com.hirain.phm.bd.data.hive.hdfs.HadoopService;
+import com.hirain.phm.bd.data.hive.hdfs.HdfsProperties;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,8 +44,8 @@ public class LoadEventHandler {
 	@Value("${store.file.root:D:\\test}")
 	public String fileRoot;
 
-	@Value("${store.hdfs.root:/test}")
-	public String hdfsRoot;
+	@Autowired
+	private HdfsProperties hdfsProps;
 
 	@Autowired
 	private ApplicationEventPublisher publisher;
@@ -51,8 +53,13 @@ public class LoadEventHandler {
 	@EventListener
 	@Async
 	public void listen(LoadFileEvent event) {
+		try {
+			TimeUnit.MINUTES.sleep(5);
+		} catch (InterruptedException e1) {
+			log.error(e1.getMessage(), e1);
+		}
 		String filepath = event.getFilepath();
-		String remotePath = generateRemotePath(filepath, hdfsRoot, fileRoot);
+		String remotePath = generateRemotePath(filepath, hdfsProps.getRoot(), fileRoot);
 		boolean result = service.uploadFileToHdfs(filepath, remotePath);
 		if (result) {
 			log.info("file upload:{}", filepath);

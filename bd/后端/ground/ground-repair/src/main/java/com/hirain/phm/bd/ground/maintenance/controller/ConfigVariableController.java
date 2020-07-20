@@ -36,7 +36,7 @@ import com.hirain.phm.bd.ground.maintenance.service.ConfigVariableService;
 public class ConfigVariableController {
 
 	@Autowired
-	ConfigVariableService configVariableService;
+	private ConfigVariableService configVariableService;
 
 	@GetMapping("/listVariable")
 	public ResultBean<List<ConfigVariable>> listVariable() {

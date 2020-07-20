@@ -4,6 +4,7 @@
 package com.hirain.phm.synapsis.ecn.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,8 +103,24 @@ public class ECNVariableQueryImpl implements ECNVariableQuery {
 	 */
 	@Override
 	public Map<Long, String> getComIdCycle(Device device) {
-		// TODO 返回comId的循环周期，优先使用pd-parameter的cycle值，如果不存在则使用trdp-process的cycle-time值
-		return null;
+		Map<Long, String> map = new HashMap<>();
+		BusInterfaceList busInterfaceList = device.getBusInterfaceList();
+		List<BusInterface> busInterfaces = busInterfaceList.getBusInterfaces();
+		for (BusInterface busInterface : busInterfaces) {
+			List<Telegram> telegrams = busInterface.getTelegram();
+			for (Telegram telegram : telegrams) {
+				map.put(Long.valueOf(telegram.getComId()), telegram.getPdParameter().getPD_cycle());
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.ecn.ECNVariableQuery#getEndian(com.hirain.phm.synapsis.ecn.model.Device)
+	 */
+	@Override
+	public String getEndian(Device device) {
+		return device.getEndian();
 	}
 
 	/**

@@ -21,26 +21,10 @@
       </template>
     </el-table>
     <el-row v-if="isQueryTable" class="toolbar" style="position:absolute;bottom:10px;">
-      <JsonExcel
-        class="export-excel-wrapper"
-        :data="tableDatas"
-        :fields="json_fields"
-        :name="excelName"
-      >
-        <!-- 上面可以自定义自己的样式，还可以引用其他组件button -->
-        <el-button type="primary" size="mini">导出本页</el-button>
-      </JsonExcel>
+      <el-button type="primary" size="mini" @click="exportExcel(tableDatas)">导出本页</el-button>
     </el-row>
     <el-row v-if="isQueryTable" class="toolbar" style="position:absolute;bottom:10px;margin-left:90px">
-      <JsonExcel
-        class="export-excel-wrapper"
-        :data="allTableDatas"
-        :fields="json_fields"
-        :name="excelName"
-      >
-        <!-- 上面可以自定义自己的样式，还可以引用其他组件button -->
-        <el-button type="primary" size="mini">导出所有</el-button>
-      </JsonExcel>
+      <el-button type="primary" size="mini" @click="exportExcel(allTableDatas)">导出所有</el-button>
     </el-row>
     <!--分页  工具条-->
     <el-row v-if="isQueryTable" class="toolbar" style="position:absolute;bottom:10px;right:20px">
@@ -66,12 +50,10 @@ import app from '@/common/js/app'
 import util from '@/common/js/util'
 import showLine from './components/showLine/index'
 import queryForm from './components/queryForm/index'
-import JsonExcel from 'vue-json-excel'
 export default {
   components: {
     showLine,
-    queryForm,
-    JsonExcel
+    queryForm
   },
   props: {
     type: {
@@ -143,7 +125,7 @@ export default {
     },
     // 查询
     queryTableDatas(formData) {
-      this.excelName = this.type + util.replaceTime(formData.time[0]) + '-' + util.replaceTime(formData.time[1]) + '.xls'
+      this.excelName = this.type + util.replaceTime(formData.time[0]) + '-' + util.replaceTime(formData.time[1]) + '.xlsx'
       this.formData = formData
       this.isQueryTable = true
       this.changeHeight()
@@ -258,6 +240,31 @@ export default {
     handleSizeChange(val) {
       this.pageSize = val
       this.getTableDatas()
+    },
+    exportExcel(datas) {
+      const keys = Object.keys(this.json_fields)
+      const excelData = []
+      excelData.push(keys)
+      datas.forEach(element => {
+        const arr = []
+        Object.values(this.json_fields).forEach(function(value, key) {
+          arr.push(element[value])
+        })
+        excelData.push(arr)
+      })
+      const cols = [{
+        wch: 20
+      }]
+      for (let index = 1; index < keys.length; index++) {
+        const element = keys[index]
+        cols.push({
+          wch: element.length * 2
+        })
+      }
+      util.exportSpecialExcel(excelData, 0, this.excelName, cols)
+    },
+    exportAll() {
+
     }
   }
 }

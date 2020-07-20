@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.hirain.phm.synapsis.setting.ADVariable;
 import com.hirain.phm.synapsis.setting.Variable;
 import com.hirain.phm.synapsis.setting.Variable.VariableType;
+import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.support.param.ADGroupVO;
 import com.hirain.phm.synapsis.setting.support.param.ADVariableVO;
 import com.hirain.phm.synapsis.setting.support.param.VariableGroupVO;
 import com.hirain.phm.synapsis.setting.support.variable.ParamVariableConverter;
-import com.hirain.phm.synapsis.setting.VariableGroup;
 
 /**
  * @Version 1.0
@@ -53,7 +53,7 @@ public class ADGroupConverter implements ParamVariableConverter {
 	private ADVariable convertFrom(ADVariableVO frontADVariable) {
 		ADVariable variable = new ADVariable();
 		variable.setChnId(frontADVariable.getChnId());
-		variable.setSignalName(frontADVariable.getName());
+		variable.setName(frontADVariable.getName());
 		variable.setSampleRate(frontADVariable.getSampleRate());
 		return variable;
 	}
@@ -77,7 +77,7 @@ public class ADGroupConverter implements ParamVariableConverter {
 	private ADVariableVO parseFrom(ADVariable variable) {
 		ADVariableVO adVariable = new ADVariableVO();
 		adVariable.setChnId(variable.getChnId());
-		adVariable.setName(variable.getSignalName());
+		adVariable.setName(variable.getName());
 		adVariable.setSampleRate(variable.getSampleRate());
 		return adVariable;
 	}

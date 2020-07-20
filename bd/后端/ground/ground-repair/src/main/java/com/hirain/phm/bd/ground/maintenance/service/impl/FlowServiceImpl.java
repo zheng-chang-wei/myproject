@@ -39,7 +39,7 @@ import com.hirain.phm.bd.ground.maintenance.service.StepTypeService;
 import com.hirain.phm.bd.ground.maintenance.service.WorkDetailService;
 import com.hirain.phm.bd.ground.maintenance.service.WorkSheetService;
 import com.hirain.phm.bd.ground.maintenance.service.WorkStepService;
-import com.hirain.phm.bd.ground.train.controller.TrainGateWay;
+import com.hirain.phm.bd.ground.train.controller.ProjectGateWay;
 import com.hirain.phm.bd.ground.train.domain.Project;
 import com.hirain.phm.bd.ground.util.RedisUtil;
 
@@ -82,7 +82,6 @@ public class FlowServiceImpl implements FlowService {
 	@Autowired
 	private FlowableClient flowClient;
 
-	// @Value("${file.upload.dir}")
 	private String uploadRoot = System.getProperty("user.dir") + "//imgs";
 
 	@Autowired
@@ -92,7 +91,7 @@ public class FlowServiceImpl implements FlowService {
 	private RBACGateWay rbacGW;
 
 	@Autowired
-	private TrainGateWay trainGW;
+	private ProjectGateWay trainGW;
 
 	/**
 	 * @throws IOException
@@ -407,10 +406,10 @@ public class FlowServiceImpl implements FlowService {
 
 	private void checkDept(Long sheetId, User user) throws FlowException {
 		Dept dept = rbacGW.findDeptById(user.getDeptId());
-		boolean check = redisMapper.checkDepart(sheetId, dept.getDeptName());
-		if (!check) {
+		Object check = redisMapper.checkDepart(sheetId, dept.getDeptName());
+		if (check == null) {
 			throw new FlowException("所属部门不能处理此工单");
-		} else if (check) {
+		} else if (check.equals("true")) {
 			throw new FlowException("所属部门已提交，不能重复操作");
 		}
 	}

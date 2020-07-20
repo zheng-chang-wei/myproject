@@ -25,4 +25,5 @@ public interface DataQueryService {
 	List<DataRecord> select(DataParam param);
 
 	int count(DataParam param);
+
 }

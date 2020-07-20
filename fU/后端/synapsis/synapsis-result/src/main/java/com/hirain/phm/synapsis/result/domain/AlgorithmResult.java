@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 /**
@@ -57,6 +59,7 @@ public class AlgorithmResult {
 
 	private Long algorithmHeaderId;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date timestamp;
 
 	private Integer value;

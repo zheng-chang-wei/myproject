@@ -43,7 +43,7 @@
 						highlight-current-row style="width: 97%;margin-left:15px">
 						<el-table-column prop="axleNum" label="轴号" align="center"></el-table-column>
 						<el-table-column prop="pointNum" label="测点号" align="center"></el-table-column>
-						<el-table-column prop="faultTime" label="故障时间" :formatter="formatFaultTime" align="center">
+						<el-table-column prop="faultTime" label="故障时间"  align="center">
 						</el-table-column>
 						<el-table-column prop="details" label="详情查询" align="center">
 							<template slot-scope="scope">
@@ -315,13 +315,11 @@ export default {
     //获取统计结果
     getStatisticsResult() {
       let vm = this;
-      vm.retrieveForm.starttime=util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss")
-			vm.retrieveForm.endtime=util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss")
       let param = {
         trainType: vm.retrieveForm.type,
         trainNum: vm.retrieveForm.num,
-        startTime: vm.retrieveForm.starttime,
-        endTime: vm.retrieveForm.endtime
+        startTime: util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss"),
+        endTime: util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss")
       };
       vm.triggerTimesChartData.rows=[]
       vm.triggerTimesChartSettings.yAxisName = [""];
@@ -351,13 +349,11 @@ export default {
     getTableData() {
       let vm = this;
       this.listLoading = true;
-      vm.retrieveForm.starttime=util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss")
-			vm.retrieveForm.endtime=util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss")
       let param = {
         trainType: vm.retrieveForm.type,
         trainNum: vm.retrieveForm.num,
-        startTime: vm.retrieveForm.starttime,
-        endTime: vm.retrieveForm.endtime,
+        startTime: util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss"),
+        endTime: util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss"),
         axleNum: vm.axleNum,
         pageNum: vm.pageNum,
         pageSize: vm.pageSize
@@ -438,12 +434,7 @@ export default {
       this.pageSize = val;
       this.getTableData();
     },
-    //格式化创建时间
-    formatFaultTime(row, column) {
-      return (row.faultTime = row.faultTime
-        ? util.formatDate(new Date(row.faultTime), "yyyy-MM-dd hh:mm:ss")
-        : "");
-    },
+
    	setTitle(title) {
 			this.tmpChartTitle.text = 'PredictionTemperature_' + title
 			this.residCharTitle.text = 'Residual_' + title

@@ -38,9 +38,6 @@ public class BoardStartUpEventHandler {
 	private BoardService boardService;
 
 	@Autowired
-	private BoardStatusTimer timer;
-
-	@Autowired
 	private RecordMapper recordMapper;
 
 	/**
@@ -66,10 +63,8 @@ public class BoardStartUpEventHandler {
 	@Async
 	public void listen(RunState state) {
 		if (state.equals(RunState.RUNNING)) {
-			timer.start();
 			recordMapper.addRecord("系统启动");
 		} else if (state.equals(RunState.IDLE)) {
-			timer.stop();
 			boardService.updateStatus(null);
 			recordMapper.addRecord("系统停止");
 		} else if (state.equals(RunState.WAITING)) {

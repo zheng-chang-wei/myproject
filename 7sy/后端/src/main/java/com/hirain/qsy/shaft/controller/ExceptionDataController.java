@@ -32,7 +32,6 @@ public class ExceptionDataController {
 	}
 
 	@GetMapping("/getAxledata")
-	@RequiresAuthentication
 	public ResponseBo getAxleExceptionData(String trainType, String trainNum, String startDate, String endDate, @RequestParam String axleName) {
 		try {
 			return ResponseBo.ok(exceptionDataService.findAxleExceptionData(trainType, trainNum, startDate, endDate, axleName));

@@ -1,9 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2019, 2019 Hirain Technologies Corporation.
+ ******************************************************************************/
 package com.hirain.phm.bd.store.kafka;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * @Version 1.0
@@ -17,32 +20,25 @@ import lombok.Getter;
  *               <p>
  *               2019年4月4日 jianwen.xin@hirain.com 1.0 create file
  */
+@Data
 @Component
-@Getter
+@ConfigurationProperties("kafka.producer")
 public class KafkaProducerProperties {
 
-	@Value("${kafka.producer.servers}")
 	private String servers;
 
-	@Value("${kafka.producer.retries}")
 	private int retries;
 
-	@Value("${kafka.producer.batch.size}")
 	private int batchSize;
 
-	@Value("${kafka.producer.linger}")
 	private int linger;
 
-	@Value("${kafka.producer.buffer.memory}")
 	private int bufferMemory;
 
-	@Value("${kafka.producer.acks}")
 	private String acks;
 
-	@Value("${kafka.producer.key.serializer}")
 	private String keySerializer;
 
-	@Value("${kafka.producer.value.serializer}")
 	private String valueSerializer;
 
 }

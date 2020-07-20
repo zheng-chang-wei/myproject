@@ -4,6 +4,7 @@
 package com.hirain.phm.synapsis.algorithm.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,9 @@ import com.hirain.phm.synapsis.algorithm.param.AlgorithmPacket;
 import com.hirain.phm.synapsis.algorithm.param.AlgorithmStatisticsResponse;
 import com.hirain.phm.synapsis.algorithm.param.Record;
 import com.hirain.phm.synapsis.algorithm.service.AlgorithmService;
+import com.hirain.phm.synapsis.board.BoardQuery;
+import com.hirain.phm.synapsis.board.IBoard;
+import com.hirain.phm.synapsis.page.QueryRequest;
 import com.hirain.phm.synapsis.response.ResultBean;
 import com.hirain.phm.synapsis.setting.AlgorithmSetting;
 
@@ -36,9 +40,12 @@ public class AlgorithmController {
 	@Autowired
 	private AlgorithmService service;
 
+	@Autowired
+	private BoardQuery boardQuery;
+
 	@GetMapping("/list")
-	public ResultBean<List<AlgorithmPacket>> list() {
-		return new ResultBean<>(service.list());
+	public ResultBean<List<AlgorithmPacket>> list(QueryRequest request) {
+		return service.list(request);
 	}
 
 	@GetMapping("/count")
@@ -54,5 +61,12 @@ public class AlgorithmController {
 	@GetMapping("/history")
 	public ResultBean<List<Record>> getRecords() {
 		return new ResultBean<>(service.getRecords());
+	}
+
+	@GetMapping("/phmboards")
+	public ResultBean<List<String>> getPhmBoards() {
+		List<IBoard> boards = boardQuery.getBoards("PHM");
+		List<String> list = boards.stream().map(b -> b.getBoardType().name() + "[" + b.getSlotID() + "]").collect(Collectors.toList());
+		return new ResultBean<>(list);
 	}
 }

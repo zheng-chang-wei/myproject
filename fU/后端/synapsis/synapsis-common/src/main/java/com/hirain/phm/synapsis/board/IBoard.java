@@ -3,6 +3,8 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.board;
 
+import com.hirain.phm.synapsis.constant.BoardType;
+
 /**
  * @Version 1.0
  * @Author jianwen.xin@hirain.com
@@ -20,4 +22,6 @@ public interface IBoard {
 	int getSlotID();
 
 	String getCardIP();
+
+	BoardType getBoardType();
 }

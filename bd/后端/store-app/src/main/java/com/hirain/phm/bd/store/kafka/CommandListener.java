@@ -9,6 +9,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 
 import com.hirain.phm.bd.common.serialize.JsonUtil;
 import com.hirain.phm.bd.message.header.MessageHeader;
+import com.hirain.phm.bd.store.filter.ProjectFilter;
 
 /**
  * @Version 1.0
@@ -27,13 +28,15 @@ public class CommandListener {
 	@Autowired
 	private ApplicationEventPublisher publisher;
 
+	@Autowired
+	private ProjectFilter filter;
+
 	@KafkaListener(topics = { "train-ground" })
 	public void listen(ConsumerRecord<?, ?> record) {
 		String string = new String((byte[]) record.value(), Charset.forName("utf-8"));
-		System.err.println(string);
 		MessageHeader header = JsonUtil.fromString(string, MessageHeader.class);
-		if (header.getSid() == 0x01) {
-			// 处理注册报文
+		if (filter.filter(header.getProject())) {
+			System.err.println(string);
 			publisher.publishEvent(header);
 		}
 	}

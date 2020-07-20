@@ -27,6 +27,12 @@ public class ValidateResult {
 	private String outline;
 
 	/**
+	 * 错误信息
 	 */
-	private List<Object> errors;
+	private List<String> errors;
+
+	/**
+	 * 警告信息
+	 */
+	private List<String> warnings;
 }

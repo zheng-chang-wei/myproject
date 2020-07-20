@@ -6,7 +6,6 @@ package com.hirain.phm.bd.data.hive;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,28 +27,16 @@ import com.alibaba.druid.pool.DruidDataSource;
 @Configuration
 public class HiveDruidConfig {
 
-	@Value("${hive.url}")
-	private String url;// jdbc:hive2://192.168.0.130:10000/default
-
-	@Value("${hive.user}")
-	private String user;
-
-	@Value("${hive.password}")
-	private String password;
-
-	@Value("${hive.driver}")
-	private String driverClassName;// org.apache.hive.jdbc.HiveDriver
-
 	@Autowired
 	private DruidProperties props;
 
-	@Bean
+	@Bean(name = "hiveDatasource")
 	public DataSource dataSource() {
 		DruidDataSource dataSource = new DruidDataSource();
-		dataSource.setUrl(url);
-		dataSource.setUsername(user);
-		dataSource.setPassword(password);
-		dataSource.setDriverClassName(driverClassName);
+		dataSource.setUrl(props.getUrl());
+		dataSource.setUsername(props.getUser());
+		dataSource.setPassword(props.getPassword());
+		dataSource.setDriverClassName(props.getDriverClassName());
 
 		dataSource.setInitialSize(props.getInitialSeize());
 		dataSource.setMinIdle(props.getMinIdle());

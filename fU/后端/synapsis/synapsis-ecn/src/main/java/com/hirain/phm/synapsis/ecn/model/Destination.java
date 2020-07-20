@@ -50,11 +50,11 @@ public class Destination extends SheetAndLine {
 	@XmlAttribute(name = "name")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String name;
+	protected String Destination_name;
 
 	@XmlAttribute(name = "uri")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NMTOKEN")
-	protected String uri;
+	protected String Destination_uri;
 
 }

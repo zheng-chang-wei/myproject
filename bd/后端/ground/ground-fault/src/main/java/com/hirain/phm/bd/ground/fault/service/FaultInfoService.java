@@ -20,10 +20,10 @@ public interface FaultInfoService extends IService<FaultInfo> {
 	 * 
 	 * @param faultName
 	 * @param faultCode
-	 * @param id
+	 * @param projectId
 	 * @return
 	 */
-	List<FaultInfo> findByNameAndCode(String faultName, int faultCode, Integer id);
+	List<FaultInfo> findByNameAndCode(String faultName, int faultCode, Integer projectId);
 
 	List<FaultInfo> selectAllGroupByFaultName();
 
@@ -32,5 +32,22 @@ public interface FaultInfoService extends IService<FaultInfo> {
 	 * @return
 	 */
 	List<FaultInfo> findFaultInfoByProject(String project);
+
+	/**
+	 * @param project
+	 */
+	List<FaultInfo> selectAllWithDetail(String project);
+
+	FaultInfo selectWithDetail(Integer id);
+
+	/**
+	 * @param info
+	 */
+	boolean checkDuplicate(FaultInfo info);
+
+	/**
+	 * @param list
+	 */
+	void insertList(List<FaultInfo> list);
 
 }

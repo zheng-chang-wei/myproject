@@ -3,8 +3,8 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.board.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,13 +37,8 @@ public class BoardQueryImpl implements BoardQuery {
 	 */
 	@Override
 	public List<IBoard> getBoards(String type) {
-		List<IBoard> list = new ArrayList<>();
 		List<Board> boards = service.getBoards();
-		boards.forEach(b -> {
-			if (b.getBoardType().getType().equals(type)) {
-				list.add(b);
-			}
-		});
+		List<IBoard> list = boards.stream().filter(b -> b.getBoardType().getType().equals(type)).map(t -> (IBoard) t).collect(Collectors.toList());
 		return list;
 	}
 

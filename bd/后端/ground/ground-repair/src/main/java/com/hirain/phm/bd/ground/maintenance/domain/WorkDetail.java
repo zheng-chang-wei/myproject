@@ -92,14 +92,20 @@ public class WorkDetail implements Serializable {
 	@Transient
 	private String faultMode;
 
+	private Integer levelOneId;
+
 	/**
 	 * 一级部件
 	 */
+	@Transient
 	private String levelOne;
+
+	private Integer levelTwoId;
 
 	/**
 	 * 二级部件
 	 */
+	@Transient
 	private String levelTwo;
 
 	/**
@@ -197,4 +203,8 @@ public class WorkDetail implements Serializable {
 	 * 自定义变量值 逗号隔开
 	 */
 	private String valuess;
+
+	private String repair;
+
+	private String solution;
 }

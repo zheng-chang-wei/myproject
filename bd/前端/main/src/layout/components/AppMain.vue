@@ -7,7 +7,8 @@
 </template>
 
 <script>
-const serverList = ['10.40.16.211', '192.168.40.33']
+// const serverList = ['10.40.16.19', '192.168.40.33']
+const serverList = ['localhost', '192.168.40.33']
 export default {
   name: 'AppMain',
   data: function() {

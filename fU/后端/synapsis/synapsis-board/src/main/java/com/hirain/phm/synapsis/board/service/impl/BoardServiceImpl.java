@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
@@ -71,8 +70,8 @@ public class BoardServiceImpl implements BoardService {
 	@Autowired
 	public Communication communication;
 
-	@Value("${udp.send.timeout:10}")
-	private int timeout;
+	@Autowired
+	private BoardConfig config;
 
 	@Autowired
 	private BoardMapper mapper;
@@ -136,7 +135,7 @@ public class BoardServiceImpl implements BoardService {
 	private Message<?> getResponse(TransportMessage<?> transportMessage) throws Exception {
 		Message<?> response = null;
 		for (int i = 0; i < 3; i++) {
-			response = communication.send(transportMessage, timeout);
+			response = communication.send(transportMessage, config.getTimeout());
 			if (response != null) {
 				break;
 			}
@@ -241,5 +240,14 @@ public class BoardServiceImpl implements BoardService {
 		for (Board board : boards) {
 			board.setCardStatus(status);
 		}
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.board.service.BoardService#scanBoards()
+	 */
+	@Override
+	public List<Board> scanBoards() {
+		boardStatusInquire();
+		return getBoards();
 	}
 }

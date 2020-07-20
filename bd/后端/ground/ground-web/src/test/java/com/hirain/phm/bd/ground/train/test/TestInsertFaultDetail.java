@@ -16,14 +16,8 @@ import com.hirain.phm.bd.ground.GroundWebApplication;
 import com.hirain.phm.bd.ground.fault.dao.FaultDetailMapper;
 import com.hirain.phm.bd.ground.fault.dao.FaultInfoMapper;
 import com.hirain.phm.bd.ground.fault.domain.FaultDetail;
-import com.hirain.phm.bd.ground.fault.domain.FaultInfo;
-import com.hirain.phm.bd.ground.push.dao.PushInfoMapper;
-import com.hirain.phm.bd.ground.push.domain.PushInfo;
 import com.hirain.phm.bd.ground.train.dao.ProjectMapper;
 import com.hirain.phm.bd.ground.train.dao.TrainMapper;
-import com.hirain.phm.bd.ground.train.domain.Project;
-import com.hirain.phm.bd.ground.train.domain.Train;
-import com.hirain.phm.bd.ground.train.param.TrainParamHeader;
 import com.hirain.phm.bd.ground.train.service.TrainService;
 
 /**
@@ -56,42 +50,7 @@ public class TestInsertFaultDetail {
 	FaultInfoMapper faultInfoMapper;
 
 	@Autowired
-	PushInfoMapper pushInfoMapper;
-
-	@Autowired
 	ProjectMapper projectMapper;
-
-	@Test
-	public void test() {
-		List<PushInfo> pushInfos = pushInfoMapper.selectAll();
-		List<Project> projects = projectMapper.selectAll();
-		for (Project project : projects) {
-			for (int i = 0; i < pushInfos.size(); i++) {
-				PushInfo pushInfo = pushInfos.get(i);
-				Integer code = pushInfo.getCode();
-				FaultInfo faultInfo = new FaultInfo();
-				faultInfo.setFaultCode(code);
-				faultInfo.setFaultName("falut" + i);
-				faultInfo.setProjectId(project.getId());
-				faultInfoMapper.insertUseGeneratedKeys(faultInfo);
-				Integer faultInfoId = faultInfo.getId();
-				TrainParamHeader trainParms = new TrainParamHeader();
-				trainParms.setProject(project.getName());
-				List<Train> trains = trainService.findTrains(trainParms);
-				for (Train train : trains) {
-					FaultDetail faultDetail = new FaultDetail();
-					faultDetail.setCarNo(1);
-					faultDetail.setDebugMode(false);
-					faultDetail.setDoorAddr(1);
-					faultDetail.setFaultInfoId(faultInfoId);
-					faultDetail.setFaultTime(new Date());
-					faultDetail.setStatistics(true);
-					faultDetail.setTrainId(train.getId());
-					faultDetailMapper.insert(faultDetail);
-				}
-			}
-		}
-	}
 
 	@Test
 	public void resetDateTest() {

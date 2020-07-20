@@ -6,7 +6,6 @@ package com.hirain.phm.synapsis.setting.service;
 import java.util.List;
 
 import com.hirain.phm.synapsis.setting.AlgorithmSetting;
-import com.hirain.phm.synapsis.setting.VariableGroup;
 
 /**
  * @Version 1.0
@@ -31,9 +30,13 @@ public interface AlgorithmSettingService {
 	/**
 	 * @param settingId
 	 */
-	void delete(int settingId);
-
-	List<VariableGroup> getVariables(int id);
+	void deleteBySettingId(int settingId);
 
 	List<AlgorithmSetting> selectBySubsystemId(Integer subsystemId);
+
+	/**
+	 * @param settingId
+	 * @return
+	 */
+	List<AlgorithmSetting> selectBySettingId(Integer settingId);
 }

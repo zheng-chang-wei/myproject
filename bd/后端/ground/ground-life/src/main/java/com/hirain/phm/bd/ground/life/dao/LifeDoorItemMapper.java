@@ -37,7 +37,6 @@ public interface LifeDoorItemMapper extends CommonMapper<LifeDoorItem> {
 			sql += " and t_life_dooritem.lifeitem_id=#{lifeitemId}";
 			sql += " and t_life_dooritem.train_id = #{trainId}";
 			sql += " and t_life_dooritem.car_no = #{carNo}";
-			sql += " and t_life_dooritem.train_no = #{trainNo}";
 			return sql;
 		}
 

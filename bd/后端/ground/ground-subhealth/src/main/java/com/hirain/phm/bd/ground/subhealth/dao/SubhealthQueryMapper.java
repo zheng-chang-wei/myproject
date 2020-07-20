@@ -19,7 +19,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 
 import com.github.pagehelper.util.StringUtil;
 import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailParams;
-import com.hirain.phm.bd.ground.subhealth.param.SubhealthWithSuggestionParams;
+import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailResponseParams;
 
 public interface SubhealthQueryMapper {
 
@@ -28,77 +28,32 @@ public interface SubhealthQueryMapper {
 	 * @return
 	 */
 	@SelectProvider(type = SubhealthQueryMapperProvider.class, method = "selectByExample")
-	public List<SubhealthWithSuggestionParams> selectByExample(SubhealthDetailParams subdeDetailParams);
-
-	/**
-	 * @return
-	 */
-	@SelectProvider(type = SubhealthQueryMapperProvider.class, method = "selectToday")
-	public List<SubhealthWithSuggestionParams> selectToday(String project, String trainNo);
+	public List<SubhealthDetailResponseParams> selectByExample(SubhealthDetailParams subdeDetailParams);
 
 	/**
 	 * @author zepei.tao
 	 */
-	@SelectProvider(type = SubhealthQueryMapperProvider.class, method = "selectToday4Bode")
-	public List<SubhealthWithSuggestionParams> selectToday4Bode(String startTime, String endTime);
+	@SelectProvider(type = SubhealthQueryMapperProvider.class, method = "selectToday")
+	public List<SubhealthDetailResponseParams> selectToday(String startTime, String endTime);
 
 	class SubhealthQueryMapperProvider {
 
-		public String selectToday(String project, String trainNo) {
+		public String selectToday(String startTime, String endTime) {
 			String sql = "select" +
 
-					" tp.name project,tt.train_no,td.id,td.car_no,td.door_addr,td.start_time,td.end_time, tts.outline suggestion," +
+					" tp.name project,tt.train_no,td.id,td.car_no,td.door_addr,td.start_time,td.end_time," +
 
-					" ti.subhealth_name, tts.suggestion treatment, trs.suggestion repair " +
+					" ti.subhealth_name,td.subhealth_info_id" +
 
 					" from t_subhealth_detail td" +
 
-					" left join t_subhealth_type ti on td.subhealth_type_id =ti.subhealth_code" +
+					" left join t_subhealth_type ti on td.subhealth_info_id =ti.subhealth_code" +
 
 					" left join t_train tt on tt.id=td.train_id" +
 
-					" left join t_project tp on tp.id=tt.project_id" +
+					" left join t_project tp on tp.id=tt.project_id";
 
-					" left join t_push ts on ti.subhealth_code=ts.code" +
-
-					" left join t_treatment_suggestion tts on ts.treatment_id=tts.id" +
-
-					" left join t_repair_suggestion trs on ts.repair_id=trs.id";
-
-			sql += " where ts.type=1";
-			if (StringUtil.isNotEmpty(project)) {
-				sql += " and tp.name=#{project}";
-			}
-			if (StringUtil.isNotEmpty(trainNo)) {
-				sql += " and tt.train_no=#{trainNo}";
-			}
-			sql += " order by td.start_time desc";
-			sql += " LIMIT 20";
-			return sql;
-		}
-
-		public String selectToday4Bode(String startTime, String endTime) {
-			String sql = "select" +
-
-					" tp.name project,tt.train_no,td.id,td.car_no,td.door_addr,td.start_time,td.end_time, tts.outline suggestion," +
-
-					" ti.subhealth_name, tts.suggestion treatment, trs.suggestion repair " +
-
-					" from t_subhealth_detail td" +
-
-					" left join t_subhealth_type ti on td.subhealth_type_id =ti.subhealth_code" +
-
-					" left join t_train tt on tt.id=td.train_id" +
-
-					" left join t_project tp on tp.id=tt.project_id" +
-
-					" left join t_push ts on ti.subhealth_code=ts.code" +
-
-					" left join t_treatment_suggestion tts on ts.treatment_id=tts.id" +
-
-					" left join t_repair_suggestion trs on ts.repair_id=trs.id";
-
-			sql += " where ts.type=1";
+			sql += " where true";
 			if (StringUtil.isNotEmpty(startTime)) {
 				sql += " and td.start_time >= #{startTime}";
 			}
@@ -130,26 +85,20 @@ public interface SubhealthQueryMapper {
 					// 故障名称
 					"	ti.subhealth_name, " +
 
-					" tts.suggestion treatment, trs.suggestion repair, ts.description, trs.solution solution " +
+					" td.subhealth_info_id " +
 
 					" FROM" +
 					// 故障详情表
 					" t_subhealth_detail td " +
 					// 故障信息表
-					"LEFT JOIN t_subhealth_type ti ON td.subhealth_type_id = ti.id " +
+					"LEFT JOIN t_subhealth_type ti ON td.subhealth_info_id = ti.id " +
 					// 列车表
 					"LEFT JOIN t_train tt ON tt.id = td.train_id " +
 
 					// 项目表
 					"LEFT JOIN t_project tp ON tp.id = tt.project_id " +
 
-					"LEFT JOIN t_push ts on ti.subhealth_code=ts.code " +
-
-					"LEFT JOIN t_treatment_suggestion tts on ts.treatment_id=tts.id " +
-
-					"LEFT JOIN t_repair_suggestion trs on ts.repair_id=trs.id " +
-
-					" where ts.type=1 ";
+					" where true ";
 			if (StringUtil.isNotEmpty(subdeDetailParams.getProject())) {
 				sql += " and tp.name=#{project}";
 			}

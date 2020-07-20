@@ -9,7 +9,7 @@
     <el-table
       v-loading="repairHistoryListLoading"
       :data="repairHistoryTableDatas"
-      :max-height="tableMaxHeight"
+      :height="tableMaxHeight"
       border
       @row-click="getAllDetails"
     >
@@ -101,7 +101,7 @@ export default {
       })
     },
     changeTableHeight() {
-      this.tableMaxHeight = document.body.offsetHeight - 160
+      this.tableMaxHeight = document.body.offsetHeight - 180
     },
     query(formObject) {
       this.projectName = formObject.projectName

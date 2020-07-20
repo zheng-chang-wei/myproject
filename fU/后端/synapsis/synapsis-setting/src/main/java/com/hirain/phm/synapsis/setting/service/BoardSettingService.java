@@ -6,7 +6,7 @@ package com.hirain.phm.synapsis.setting.service;
 import java.util.List;
 
 import com.hirain.phm.synapsis.setting.BoardSetting;
-import com.hirain.phm.synapsis.setting.VariableGroup;
+import com.hirain.phm.synapsis.setting.common.IService;
 
 /**
  * @Version 1.0
@@ -20,7 +20,7 @@ import com.hirain.phm.synapsis.setting.VariableGroup;
  *               <p>
  *               Dec 5, 2019 jianwen.xin@hirain.com 1.0 create file
  */
-public interface BoardSettingService {
+public interface BoardSettingService extends IService<BoardSetting> {
 
 	void saveList(int settingId, List<BoardSetting> boardSettings);
 
@@ -32,10 +32,11 @@ public interface BoardSettingService {
 	/**
 	 * @param settingId
 	 */
-	void delete(int settingId);
+	void deleteBySettingId(int settingId);
 
 	/**
-	 * @param i
+	 * @param settingId
+	 * @return
 	 */
-	List<VariableGroup> getVariables(int boardId);
+	List<BoardSetting> selectBySettingId(Integer settingId);
 }

@@ -37,8 +37,8 @@ public class AlgorithmStatusResponse implements SynapsisResponse {
 	@Override
 	public void parse(byte[] datas) {
 		ByteBuffer buffer = ByteBuffer.wrap(datas).order(MessageConstant.MESSAGE_ORDER);
+		@SuppressWarnings("unused")
 		byte slotId = buffer.get();
-		System.out.println(slotId);
 		byte length = buffer.get();
 		RunStatus[] values = RunStatus.values();
 		for (int i = 0; i < length; i++) {

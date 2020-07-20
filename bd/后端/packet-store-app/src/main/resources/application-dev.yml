@@ -1,0 +1,11 @@
+hdfs:
+  default-fs: hdfs://192.168.1.14:8022
+kafka:
+  consumer:
+    group-prefix: store-
+    servers: 192.168.1.14:9092,192.168.1.13:9092,192.168.1.12:9092
+  producer:
+    servers: 192.168.1.14:9092,192.168.1.13:9092,192.168.1.12:9092
+store:
+  file:
+    root: /data

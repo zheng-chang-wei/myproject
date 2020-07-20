@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 
 import com.hirain.phm.synapsis.setting.AlgorithmSetting;
-import com.hirain.phm.synapsis.setting.CommonMapper;
+import com.hirain.phm.synapsis.setting.common.CommonMapper;
 
 /**
  * @Version 1.0
@@ -45,7 +45,9 @@ public interface AlgorithmSettingMapper extends CommonMapper<AlgorithmSetting> {
 	@Results({
 
 			@Result(property = "id", column = "id", id = true),
-			@Result(property = "variableGroups", column = "id", many = @Many(select = "com.hirain.phm.synapsis.setting.dao.VariableGroupMapper.selectByAlgorithm")) })
+			@Result(property = "variableGroups", column = "id", many = @Many(select = "com.hirain.phm.synapsis.setting.dao.VariableGroupMapper.selectByAlgorithm"))
+
+	})
 	List<AlgorithmSetting> selectSetting(int settingId);
 
 	/**

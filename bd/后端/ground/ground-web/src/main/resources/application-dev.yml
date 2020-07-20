@@ -1,0 +1,70 @@
+hdfs:
+  default-fs: hdfs://192.168.1.14:8022
+kafka:
+  consumer:
+    group-id: groundapp
+    group-prefix: ground-
+    servers: 192.168.1.11:9092,192.168.1.13:9092,192.168.1.12:9092
+  producer:
+    servers: 192.168.1.11:9092,192.168.1.13:9092,192.168.1.12:9092
+mqtt:
+  ssl:
+    cert-file: /opt/server/ca.crt
+    client-file: /opt/server/client.crt
+    key-file: /opt/server/client.key
+owner:
+  tooken: 123123123
+  url: http://10.10.251.50:10000
+  timed:
+    temp-dir: /opt/server/temp
+    faults:
+    - 门电机开路故障
+    - 门电机过流故障
+    - 门门板开关故障
+    - 门绿色环线故障
+    - 门锁闭开关故障
+    - 门编码器故障
+    - 门开关门超时故障
+    - 门输出短路故障
+    - 外网通讯故障
+    - 内网通讯故障
+    - 隔离
+    - 防挤压
+    - 紧急解锁
+    subhealths:
+    - 尺带张紧力过松
+    - 行程开关异常
+    - 电机工况异常
+    - 网络干扰异常
+    - 闭锁组件异常
+repair:
+  integration:
+    cron-expression: 0 0 1 1/1 * ? *
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://192.168.1.11:3306/phm_bd_ground?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+  mail:
+    default-encoding: UTF-8
+    host: smtp.exmail.qq.com
+    password: Yun.666
+    port: 465
+    properties:
+      mail:
+        imap:
+          ssl:
+            socketFactory:
+              fallback: false
+        smtp:
+          ssl:
+            enable: true
+            socketFactory:
+              class: com.hirain.phm.bd.ground.mail.MailSSLSocketFactory
+    username: yunguanli@bode-beijing.com
+  redis:
+    host: 192.168.1.11
+    
+ground:
+  mail:
+    from: yunguanli@bode-beijing.com

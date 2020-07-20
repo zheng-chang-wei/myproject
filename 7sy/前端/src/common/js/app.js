@@ -1,6 +1,5 @@
 import axios from 'axios'
 import allApi from './allApi'
-import apiDomain from './apiDomain.js'
 import qs from 'qs'
 var notifyList=[]
 axios.defaults.baseURL = 'api'
@@ -15,7 +14,7 @@ axios.interceptors.response.use(res => {
 		}
 		return res.data
 	}
-	console.log('code====' + res.data.code);
+	console.log('code==='+res.data.code);
 	if (res.data.code == 500) {
 		if (res.data.msg == 'NotLogin') {
 			vm.$root.Bus.$emit("handleError");
@@ -49,10 +48,24 @@ export default {
 		if (r != null) return unescape(r[2]); return null;
 	},
 	get(url, data) {
+		if (data === null||data===undefined) {
+			data = {
+				t: new Date()
+			}
+		} else { 
+			data['t']=new Date().getTime()
+		}
 		return axios.get(allApi[url], { params: data })
 	},
 	
 	post(url, data) {
+		if (data === null||data===undefined) {
+			data = {
+				t: new Date()
+			}
+		} else { 
+			data['t']=new Date().getTime()
+		}
 		return axios.post(allApi[url], qs.stringify(data))
 	},
 	uploadFile(url, data){

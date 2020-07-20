@@ -63,6 +63,7 @@ public class ShiroConfiguration {
 		filterChainDefinitionMap.put("/login", "anon");
 		filterChainDefinitionMap.put("/logout", "anon");
 		filterChainDefinitionMap.put("/swagger-ui.html", "anon");
+		filterChainDefinitionMap.put("/getAxledata", "anon");
 
 		// filterChainDefinitionMap.put("/*", "authc");// 表示需要认证才可以访问
 		// filterChainDefinitionMap.put("/**", "authc");// 表示需要认证才可以访问
@@ -180,7 +181,7 @@ public class ShiroConfiguration {
 		Collection<SessionListener> listeners = new ArrayList<>();
 		listeners.add(new ShiroSessionListener());
 		// 设置session超时时间，单位为毫秒
-		sessionManager.setGlobalSessionTimeout(3600 * 6 * 1000L);
+		sessionManager.setGlobalSessionTimeout(3600 * 1000L);
 		sessionManager.setSessionListeners(listeners);
 		sessionManager.setSessionDAO(redisSessionDAO());
 		sessionManager.setSessionIdUrlRewritingEnabled(false);

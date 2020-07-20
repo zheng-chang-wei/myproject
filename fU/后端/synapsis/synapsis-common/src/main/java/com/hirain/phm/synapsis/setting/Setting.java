@@ -14,12 +14,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
@@ -39,8 +40,6 @@ import lombok.Data;
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "Setting")
-@XmlType(propOrder = { "name", "line", "train", "rawStrategy", "resultStrategy", "rawSpace", "resultSpace", "timeOn", "selected", "retryIp",
-		"timeVariables", "storeVariables", "boardSettings", "algorithmSettings", })
 public class Setting {
 
 	@Id
@@ -59,42 +58,31 @@ public class Setting {
 	private String train;
 
 	@JSONField(serialize = false)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@XmlTransient
 	private Date lastModify;
-
-	@XmlElement(name = "rawStrategy", required = true)
-	private Integer rawStrategy;
-
-	@XmlElement(name = "resultStrategy", required = true)
-	private Integer resultStrategy;
-
-	@XmlElement(name = "rawSpace", required = true)
-	private Integer rawSpace;
-
-	@XmlElement(name = "resultSpace", required = true)
-	private Integer resultSpace;
-
-	@XmlAttribute(name = "timeOn", required = true)
-	private Boolean timeOn;
 
 	@XmlAttribute(name = "selected", required = true)
 	private Boolean selected;
 
+	@XmlTransient
+	private String userName;
+
 	@XmlElement(name = "retryIp", required = true)
+	@Transient
 	private String retryIp;
 
 	@Transient
-	@XmlElement(name = "timeVariables", required = true)
-	private VariableGroup timeVariables;
+	@XmlElementRef
+	private StoreSetting storeSetting;
 
 	@Transient
-	@XmlElementWrapper(name = "storeVariables")
-	@XmlElement(name = "variableGroup", required = true, type = VariableGroup.class)
-	private List<VariableGroup> storeVariables;
+	@XmlElementRef
+	private TimeSetting timeSetting;
 
 	@Transient
 	@XmlElementWrapper(name = "boardSettings")
-	@XmlElement(name = "boardSetting", required = true, type = BoardSetting.class)
+	@XmlElementRef(name = "boardSetting", required = true)
 	private List<BoardSetting> boardSettings;
 
 	@Transient

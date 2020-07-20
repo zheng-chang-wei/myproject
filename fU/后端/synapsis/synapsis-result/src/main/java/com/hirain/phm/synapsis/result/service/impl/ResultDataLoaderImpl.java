@@ -14,7 +14,6 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.hirain.phm.synapsis.compress.CompressSupport;
@@ -26,6 +25,7 @@ import com.hirain.phm.synapsis.parse.domain.FileDataContent;
 import com.hirain.phm.synapsis.parse.domain.FileHeader;
 import com.hirain.phm.synapsis.parse.domain.HeaderVariableGroup;
 import com.hirain.phm.synapsis.parse.domain.VariableData;
+import com.hirain.phm.synapsis.result.ResultConfig;
 import com.hirain.phm.synapsis.result.domain.AlgorithmResult;
 import com.hirain.phm.synapsis.result.service.ResultDataLoader;
 import com.hirain.phm.synapsis.setting.VariableGroup;
@@ -66,9 +66,9 @@ public class ResultDataLoaderImpl implements ResultDataLoader {
 	@Autowired
 	private CompressSupport compress;
 
+	@Autowired
 	@Setter
-	@Value("${synapsis.result.root}")
-	private String resultFolder;
+	private ResultConfig config;
 
 	/**
 	 * @throws SynapsisException
@@ -98,7 +98,7 @@ public class ResultDataLoaderImpl implements ResultDataLoader {
 	 * @param path
 	 */
 	private File getHeaderFile(String filename) {
-		File folder = new File(resultFolder, filename);
+		File folder = new File(config.getRoot(), filename);
 		File[] files = folder.listFiles((FilenameFilter) (dir, name) -> name.startsWith("data_header"));
 		if (files.length > 0) {
 			return files[0];
@@ -152,7 +152,7 @@ public class ResultDataLoaderImpl implements ResultDataLoader {
 	 */
 	private File getDataFile(String foldername, VariableGroup group) {
 		String prefix = helper.getDataFilePrefix(group);
-		File folder = new File(resultFolder, foldername);
+		File folder = new File(config.getRoot(), foldername);
 		File[] files = folder.listFiles((FilenameFilter) (dir, name) -> name.startsWith(prefix));
 		if (files.length > 0) {
 			return files[0];
@@ -175,7 +175,7 @@ public class ResultDataLoaderImpl implements ResultDataLoader {
 	@Override
 	public String getVideo(AlgorithmResult result) {
 		String filename = getFilename(result);
-		return resultFolder + File.separator + filename;
+		return config.getRoot() + File.separator + filename;
 	}
 
 }

@@ -63,11 +63,6 @@ public interface SettingService {
 	Setting selectByName(String string);
 
 	/**
-	 * 
-	 */
-	void deleteOldest();
-
-	/**
 	 * @param id
 	 */
 	void changeCurrent(Integer id);
@@ -75,6 +70,6 @@ public interface SettingService {
 	/**
 	 * @param setting
 	 */
-	void saveOrUpdate(Setting setting);
+	void updateNotNull(Setting setting);
 
 }

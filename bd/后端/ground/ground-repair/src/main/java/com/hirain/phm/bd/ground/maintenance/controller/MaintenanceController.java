@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -83,13 +82,9 @@ public class MaintenanceController {
 
 	@GetMapping("/worksheets")
 	public PageResultBean<WorkSheetRecord> findWorksheets(QueryRequest request, WorkSheetQueryParam param) {
-		List<WorkSheetRecord> sheets = readService.listWorkSheets(param);
-		int start = request.getPageSize() * (request.getPageNum() - 1);
-		List<WorkSheetRecord> records = new ArrayList<>();
-		for (int i = start; i < Math.min(start + request.getPageSize(), sheets.size()); i++) {
-			records.add(sheets.get(i));
-		}
-		return new PageResultBean<>(records, sheets.size());
+		List<WorkSheetRecord> sheets = readService.listWorkSheets(param, request);
+		Integer total = readService.countWorkSheets(param);
+		return new PageResultBean<>(sheets, total);
 	}
 
 	@GetMapping("/worksheet")
@@ -240,6 +235,7 @@ public class MaintenanceController {
 	public ResultBean<List<FaultType>> getFaultTypes() {
 		return new ResultBean<>(readService.getFaultTypes());
 	}
+
 	@InitBinder
 	public void initBinder(WebDataBinder binder, WebRequest request) {
 		// 转换日期

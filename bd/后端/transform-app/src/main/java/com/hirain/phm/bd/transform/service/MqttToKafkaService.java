@@ -17,6 +17,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 
 import com.hirain.phm.bd.common.serialize.JsonUtil;
 import com.hirain.phm.bd.message.header.MessageHeader;
+import com.hirain.phm.bd.transform.filter.ProjectFilter;
 import com.hirain.phm.bd.transform.mqtt.MqttProperties;
 import com.hirain.phm.bd.transform.mqtt.client.MqttClientManager;
 import com.hirain.phm.bd.transform.topic.TopicGenerator;
@@ -62,16 +63,20 @@ public class MqttToKafkaService {
 	@Value("${mqtt.client.id}")
 	private String mqttClientId;
 
+	@Autowired
+	private ProjectFilter projectFilter;
+
 	@Async(value = "mqttPool")
 	public void transform(String topic, Object message) {
 		process(topic, message);
 	}
 
-
 	private void process(String topic, Object message) {
-		// kafkaTopic = train-ground
-		String kafkaTopic = topicGenerator.mqtt2Kafka(topic);
 		MessageHeader header = JsonUtil.fromString(message.toString(), MessageHeader.class);
+		if (!projectFilter.filter(header.getProject())) {
+			return;
+		}
+		String kafkaTopic = topicGenerator.mqtt2Kafka(topic);
 		String key = topicGenerator.kafkaKey(header);
 		ListenableFuture<SendResult<String, Object>> future;
 		future = kafkaTemplate.send(kafkaTopic, key, message.toString().getBytes(Charset.forName("utf-8")));

@@ -29,7 +29,7 @@ import lombok.EqualsAndHashCode;
  */
 @Table(name = "t_mvb_variable")
 @Data
-@EqualsAndHashCode(callSuper = true, of = { "device", "port", "name" })
+@EqualsAndHashCode(callSuper = true, of = { "device", "port" })
 @XmlRootElement(name = "MVBVariable")
 public class MVBVariable extends Variable {
 
@@ -66,10 +66,9 @@ public class MVBVariable extends Variable {
 	@XmlAttribute(name = "bitLen", required = true)
 	private Integer bitLen;
 
-	@XmlAttribute(name = "name", required = true)
-	private String name;
-
 	@XmlAttribute(name = "unit", required = true)
 	private String unit;
 
+	@XmlAttribute(name = "signalName", required = true)
+	private String signalName;
 }

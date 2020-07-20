@@ -5,12 +5,16 @@ package com.hirain.phm.synapsis.result.ecn.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hirain.phm.synapsis.result.ecn.dao.CommonSegmentMapper;
 import com.hirain.phm.synapsis.result.ecn.dao.CommonSegmentSettingMapper;
 import com.hirain.phm.synapsis.result.ecn.domain.CommonSegment;
 import com.hirain.phm.synapsis.result.ecn.domain.CommonSegmentSetting;
 import com.hirain.phm.synapsis.result.ecn.service.CommonHeaderService;
+import com.hirain.phm.synapsis.setting.ECNVariable;
+import com.hirain.phm.synapsis.setting.Variable;
+import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.db.VariableDbService;
 
 /**
@@ -41,12 +45,24 @@ public class CommonHeaderServiceImpl implements CommonHeaderService {
 	 * @see com.hirain.phm.synapsis.result.ecn.service.CommonHeaderService#save(com.hirain.phm.synapsis.result.ecn.domain.CommonSegmentSetting)
 	 */
 	@Override
+	@Transactional
 	public void save(CommonSegmentSetting commonHeader) {
-		settingMapper.insertGenerateKey(commonHeader);
+		delete(commonHeader.getSettingId());
+		VariableGroup subscribeGroup = commonHeader.getSubscribeGroup();
+		if (subscribeGroup != null) {
+			dbService.saveVariableGroup(subscribeGroup);
+			commonHeader.setGroupId(subscribeGroup.getId());
+		}
+		if (!(commonHeader.getSegments() == null || commonHeader.getSegments().isEmpty())) {
+			settingMapper.insertGenerateKey(commonHeader);
+		}
 		commonHeader.getSegments().forEach(s -> {
 			s.setSegmentSettingId(commonHeader.getId());
-			dbService.insertVariable("ECN", s.getSource());
-			s.setVariableId(s.getSource().getId());
+			if (s.getType().equals("bus")) {
+				Variable variable = subscribeGroup.getVariables().stream().filter(v -> ((ECNVariable) v).getName().equals(s.getSource().getName()))
+						.findFirst().get();
+				s.setVariableId(((ECNVariable) variable).getId());
+			}
 			segmentMapper.insertGenerateKey(s);
 		});
 	}
@@ -56,7 +72,22 @@ public class CommonHeaderServiceImpl implements CommonHeaderService {
 	 */
 	@Override
 	public CommonSegmentSetting selectBy(Integer settingId) {
-		return settingMapper.selectBySettingId(settingId);
+		CommonSegmentSetting segmentSetting = settingMapper.selectBySettingId(settingId);
+		if (segmentSetting != null) {
+			Integer groupId = segmentSetting.getGroupId();
+			if (groupId != null) {
+				VariableGroup groups = dbService.selectVariableGroup(groupId);
+				segmentSetting.setSubscribeGroup(groups);
+				segmentSetting.getSegments().forEach(s -> {
+					if (s.getType().equals("bus")) {
+						Variable variable = groups.getVariables().stream().filter(v -> ((ECNVariable) v).getId().equals(s.getVariableId()))
+								.findFirst().get();
+						s.setSource((ECNVariable) variable);
+					}
+				});
+			}
+		}
+		return segmentSetting;
 	}
 
 	/**
@@ -65,10 +96,12 @@ public class CommonHeaderServiceImpl implements CommonHeaderService {
 	@Override
 	public void delete(int settingId) {
 		CommonSegmentSetting setting = selectBy(settingId);
-		settingMapper.deleteByPrimaryKey(setting.getId());
-		for (CommonSegment segment : setting.getSegments()) {
-			segmentMapper.deleteByPrimaryKey(segment.getId());
-			dbService.delete("ECN", segment.getVariableId());
+		if (setting != null) {
+			settingMapper.deleteByPrimaryKey(setting.getId());
+			for (CommonSegment segment : setting.getSegments()) {
+				segmentMapper.deleteByPrimaryKey(segment.getId());
+				dbService.delete("ECN", segment.getVariableId());
+			}
 		}
 	}
 

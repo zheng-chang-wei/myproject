@@ -146,7 +146,11 @@ public class LifeServiceImpl implements LifeService {
 
 	private Integer increDoorItemValue(Integer lifeItemID, LifeMessage message, LifeDoorItem doorItem) {
 		Integer increment = getDoorItemIncrement(lifeItemID, message);
-		return doorItem.getValue() + increment;
+		if (doorItem != null && doorItem.getValue() != null) {
+			return doorItem.getValue() + increment;
+		} else {
+			return increment;
+		}
 	}
 
 	private void saveOrUpdateLifeWearning(LifeDoorItem doorItemLife, Integer doorItemValue) {

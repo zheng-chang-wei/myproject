@@ -3,21 +3,32 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.result.service.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hirain.phm.synapsis.exception.SynapsisException;
 import com.hirain.phm.synapsis.parse.domain.FileHeader;
 import com.hirain.phm.synapsis.parse.domain.VariableData;
+import com.hirain.phm.synapsis.result.ResultConfig;
 import com.hirain.phm.synapsis.result.domain.AlgorithmHeader;
 import com.hirain.phm.synapsis.result.domain.AlgorithmResult;
 import com.hirain.phm.synapsis.result.domain.CommonHeader;
 import com.hirain.phm.synapsis.result.message.AlgorithmResultMessage;
+import com.hirain.phm.synapsis.result.message.AlgorithmResultMessage.Head;
 import com.hirain.phm.synapsis.result.param.ResultQueryParam;
 import com.hirain.phm.synapsis.result.service.AlgorithmResultService;
 import com.hirain.phm.synapsis.result.service.ResultDataLoader;
@@ -26,6 +37,7 @@ import com.hirain.phm.synapsis.setting.AlgorithmSetting;
 import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.db.AlgorithmSettingQuery;
 
+import cn.hutool.core.util.ZipUtil;
 import lombok.Setter;
 
 /**
@@ -54,6 +66,16 @@ public class ResultServiceImpl implements ResultService {
 	@Setter
 	@Autowired
 	private ResultDataLoader dataLoader;
+
+	@Autowired
+	private ResultConfig config;
+
+	/**
+	 * 要导出的文件所在目录
+	 */
+	private String exportRoot = System.getProperty("user.dir") + "//result_files";
+
+	private String zipRoot = System.getProperty("user.dir") + "//result_files.zip";
 
 	/**
 	 * @see com.hirain.phm.synapsis.result.service.ResultService#parseAndSave(com.hirain.phm.synapsis.result.message.AlgorithmResultMessage)
@@ -112,19 +134,24 @@ public class ResultServiceImpl implements ResultService {
 	 * @return
 	 */
 	private CommonHeader generateHeader(AlgorithmResultMessage message) {
-		CommonHeader header = new CommonHeader();
-		header.setSystemTime(message.getSystemTime());
-		header.setLongiDegree(message.getLongiDegree());
-		header.setLongiMinute(message.getLongiMinute());
-		header.setLongiDirection(String.valueOf(message.getLongiDirection()));
+		if (message.getHead() != null) {
+			CommonHeader header = new CommonHeader();
+			Head head = message.getHead();
+			header.setSystemTime(head.getSystemTime());
+			header.setLongiDegree(head.getLongiDegree());
+			header.setLongiMinute(head.getLongiMinute());
+			header.setLongiDirection(String.valueOf(head.getLongiDirection()));
 
-		header.setLatiDegree(message.getLatiDegree());
-		header.setLatiMinute(message.getLatiMinute());
-		header.setLatiDirection(String.valueOf(message.getLatiDirection()));
+			header.setLatiDegree(head.getLatiDegree());
+			header.setLatiMinute(head.getLatiMinute());
+			header.setLatiDirection(String.valueOf(head.getLatiDirection()));
 
-		header.setVersion(message.getProtocolVersion());
-		header.setCrc(message.getCrc());
-		return header;
+			header.setVersion(head.getProtocolVersion());
+			header.setCrc(head.getCrc());
+			return header;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -179,6 +206,76 @@ public class ResultServiceImpl implements ResultService {
 			throw new SynapsisException("文件不是视频文件，无法播放");
 		}
 		return dataLoader.getVideo(result);
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.result.service.ResultService#deleteById(java.lang.Long)
+	 */
+	@Override
+	public void deleteById(long resultId) {
+		service.deleteById(resultId);
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.result.service.ResultService#deleteFile(java.lang.String)
+	 */
+	@Override
+	public boolean deleteFile(String filePath) {
+		boolean result = true;
+		File file = new File(filePath);
+		if (file.exists()) {
+			result = FileUtils.deleteQuietly(file);
+		}
+		return result;
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.result.service.ResultService#downloadFile(javax.servlet.http.HttpServletResponse, java.lang.String[])
+	 */
+	@Override
+	public void downloadFile(HttpServletResponse response, String... sourceFilePath) throws Exception {
+		File uploadRootDir = new File(exportRoot);
+		if (!uploadRootDir.exists()) {
+			uploadRootDir.mkdirs();
+		}
+		copyFile(exportRoot, sourceFilePath);
+		ZipUtil.zip(exportRoot);
+		exportFile(response, "download_resultfiles");
+		FileUtils.deleteDirectory(uploadRootDir);
+	}
+
+	private void copyFile(String destFilePath, String... srcFilePath) throws IOException {
+		for (String path : srcFilePath) {
+			File srcDir = new File(config.getRoot() + File.separator + path);
+			if (srcDir.exists()) {
+				File destDir = new File(destFilePath);
+				FileUtils.copyDirectoryToDirectory(srcDir, destDir);
+			}
+		}
+	}
+
+	private void exportFile(HttpServletResponse response, String fileName) throws UnsupportedEncodingException, FileNotFoundException, IOException {
+		File file = new File(zipRoot);
+		String extension = getExtension(file.getName());
+		response.reset();
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(fileName + extension, "UTF-8"));
+		InputStream input = new FileInputStream(file);
+		OutputStream out = response.getOutputStream();
+		byte[] buff = new byte[1024];
+		int index = 0;
+		while ((index = input.read(buff)) != -1) {
+			out.write(buff, 0, index);
+			out.flush();
+		}
+		out.close();
+		input.close();
+	}
+
+	private String getExtension(String filename) {
+		int lastIndexOf = filename.lastIndexOf(".");
+		String extension = filename.substring(lastIndexOf);
+		return extension;
 	}
 
 }

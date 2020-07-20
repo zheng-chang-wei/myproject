@@ -30,8 +30,6 @@ public class WorksheetPacket {
 
 	private List<WorkStep> steps;
 
-	private Suggestion suggestion;
-
 	private RepairOption option;
 
 }

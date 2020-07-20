@@ -51,15 +51,15 @@ public class PdParameter extends SheetAndLine {
 	@XmlAttribute(name = "callback")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String callback;
+	protected String callback = "off";
 
 	@XmlAttribute(name = "cycle")
-	protected String cycle;
+	protected String PD_cycle;
 
 	@XmlAttribute(name = "marshall")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String marshall;
+	protected String marshall = "off";
 
 	@XmlAttribute(name = "offset-address")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -70,11 +70,11 @@ public class PdParameter extends SheetAndLine {
 	protected String redundant;
 
 	@XmlAttribute(name = "timeout-value")
-	protected String timeOutValue;
+	protected String timeOutValue = "100000";
 
 	@XmlAttribute(name = "validity-behavior")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String validityBehaviour;
+	protected String validityBehaviour = "zero";
 
 }

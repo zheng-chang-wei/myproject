@@ -14,7 +14,6 @@ import java.util.Date;
 import com.hirain.phm.synapsis.message.SynapsisResponse;
 
 import lombok.Data;
-
 /**
  * @Version 1.0
  * @Author jianwen.xin@hirain.com
@@ -34,23 +33,7 @@ public class AlgorithmResultMessage implements SynapsisResponse {
 
 	private int fileType;
 
-	private Date systemTime;
-
-	private int longiDegree;
-
-	private double longiMinute;
-
-	private char longiDirection;
-
-	private int latiDegree;
-
-	private double latiMinute;
-
-	private char latiDirection;
-
-	private String protocolVersion;
-
-	private int crc;
+	private Head head;
 
 	private short headerType;
 
@@ -78,7 +61,7 @@ public class AlgorithmResultMessage implements SynapsisResponse {
 
 	private int value;
 
-	private static final ByteOrder BUFFER_ENDIAN = ByteOrder.BIG_ENDIAN;
+	private static final ByteOrder BUFFER_ENDIAN = ByteOrder.LITTLE_ENDIAN;
 
 	/**
 	 * @see com.hirain.phm.synapsis.message.SynapsisResponse#parse(byte[])
@@ -87,13 +70,17 @@ public class AlgorithmResultMessage implements SynapsisResponse {
 	public void parse(byte[] bs) {
 		ByteBuffer buffer = ByteBuffer.wrap(bs).order(BUFFER_ENDIAN);
 		setCode(buffer.getInt());
-		// setFileType(buffer.get());
+		setFileType(buffer.get());
 		buffer.get(new byte[8]);
 		int commonLength = Byte.toUnsignedInt(buffer.get());
-		byte[] headBs = new byte[commonLength - 3];
-		buffer.get(headBs);
-		parseHead(headBs);
-		setCrc(Short.toUnsignedInt(buffer.getShort()));
+		if (commonLength != 0) {
+			Head head = new Head();
+			byte[] headBs = new byte[commonLength - 3];
+			buffer.get(headBs);
+			parseHead(headBs, head);
+			head.setCrc(Short.toUnsignedInt(buffer.getShort()));
+			setHead(head);
+		}
 		parseAlgorithm(buffer);
 		parseValue(buffer);
 	}
@@ -136,40 +123,43 @@ public class AlgorithmResultMessage implements SynapsisResponse {
 
 	/**
 	 * @param headBs
+	 * @param head
 	 */
-	private void parseHead(byte[] headBs) {
+	private void parseHead(byte[] headBs, Head head) {
 		ByteBuffer buffer = ByteBuffer.wrap(headBs).order(BUFFER_ENDIAN);
-		setSystemTime(parseTimestamp(buffer));
-		parseLongitude(buffer);
-		parseLatitude(buffer);
+		head.setSystemTime(parseTimestamp(buffer));
+		parseLongitude(buffer, head);
+		parseLatitude(buffer, head);
 		int first = Byte.toUnsignedInt(buffer.get());
 		int second = Byte.toUnsignedInt(buffer.get());
 		String version = Integer.toHexString(first) + "." + Integer.toHexString(second);
-		setProtocolVersion("V" + version);
+		head.setProtocolVersion("V" + version);
 	}
 
 	/**
 	 * @param buffer
+	 * @param head
 	 */
-	private void parseLatitude(ByteBuffer buffer) {
+	private void parseLatitude(ByteBuffer buffer, Head head) {
 		byte[] bs = new byte[4];
 		buffer.get(bs);
 		String string = bs2str(bs);
-		setLatiDegree(getDegreePart(string));
-		setLatiMinute(getMinutePart(string));
-		setLatiDirection((char) buffer.get());
+		head.setLatiDegree(getDegreePart(string));
+		head.setLatiMinute(getMinutePart(string));
+		head.setLatiDirection((char) buffer.get());
 	}
 
 	/**
 	 * @param buffer
+	 * @param head
 	 */
-	private void parseLongitude(ByteBuffer buffer) {
+	private void parseLongitude(ByteBuffer buffer, Head head) {
 		byte[] bs = new byte[4];
 		buffer.get(bs);
 		String string = bs2str(bs);
-		setLongiDegree(getDegreePart(string));
-		setLongiMinute(getMinutePart(string));
-		setLongiDirection((char) buffer.get());
+		head.setLongiDegree(getDegreePart(string));
+		head.setLongiMinute(getMinutePart(string));
+		head.setLongiDirection((char) buffer.get());
 	}
 
 	/**
@@ -223,4 +213,25 @@ public class AlgorithmResultMessage implements SynapsisResponse {
 		return date;
 	}
 
+	@Data
+	public class Head {
+
+		private Date systemTime;
+
+		private int longiDegree;
+
+		private double longiMinute;
+
+		private char longiDirection;
+
+		private int latiDegree;
+
+		private double latiMinute;
+
+		private char latiDirection;
+
+		private String protocolVersion;
+
+		private int crc;
+	}
 }

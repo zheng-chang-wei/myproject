@@ -6,7 +6,11 @@ package com.hirain.phm.synapsis.setting.support;
 import java.util.List;
 
 import com.hirain.phm.synapsis.board.domain.Board;
+import com.hirain.phm.synapsis.setting.AlgorithmSetting;
+import com.hirain.phm.synapsis.setting.BoardSetting;
 import com.hirain.phm.synapsis.setting.Setting;
+import com.hirain.phm.synapsis.setting.StoreSetting;
+import com.hirain.phm.synapsis.setting.TimeSetting;
 import com.hirain.phm.synapsis.setting.support.domain.ValidateResult;
 
 /**
@@ -37,5 +41,33 @@ public interface SettingValidator {
 	 * @param setting
 	 */
 	ValidateResult validate(Setting setting);
+
+	/**
+	 * 单步配置信息保存前对板卡配置的校验
+	 * 
+	 * @param boards
+	 */
+	ValidateResult preBoardValidate(List<BoardSetting> boards);
+
+	/**
+	 * 单步配置信息保存前对算法配置的校验
+	 * 
+	 * @param algorithms
+	 */
+	ValidateResult preAlgoValidate(List<AlgorithmSetting> algorithms);
+
+	/**
+	 * 单步配置信息保存前对存储配置的校验
+	 * 
+	 * @param storeSetting
+	 */
+	ValidateResult preStoreValidate(StoreSetting storeSetting);
+
+	/**
+	 * 单步配置信息保存前对时钟配置的校验
+	 * 
+	 * @param timeSetting
+	 */
+	ValidateResult preTimeValidate(TimeSetting timeSetting);
 
 }

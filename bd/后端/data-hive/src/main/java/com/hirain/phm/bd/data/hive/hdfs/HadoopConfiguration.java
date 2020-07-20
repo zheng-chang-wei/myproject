@@ -3,7 +3,7 @@
  ******************************************************************************/
 package com.hirain.phm.bd.data.hive.hdfs;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,13 +22,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class HadoopConfiguration {
 
-	@Value("${store.hdfs.defaultFS:hdfs://192.168.40.31:8022}")
-	private String defaultHdfsUri;
+	@Autowired
+	private HdfsProperties properties;
 
 	@Bean
 	public HadoopService getService() {
 		org.apache.hadoop.conf.Configuration configuration = new org.apache.hadoop.conf.Configuration();
-		configuration.set("fs.defaultFS", defaultHdfsUri);
-		return new HadoopServiceImpl(configuration, defaultHdfsUri);
+		configuration.set("fs.defaultFS", properties.getDefaultFs());
+		return new HadoopServiceImpl(configuration, properties.getDefaultFs());
 	}
 }

@@ -3,8 +3,10 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.setting.dao;
 
-import com.hirain.phm.synapsis.setting.CommonMapper;
+import org.apache.ibatis.annotations.Delete;
+
 import com.hirain.phm.synapsis.setting.Subsystem;
+import com.hirain.phm.synapsis.setting.common.CommonMapper;
 
 /**
  * @Version 1.0
@@ -19,6 +21,9 @@ import com.hirain.phm.synapsis.setting.Subsystem;
  *               2019年12月24日 changwei.zheng@hirain.com 1.0 create file
  */
 public interface SubsystemMapper extends CommonMapper<Subsystem> {
+
+	@Delete("delete from t_subsystem")
+	void deleteALl();
 
 	// @SelectProvider(type = SubsystemMapperProvider.class, method = "listSubsystemByParms")
 	// List<SubsystemGroupItem> listSubsystemByParms(String name);

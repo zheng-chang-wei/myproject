@@ -42,7 +42,7 @@ public class Train implements Serializable {
 
 	private String serverip2;
 
-	private int doorCount;
+	private Integer doorCount;
 
 	@Column(name = "offsets")
 	private Integer offset;

@@ -14,7 +14,7 @@ public interface TrainInfoService extends IService<TrainInfo> {
 	/**
 	 * 根据车号查询trianId
 	 * 
-	 * @param trianId
+	 * @param
 	 * @return
 	 */
 	@Cacheable(key = "'findIdByTrainNum'+#p0 ")

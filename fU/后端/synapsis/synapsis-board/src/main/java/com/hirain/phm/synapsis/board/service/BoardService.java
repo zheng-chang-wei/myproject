@@ -79,4 +79,9 @@ public interface BoardService {
 	 * @param status
 	 */
 	void updateStatus(CardStatus status);
+
+	/**
+	 * @return
+	 */
+	List<Board> scanBoards();
 }

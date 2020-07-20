@@ -18,7 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hirain.phm.bd.ground.subhealth.dao.SubhealthQueryMapper;
 import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailParams;
-import com.hirain.phm.bd.ground.subhealth.param.SubhealthWithSuggestionParams;
+import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailResponseParams;
 
 /**
  * @Version 1.0
@@ -42,20 +42,19 @@ public class TestMapper {
 
 	@Test
 	public void test() {
-		List<SubhealthWithSuggestionParams> details = mapper.selectByExample(new SubhealthDetailParams());
+		List<SubhealthDetailResponseParams> details = mapper.selectByExample(new SubhealthDetailParams());
 		assertNotNull(details);
 		assertFalse(details.isEmpty());
 		if (details.size() > 1) {
-			SubhealthWithSuggestionParams d1 = details.get(0);
-			SubhealthWithSuggestionParams d2 = details.get(1);
+			SubhealthDetailResponseParams d1 = details.get(0);
+			SubhealthDetailResponseParams d2 = details.get(1);
 			assertNotNull(d1.getStartTime());
 			assertNotNull(d2.getStartTime());
 
 			assertTrue(d1.getStartTime().compareTo(d2.getStartTime()) > 0);
 		}
 
-		assertNotNull(details.get(0).getSolution());
-		System.out.println(details.get(0));
+		details.forEach(System.out::println);
 	}
 
 }

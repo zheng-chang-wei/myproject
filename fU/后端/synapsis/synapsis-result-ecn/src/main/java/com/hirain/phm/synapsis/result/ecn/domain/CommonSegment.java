@@ -6,6 +6,7 @@ package com.hirain.phm.synapsis.result.ecn.domain;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlTransient;
 
 import com.hirain.phm.synapsis.setting.ECNVariable;
 
@@ -46,13 +47,17 @@ public class CommonSegment {
 
 	private Integer byteLen;
 
-	private Integer type;
+	/**
+	 * 数据来源，总线:bus或系统:local
+	 */
+	private String type;
 
 	private String property;
 
 	@Transient
 	private ECNVariable source;
 
+	@XmlTransient
 	private Long variableId;
 
 }

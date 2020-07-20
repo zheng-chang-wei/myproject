@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ResourceUtils;
 
 import com.hirain.phm.synapsis.protocol.ParseResult;
-import com.hirain.phm.synapsis.protocol.ProtocolService;
+import com.hirain.phm.synapsis.protocol.ProtocolStreamService;
 import com.hirain.phm.synapsis.setting.MVBVariable;
 
 @SpringBootTest(classes = TestApplication.class)
@@ -26,13 +26,13 @@ public class MVBVariableConverterTest {
 	private MVBVariableConverter mvbVariableConverter;
 
 	@Autowired
-	private ProtocolService parseService;
+	private ProtocolStreamService parseService;
 
 	@Test
 	public void converterMVBTest() {
 		try {
 			File file = ResourceUtils.getFile("classpath:mvb.xlsx");
-			ParseResult result = parseService.parse("MVB", file.getAbsolutePath());
+			ParseResult result = parseService.read("MVB", file.getAbsolutePath());
 			List<MVBVariable> convert = mvbVariableConverter.convert(result.getData());
 			List<MVBVariable> list = new ArrayList<>();
 			MVBVariable mvbVariable1 = new MVBVariable();

@@ -1,0 +1,49 @@
+ground:
+  mail:
+    from: yunguanli@bode-beijing.com
+    mobile-prefix: http://58.33.15.3:8083/#/mobile/mail
+    url-prefix: http://58.33.15.3:8083/#/mail
+hdfs:
+  default-fs: hdfs://192.168.40.31:8022
+kafka:
+  consumer:
+    group-id: groundapp
+    group-prefix: ground-
+    servers: 192.168.40.31:9092,192.168.40.32:9092,192.168.40.33:9092
+  producer:
+    servers: 192.168.40.31:9092,192.168.40.32:9092,192.168.40.33:9092
+mqtt:
+  ssl:
+    cert-file: /opt/server/ca.crt
+    client-file: /opt/server/client.crt
+    key-file: /opt/server/client.key
+owner:
+  tooken: 123123
+  url: http://localhost:10000
+repair:
+  integration:
+    cron-expression: 0 0 1 1/1 * ? *
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://192.168.40.31:3306/phm_bd_ground?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+  mail:
+    default-encoding: UTF-8
+    host: smtp.exmail.qq.com
+    password: Yun.666
+    port: 465
+    properties:
+      mail:
+        imap:
+          ssl:
+            socketFactory:
+              fallback: false
+        smtp:
+          ssl:
+            enable: true
+            socketFactory:
+              class: com.hirain.phm.bd.ground.mail.MailSSLSocketFactory
+    username: yunguanli@bode-beijing.com
+  redis:
+    host: 192.168.40.34

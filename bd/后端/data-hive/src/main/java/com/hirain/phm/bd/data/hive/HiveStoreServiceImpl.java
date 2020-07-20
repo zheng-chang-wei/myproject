@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hirain.phm.bd.data.DataStoreService;
+import com.hirain.phm.bd.data.TableNameFormatter;
 import com.hirain.phm.bd.data.bean.DataRecord;
 import com.hirain.phm.bd.data.hive.file.FileManager;
 
@@ -31,22 +32,15 @@ public class HiveStoreServiceImpl implements DataStoreService {
 	@Autowired
 	private FileManager manager;
 
+	@Autowired
+	private TableNameFormatter tnf;
+
 	/**
 	 * @see com.hirain.phm.bd.data.DataStoreService#insert(com.hirain.phm.bd.data.bean.DataRecord)
 	 */
 	@Override
 	public void insert(DataRecord record) {
-		manager.write(getTableName(record), Arrays.asList(record));
-	}
-
-	/**
-	 * @param record
-	 * @return
-	 */
-	private String getTableName(DataRecord record) {
-		// String project = PinyinUtil.getFullSpell(record.getProject());
-		// String train = PinyinUtil.getFullSpell(record.getTrain());
-		return "shenzhen_717";
+		manager.write(tnf.getTableName(record.getProject(), record.getTrain()), Arrays.asList(record));
 	}
 
 	/**
@@ -55,7 +49,8 @@ public class HiveStoreServiceImpl implements DataStoreService {
 	@Override
 	public void insertList(List<DataRecord> records) {
 		System.out.println("insert");
-		manager.write(getTableName(records.get(0)), records);
+		DataRecord record = records.get(0);
+		manager.write(tnf.getTableName(record.getProject(), record.getTrain()), records);
 	}
 
 }

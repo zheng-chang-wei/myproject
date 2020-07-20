@@ -28,4 +28,8 @@ public class WorkSheetQueryParam {
 	private String trainNo;
 
 	private Integer faultType;
+
+	private Integer limit;
+
+	private Integer offset;
 }

@@ -5,21 +5,15 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.hirain.qsy.shaft.Application;
 import com.hirain.qsy.shaft.common.util.DateUtil;
 import com.hirain.qsy.shaft.dao.InitialDataMapper;
 import com.hirain.qsy.shaft.dao.TrainInfoMapper;
 import com.hirain.qsy.shaft.service.ExceptionDataService;
 import com.hirain.qsy.shaft.service.RedisCacheService;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RedisCacheServiceTest {
+public class RedisCacheServiceTest extends BaseTest {
 
 	@Autowired
 	RedisCacheService redisCacheService;
@@ -36,16 +30,15 @@ public class RedisCacheServiceTest {
 	private Integer trainId = 522;
 
 	//
-	private Integer[] trainIds = { trainId };
 
-	// @Test
+	@Test
 	public void getLastestTimeTest() {
 		String lastestTime2 = redisCacheService.getLastestTime(trainId);
 		String maxTime = initialDataMapper.findMaxTime(trainId);
 		assertEquals(maxTime, lastestTime2);
 	}
 
-	// @Test
+	@Test
 	public void getLastestExceptionTimeTest() {
 		redisCacheService.getLastestExceptionTime(trainId);
 	}
@@ -57,7 +50,7 @@ public class RedisCacheServiceTest {
 		redisCacheService.deleteBypPttern("*session*");
 	}
 
-	// @Test
+	@Test
 	public void getKeysPyPtternTest() {
 		Integer valueByKey = redisCacheService.getValueByKey("617_21_2019-02-21");
 		Integer valueByKey2 = redisCacheService.getValueByKey("617_52_2019-02-21");
@@ -111,7 +104,7 @@ public class RedisCacheServiceTest {
 	// }
 	// }
 
-	// @Test
+	@Test
 	public void getDaysCurrentWeekTest() {
 		List<String> week = DateUtil.getDaysCurrentWeek("2019-10-22");
 		for (String string : week) {

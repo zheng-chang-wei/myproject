@@ -9,8 +9,8 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
-import com.hirain.phm.synapsis.setting.CommonMapper;
 import com.hirain.phm.synapsis.setting.VariableGroup;
+import com.hirain.phm.synapsis.setting.common.CommonMapper;
 
 /**
  * @Version 1.0
@@ -52,13 +52,13 @@ public interface VariableGroupMapper extends CommonMapper<VariableGroup> {
 	List<VariableGroup> selectStoreVariables(int settingId);
 
 	/**
-	 * {@link com.hirain.phm.synapsis.setting.dao.SettingMapper#selectDetails(int)}
+	 * {@link com.hirain.phm.synapsis.setting.dao.TimeSettingMapper#selectDetail(int)}
 	 * 
 	 * @param settingId
 	 * @return
 	 */
-	@Select("select tvg.* from t_variable_group tvg left join t_time_setting ttv on ttv.group_id=tvg.id where ttv.setting_id=#{settingId}")
-	List<VariableGroup> selectTimeVariables(int settingId);
+	@Select("select tvg.* from t_variable_group tvg where tvg.id=#{groupId}")
+	List<VariableGroup> selectTimeVariables(int groupId);
 
 	@Insert({
 
@@ -125,12 +125,6 @@ public interface VariableGroupMapper extends CommonMapper<VariableGroup> {
 	 */
 	@Insert("insert into t_time_setting (setting_id,group_id) values(#{settingId},#{groupId})")
 	void insertTimeGroup(Integer settingId, Integer groupId);
-
-	/**
-	 * @param settingId
-	 */
-	@Delete("delete from t_time_setting where setting_id=#{settingId}")
-	void deleteTimeVariables(Integer settingId);
 
 	/**
 	 * @param settingId

@@ -83,4 +83,13 @@ public class InMemoryAlgorithmResultService implements AlgorithmResultService {
 		return null;
 	}
 
+	/**
+	 * @see com.hirain.phm.synapsis.result.service.AlgorithmResultService#deleteById(long)
+	 */
+	@Override
+	public void deleteById(long resultId) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

@@ -9,11 +9,11 @@ import org.springframework.scheduling.annotation.Async;
 
 import com.hirain.phm.bd.ground.common.event.StatisticsEvent;
 import com.hirain.phm.bd.ground.common.event.UnifiedFaultRecord;
+import com.hirain.phm.bd.ground.common.push.PushFaultService;
 import com.hirain.phm.bd.ground.maintenance.domain.ExternalFault;
 import com.hirain.phm.bd.ground.maintenance.domain.WorkSheet;
 import com.hirain.phm.bd.ground.maintenance.service.ExternalFaultService;
 import com.hirain.phm.bd.ground.maintenance.service.FlowService;
-import com.hirain.phm.bd.ground.push.service.PushFaultService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +27,7 @@ public class RepairEventHandler {
 	@Autowired
 	private FlowService flowService;
 
-	@Autowired
+	@Autowired(required = false)
 	private List<PushFaultService> pushList;
 
 	@EventListener
@@ -46,8 +46,10 @@ public class RepairEventHandler {
 	public void onUnifiedFault(UnifiedFaultRecord record) {
 		log.info(record.toString());
 		WorkSheet sheet = flowService.createWorksheet(record);
-		pushList.forEach(service -> {
-			service.push(record, sheet.getId());
-		});
+		if (pushList != null) {
+			pushList.forEach(service -> {
+				service.push(record, sheet.getId());
+			});
+		}
 	}
 }

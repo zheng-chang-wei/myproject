@@ -59,7 +59,9 @@ public class ResultServiceTest {
 		loader.setFileCache(new InMemoryDataFileCache());
 		loader.setCompress(new QuickLzSupport());
 		loader.setHelper(new DefaultVariableTypeHelper());
-		loader.setResultFolder(System.getProperty("user.dir") + File.separator + "test-data");
+		ResultConfig config = new ResultConfig();
+		config.setRoot(System.getProperty("user.dir") + File.separator + "test-data");
+		loader.setConfig(config);
 		((ResultServiceImpl) service).setDataLoader(loader);
 	}
 

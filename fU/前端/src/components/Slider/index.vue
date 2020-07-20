@@ -118,7 +118,7 @@ export default {
     width: 400px;
     height: 20px;
     border-radius: 5px;
-    background: #409eff
+    background: #7EB2DB
   }
 
   .slider .thunk {
@@ -133,7 +133,7 @@ export default {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    border: 2px solid #409eff;
+    border: 2px solid #7EB2DB;
     background: rgba(255, 255, 255, 1);
     transition: .2s all
   }
@@ -149,7 +149,7 @@ export default {
 		-webkit-justify-content: center;
 		justify-content: center;
     padding: 4px 8px;
-    background: #000;
+    background: #7EB2DB;
     border-radius: 5px;
     height: 24px;
     color: #fff

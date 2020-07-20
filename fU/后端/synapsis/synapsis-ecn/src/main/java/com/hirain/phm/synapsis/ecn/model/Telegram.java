@@ -55,10 +55,10 @@ import lombok.EqualsAndHashCode;
 public class Telegram extends SheetAndLine {
 
 	@XmlElement(name = "md-parameter")
-	protected MdParameter mdParameter;
+	protected MdParameter mdParameter = new MdParameter();
 
 	@XmlElement(name = "pd-parameter")
-	protected PdParameter pdParameter;
+	protected PdParameter pdParameter = new PdParameter();
 
 	@XmlElement(required = true)
 	protected List<Source> source;
@@ -70,7 +70,7 @@ public class Telegram extends SheetAndLine {
 	protected String comId;
 
 	@XmlAttribute(name = "com-parameter-id")
-	protected String comParameterId;
+	protected String comParameterId = "1";
 
 	@XmlAttribute(name = "data-set-id")
 	protected String datasetId;

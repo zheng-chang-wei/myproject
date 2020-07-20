@@ -1,0 +1,44 @@
+16:40:49.145 Demo [main] INFO  c.h.p.b.s.PacketStoreAppApplication - Starting PacketStoreAppApplication on jianwenxinL2 with PID 7616 (D:\workIde\workspace-bdweb\packet-store-app\target\classes started by jianwen.xin in D:\workIde\workspace-bdweb\packet-store-app)
+16:40:49.148 Demo [main] INFO  c.h.p.b.s.PacketStoreAppApplication - The following profiles are active: test
+16:40:52.160 Demo [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+16:40:52.187 Demo [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'taskScheduler' has been explicitly defined. Therefore, a default ThreadPoolTaskScheduler will be created.
+16:40:52.217 Demo [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+16:40:52.287 Demo [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.kafka.annotation.KafkaBootstrapConfiguration' of type [org.springframework.kafka.annotation.KafkaBootstrapConfiguration$$EnhancerBySpringCGLIB$$32065e2e] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+16:40:52.402 Demo [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$5e544cab] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+16:40:52.428 Demo [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.integration.config.IntegrationManagementConfiguration' of type [org.springframework.integration.config.IntegrationManagementConfiguration$$EnhancerBySpringCGLIB$$c94607da] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+16:40:52.453 Demo [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'integrationDisposableAutoCreatedBeans' of type [org.springframework.integration.config.annotation.Disposables] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+16:40:55.251 Demo [main] INFO  org.apache.hive.jdbc.Utils - Supplied authorities: 192.168.40.34:10000
+16:40:55.252 Demo [main] INFO  org.apache.hive.jdbc.Utils - Resolved authority: 192.168.40.34:10000
+16:40:55.382 Demo [main] INFO  org.apache.hive.jdbc.HiveConnection - Will try to open client transport with JDBC Uri: jdbc:hive2://192.168.40.34:10000/test
+16:40:56.067 Demo [main] INFO  c.alibaba.druid.pool.DruidDataSource - {dataSource-1} inited
+16:40:56.151 Demo [main] INFO  org.quartz.impl.StdSchedulerFactory - Using default implementation for ThreadExecutor
+16:40:56.174 Demo [main] INFO  o.quartz.core.SchedulerSignalerImpl - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+16:40:56.175 Demo [main] INFO  org.quartz.core.QuartzScheduler - Quartz Scheduler v.2.3.0 created.
+16:40:56.176 Demo [main] INFO  org.quartz.simpl.RAMJobStore - RAMJobStore initialized.
+16:40:56.178 Demo [main] INFO  org.quartz.core.QuartzScheduler - Scheduler meta-data: Quartz Scheduler (v2.3.0) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+16:40:56.178 Demo [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+16:40:56.179 Demo [main] INFO  org.quartz.impl.StdSchedulerFactory - Quartz scheduler version: 2.3.0
+16:40:56.179 Demo [main] INFO  org.quartz.core.QuartzScheduler - JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@71ad3d8a
+16:40:56.841 Demo [main] INFO  o.s.s.c.ThreadPoolTaskScheduler - Initializing ExecutorService 'taskScheduler'
+16:40:56.936 Demo [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+16:40:56.936 Demo [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'application.errorChannel' has 1 subscriber(s).
+16:40:56.936 Demo [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started _org.springframework.integration.errorLogger
+16:40:57.201 Demo [main] INFO  o.s.s.c.ThreadPoolTaskScheduler - Initializing ExecutorService
+16:40:57.221 Demo [main] INFO  o.s.s.c.ThreadPoolTaskScheduler - Initializing ExecutorService
+16:40:57.236 Demo [main] INFO  o.s.s.c.ThreadPoolTaskScheduler - Initializing ExecutorService
+16:40:57.236 Demo [main] INFO  o.s.s.quartz.SchedulerFactoryBean - Starting Quartz Scheduler now
+16:40:57.236 Demo [main] INFO  org.quartz.core.QuartzScheduler - Scheduler quartzScheduler_$_NON_CLUSTERED started.
+16:40:57.252 Demo [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.s.k.l.KafkaMessageListenerContainer - partitions revoked: []
+16:40:57.255 Demo [main] INFO  c.h.p.b.s.PacketStoreAppApplication - Started PacketStoreAppApplication in 8.659 seconds (JVM running for 10.411)
+16:40:57.258 Demo [org.springframework.kafka.KafkaListenerEndpointContainer#0-1-C-1] INFO  o.s.k.l.KafkaMessageListenerContainer - partitions revoked: []
+16:40:57.271 Demo [org.springframework.kafka.KafkaListenerEndpointContainer#0-2-C-1] INFO  o.s.k.l.KafkaMessageListenerContainer - partitions revoked: []
+16:41:03.318 Demo [org.springframework.kafka.KafkaListenerEndpointContainer#0-1-C-1] INFO  o.s.k.l.KafkaMessageListenerContainer - partitions assigned: []
+16:41:03.318 Demo [org.springframework.kafka.KafkaListenerEndpointContainer#0-2-C-1] INFO  o.s.k.l.KafkaMessageListenerContainer - partitions assigned: []
+16:41:03.349 Demo [org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1] INFO  o.s.k.l.KafkaMessageListenerContainer - partitions assigned: [train-ground-0]

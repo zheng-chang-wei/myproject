@@ -1,31 +1,46 @@
-<template lang='pug'>
-#home_page(@keyup.enter='login')
-	header
-			.imagelogo
-				img.logo-title(src='../assets/qsy-Corp-1.jpg')
-			
-	.mid
-		.img-wrapper
-		el-form.form-wrapper(:model='ruleForm', ref='ruleForm' :rules="loginRules")
-			h2.title 欢迎登录
-			i.iconfont.icon-Signin-Deleteall(v-if='ruleForm.username', @click='deleteAllUsername')
-			el-form-item.form-group(prop='username' )
-				img(src='../assets/Icon-User name.png', alt='')
-				el-input.form-input(type='text', v-model='ruleForm.username', auto-complete='off', placeholder='用户名')
-			el-form-item.form-group(prop='password' )
-				img(src='../assets/Icon-Password.png', alt='')
-				el-input(type='password', v-model='ruleForm.password', show-password auto-complete='off', placeholder='密码')
-			.za
-				el-checkbox(v-model='remeber_Flag', name='rememberMe') 记住密码
-			.form-group
-				input(type='button', value='登录', @click='login')
-		.loginAlertBox(v-text='loginAlertInfo', v-if='showLoginAlertBoxFlg')
-	footer 戚墅堰厂机车运用数据分析诊断软件V1.1.4
+<template>
+	<div id="home_page" @keyup.enter="login">
+		<header class="imagelogo">
+			<img class="logo-title" src="../assets/qsy-Corp-1.jpg">
+		</header>
+		<div class="mid img-wrapper">
+			<el-form class="form-wrapper" :model='loginForm' ref="loginForm" :rules="loginRules" size="mini">
+				<h2 class="title">欢迎登录</h2>
+				<i class="iconfont icon-Signin-Deleteall" v-if='loginForm.username' @click='deleteAllUsername'></i>
+				<el-form-item class="form-group" prop='username'>
+					<img src='../assets/Icon-User name.png' alt=''>
+					<el-input type='text' v-model='loginForm.username' auto-complete='off'
+						placeholder='用户名'></el-input>
+				</el-form-item>
+				<el-form-item class="form-group" prop='password'>
+					<img src='../assets/Icon-Password.png' alt=''>
+					<el-input type='password' v-model='loginForm.password' show-password auto-complete='off'
+						placeholder='密码'></el-input>
+				</el-form-item>
+				<el-form-item prop="code" style="padding:0 34px;">
+					<el-row style=" display: flex;
+    align-items: center;">
+						<el-input type="text" v-model="loginForm.code" auto-complete="off" placeholder="点击图片更换验证码"
+							style="width:210px"></el-input>
+						<img :src="vcUrl" @click="updateVerifyCode" alt="" style="cursor: pointer;">
+					</el-row>
+
+				</el-form-item>
+				<div class="za">
+					<el-checkbox v-model='remeber_Flag' name='rememberMe'>记住密码</el-checkbox>
+				</div>
+				<div class="form-group">
+					<input type='button' value='登录' @click='login'>
+				</div>
+			</el-form>
+		</div>
+		<footer>机车轴温数据分析诊断系统V1.1.5</footer>
+	</div>
 </template>
 <script>
 import app from 'common/js/app'
 let Base64 = require('js-base64').Base64;
-import appApi from '../common/js/allApi.js'
+import apiDomain from '../common/js/apiDomain.js'
 export default {
 	data() {
 		const checkUserName = (rule, value, callback) => {
@@ -44,16 +59,14 @@ export default {
 			}
 		};
 		return {
-			user_name: '',
-			password: '',
+			vcUrl:'http://'+apiDomain.ip+'/verifyCode?time='+new Date().getTime(),
 			remeber_Flag: false, // 是否记住密码
 			logining: false,
-			ruleForm: {
+			loginForm: {
 				username: '',
-				password: ''
+				password: '',
+				code:''
 			},
-			loginAlertInfo: '', //登陆警示信息
-			showLoginAlertBoxFlg: false, //显示登录错误信息
 			loginRules: {
 				username: [{
 						required: true,
@@ -74,16 +87,25 @@ export default {
 						validator: checkPassWord,
 						trigger: "change"
 					}
+				],
+				code: [{
+						required: true,
+						message: "必填",
+						trigger: "submit"
+					}
 				]
 			},
 		}
 	},
 	mounted() {
 		this.inputPadding();
-		this.ifRememberPassword();
+		this.ifRememberPassword()
+		this.updateVerifyCode()
 	},
 	methods: {
-	
+		updateVerifyCode() {
+			this.vcUrl = 'http://'+apiDomain.ip+'/verifyCode?time='+new Date().getTime();
+		},
 		inputPadding() {
 			$('.el-input__inner').css({
 				"padding-left": "50px",
@@ -104,12 +126,13 @@ export default {
 			setTimeout(function () {
 				$('input[type=button]').css("background-color", "#00a1e9");
 			}, 500);
-			this.$refs.ruleForm.validate(valid => {
+			this.$refs.loginForm.validate(valid => {
 				if (valid) {
 					this.logining = true;
 					let para = {
-						accountname: this.ruleForm.username,
-						password: this.ruleForm.password
+						accountname: this.loginForm.username,
+						password: this.loginForm.password,
+						code:this.loginForm.code
 					};
 					para.password = Base64.encode(para.password);
 					app.post('logIn', para).then(data => {
@@ -118,14 +141,12 @@ export default {
 							path: './main'
 						});
 						localStorage.setItem('menuActive', null);
-						localStorage.setItem('username', vm.ruleForm.username)
+						localStorage.setItem('username', vm.loginForm.username)
 						vm.rememberPassword();
 					}).catch(e => {
 						vm.logining = false;
 						if (e === 'Locked') {
-							// vm.showLoginAlertBox('该账号被禁用，请更换其他账号');
 						} else {
-							// vm.showLoginAlertBox('用户名或密码错误，请重新输入');
 						}
 					})
 				}
@@ -135,7 +156,7 @@ export default {
 			let vm = this;
 			//点提交时,设置了记住密码
 			if (vm.remeber_Flag) {
-				localStorage.setItem('password', Base64.encode(vm.ruleForm.password))
+				localStorage.setItem('password', Base64.encode(vm.loginForm.password))
 			} else {
 				localStorage.removeItem('password')
 			}
@@ -144,23 +165,20 @@ export default {
 			let vm = this;
 			//进入页面,判断是否存在账户密码,有就直接填充
 			if (localStorage.getItem('username') && localStorage.getItem('password')) {
-				vm.ruleForm.username = localStorage.getItem('username');
-				vm.ruleForm.password = Base64.decode(localStorage.getItem('password'));
+				vm.loginForm.username = localStorage.getItem('username');
+				vm.loginForm.password = Base64.decode(localStorage.getItem('password'));
 				vm.remeber_Flag = true;
 			}
 		},
 		forgetPassword() {},
-		showLoginAlertBox(text) {
-			let vm = this;
-			vm.showLoginAlertBoxFlg = true;
-			vm.loginAlertInfo = text;
-		},
+
 		deleteAllUsername() {
-			this.ruleForm.username = "";
+			this.loginForm.username = "";
 		}
 	}
 }
 </script>
+
 <style scoped lang="stylus">
 @import '../common/stylus/utils'
 #home_page
@@ -183,7 +201,7 @@ export default {
 				margin: 10px 0;
 				width 100%
 	.mid
-		height: calc(100% - 120px);
+		height: calc(100% - 100px);
 		background-color: #c0e6f8;
 		background:url(../assets/Page-Login-5.jpg);
 		background-size: 100% 100%; 
@@ -211,7 +229,7 @@ export default {
 			width: 414px;
 			@media screen and (max-width: 414px)
 				width 100%
-			height: 442px;
+			height: 410px;
 			box-sizing: border-box;
 			background-color: #fff;
 			padding-bottom: 20px;
@@ -236,8 +254,8 @@ export default {
 			.za
 				padding: 0 34px;
 				margin: 0 auto;
-				margin-top: 32px;
-				margin-bottom: 40px;
+				margin-top: 10px;
+				margin-bottom: 10px;
 				text-align: left;
 				line-height: 26px;
 				font-size: 20px;
@@ -249,7 +267,7 @@ export default {
 			.form-group
 				margin: 0 auto;
 				border-radius: 3px;
-				margin-bottom: 22px;
+				margin-bottom: 10px;
 				position: relative;
 				padding: 0 34px;
 				i
@@ -293,7 +311,7 @@ export default {
 			padding-left: 50px;
 			box-sizing: border-box;
 	footer
-		block-line 67px
+		block-line 47px
 		colors #eef9fd #5c5d5d
 		font-size: 16px;
 </style>

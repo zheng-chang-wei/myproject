@@ -44,7 +44,12 @@ public class ADVariableService implements VariableService {
 	 */
 	@Override
 	public int insertVariables(int groupId, List<? extends Variable> variables) {
-		return mapper.insertVariables(groupId, variables);
+		variables.forEach(v -> {
+			ADVariable ad = (ADVariable) v;
+			ad.setGroupId(groupId);
+			mapper.insertGenerateKey(ad);
+		});
+		return variables.size();
 	}
 
 	/**

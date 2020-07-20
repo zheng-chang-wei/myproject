@@ -34,7 +34,7 @@ import com.hirain.phm.bd.ground.repair.TestApplication;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 public class WorkDetailMapperTest {
 
 	@Autowired
@@ -48,6 +48,11 @@ public class WorkDetailMapperTest {
 		assertNotNull(detail.getDoorType());
 		assertNotNull(detail.getEffect());
 		assertNotNull(detail.getStage());
+		assertNotNull(detail.getLevelOne());
+		assertNotNull(detail.getLevelTwo());
+		assertNotNull(detail.getRepair());
+		assertNotNull(detail.getSolution());
+		System.out.println(detail);
 	}
 
 	@Test

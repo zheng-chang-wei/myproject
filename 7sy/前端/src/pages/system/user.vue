@@ -5,7 +5,7 @@
 
       <!--查询-->
       <el-col :span="24" class="query" style="padding-bottom: 0px;min-width:900px">
-        <el-form :inline="true" :rules="retrieveRules" ref="retrieveForm" :model="retrieveForm">
+        <el-form :inline="true"  ref="retrieveForm" :model="retrieveForm">
           <el-form-item prop="username">
             <el-input v-model="retrieveForm.username" placeholder="用户名" :maxlength="20"></el-input>
           </el-form-item>
@@ -58,7 +58,7 @@
         <el-table-column prop="idNum" label="证件号码" align="center" sortable> </el-table-column>
         <el-table-column prop="deptName" label="部门名称" align="center" sortable> </el-table-column>
         <el-table-column prop="parentName" label="创建人" align="center" sortable> </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" :formatter="formatCreatetime" align="center" sortable> </el-table-column>
+        <el-table-column prop="createTime" label="创建时间"  align="center" sortable> </el-table-column>
       </el-table>
 
       <!--分页  工具条-->
@@ -134,9 +134,7 @@
 
 <script type="text/ecmascript-6">
 let Base64 = require("js-base64").Base64;
-import util from "common/js/util";
 import app from "common/js/app";
-import { switchCase } from "babel-types";
 export default {
   data() {
     //新增&编辑弹框里长度到达限制时提示
@@ -149,20 +147,14 @@ export default {
     };
 
     const checkPassWord = (rule, value, callback) => {
+      if (!/[a-z]/.test(value) || !/[A-Z]/.test(value) || !/[0-9]/.test(value)){
+        callback(new Error("密码必须包含英文大小写字母和数字"));
+      }
       if (value.length === 21) {
         callback(new Error("密码长度限制20字符"));
       } else if(value.length <6){
         callback(new Error("密码长度至少为6字符"));
       }else {
-        callback();
-      }
-    };
-    const checkTime = (rule, value, callback) => {
-      let sTime = new Date(this.retrieveForm.starttime).getTime(),
-        eTime = new Date(value).getTime();
-      if (eTime < sTime) {
-        callback(new Error("结束时间比开始时间早"));
-      } else {
         callback();
       }
     };
@@ -174,7 +166,6 @@ export default {
       pageNum: 1,
       pageSize: 10,
       currentPage: 1,
-      inputUsername: "",
       listLoading: false,
       sels: [], //列表选中的选项
       rolesOptions: [],
@@ -186,9 +177,7 @@ export default {
         parentName: "",
         deptName:"",
         name: "",
-        idNum: "",
-        starttime: "", //查询时开始时间
-        endtime: "" //查询时结束时间
+        idNum: ""
       },
       //新增界面数据
       addForm: {
@@ -342,15 +331,6 @@ export default {
           }
         ],
       },
-      //查询时验证
-      retrieveRules: {
-        endtime: [
-          {
-            validator: checkTime,
-            trigger: "change"
-          }
-        ]
-      },
       tableMaxHeight:  document.body.offsetHeight - 280,
     };
   },
@@ -376,20 +356,6 @@ export default {
         default:
           return "";
       }
-    },
-    //格式化创建时间
-    formatCreatetime(row, column) {
-      return (row.createTime = row.createTime
-        ? util.formatDate(new Date(row.createTime), "yyyy-MM-dd")
-        : "");
-    },
-    //格式化时间控件的开始时间
-    formatStartTime(val) {
-      this.retrieveForm.starttime = val;
-    },
-    //格式化时间控件的结束时间
-    formatEndTime(val) {
-      this.retrieveForm.endtime = val;
     },
     //列表选中的选项
     selsChange(sels) {

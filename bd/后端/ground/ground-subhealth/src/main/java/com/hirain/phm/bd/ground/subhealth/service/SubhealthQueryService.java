@@ -17,21 +17,16 @@ import java.util.List;
 
 import com.hirain.phm.bd.ground.subhealth.param.AnnualCountResponse;
 import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailParams;
-import com.hirain.phm.bd.ground.subhealth.param.SubhealthWithSuggestionParams;
+import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailResponseParams;
 
 public interface SubhealthQueryService {
 
-	public List<SubhealthWithSuggestionParams> selectByParams(SubhealthDetailParams subdeDetailParams);
-
-	/**
-	 * @return
-	 */
-	List<SubhealthWithSuggestionParams> selectToday(String project, String trainNo);
+	public List<SubhealthDetailResponseParams> selectByParams(SubhealthDetailParams subdeDetailParams);
 
 	/**
 	 * 博得首页查询亚健康预警的接口 @author zepei.tao
 	 */
-	List<SubhealthWithSuggestionParams> selectToday();
+	List<SubhealthDetailResponseParams> selectToday();
 
 	/**
 	 * @param year
@@ -51,5 +46,10 @@ public interface SubhealthQueryService {
 	 * @return
 	 */
 	AnnualCountResponse selectYearCounts(int year);
+
+	/**
+	 * @param details
+	 */
+	void getRepairAndSolution(List<SubhealthDetailResponseParams> details);
 
 }

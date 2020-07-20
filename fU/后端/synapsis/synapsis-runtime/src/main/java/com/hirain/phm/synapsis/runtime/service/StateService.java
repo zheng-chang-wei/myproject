@@ -2,6 +2,7 @@ package com.hirain.phm.synapsis.runtime.service;
 
 import com.hirain.phm.synapsis.constant.RunState;
 import com.hirain.phm.synapsis.runtime.param.ControlResponse;
+import com.hirain.phm.synapsis.runtime.param.StateResponse;
 import com.hirain.phm.synapsis.setting.support.domain.ValidateResult;
 
 public interface StateService {
@@ -51,4 +52,9 @@ public interface StateService {
 	 * 
 	 */
 	void idle();
+
+	/**
+	 * @return
+	 */
+	StateResponse getStates();
 }

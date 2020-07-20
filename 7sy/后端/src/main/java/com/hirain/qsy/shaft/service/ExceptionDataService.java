@@ -1,5 +1,6 @@
 package com.hirain.qsy.shaft.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -58,4 +59,7 @@ public interface ExceptionDataService extends IService<ExceptionData> {
 	List<ExceptionData> listExceptionDataGroupByAcquisitionTime(String trainType, String trainNum, String startDate, String endDate);
 
 	boolean isException(String exception);
+
+	@CacheEvict(allEntries = true)
+	void saveData(String objectToPythonJson, List<Date> acquisitionTime, List<String> primaryKey, Integer trainId) throws Exception;
 }

@@ -50,9 +50,9 @@ public class FilePrepare {
 	private static String FILE_ROOT = System.getProperty("user.dir") + File.separator + "test-data";
 
 	public static void main(String[] args) throws IOException {
-		wirteFile(FILE_ROOT + "\\2019年12月\\18日\\20191218150000\\MVB_01_20191218150000.txt");
-		wirteFile(FILE_ROOT + "\\2019年12月\\18日\\20191218150000\\MVB_01_20191218150500.txt");
-		wirteFile(FILE_ROOT + "\\2019年12月\\18日\\20191218160000\\MVB_01_20191218160000.txt");
+		wirteFile(FILE_ROOT + "\\201912\\18\\150000\\MVB_01_20191218_150000.txt");
+		wirteFile(FILE_ROOT + "\\201912\\18\\150000\\MVB_01_20191218_150500.txt");
+		wirteFile(FILE_ROOT + "\\201912\\18\\160000\\MVB_01_20191218_160000.txt");
 	}
 
 	/**

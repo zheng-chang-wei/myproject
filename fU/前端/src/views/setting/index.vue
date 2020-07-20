@@ -1,42 +1,70 @@
 <template>
-  <el-row id="config" :gutter="5">
+  <el-row id="config" :gutter="20">
     <form ref="fileForm" action="" method="get" style="display:none">
       <input ref="input" type="text" name="settingId" value="">
     </form>
-    <el-col :span="8">
-      <el-row :style="commonStyle" class="config-list">
+    <el-col :span="7">
+      <el-row class="config-list">
         <el-button style="width:97%;margin:5px 5px" icon="el-icon-plus" type="primary" @click="newSetting">新建</el-button>
-        <el-table ref="table" :data="settings" style="width: 100%;" border :max-height="476" :row-style="{ cursor: 'pointer', fontSize: '12px' }" :header-cell-style="{padding:'3px',fontSize:'12px'}" :cell-style="{padding:'3px'}" :highlight-current-row="isHighlightCurrentRow" @row-click="rowClick">
+        <el-table
+          ref="table"
+          :data="settingTableDatas"
+          :row-style="{ cursor: 'pointer', fontSize: '12px' }"
+          :header-cell-style="{padding:'3px',fontSize:'12px'}"
+          :cell-style="{padding:'3px'}"
+          :highlight-current-row="isHighlightCurrentRow"
+          :height="tableHeight"
+          @row-click="rowClick"
+        >
+          <el-table-column type="expand">
+            <template slot-scope="props">
+              <el-form label-position="left">
+                <el-form-item label="最后一次修改时间:">
+                  <span>{{ props.row.lastModify }}</span>
+                </el-form-item>
+                <el-form-item label="操作用户:">
+                  <span>{{ props.row.userName }}</span>
+                </el-form-item>
+              </el-form>
+            </template>
+          </el-table-column>
           <el-table-column prop="name" label="配置名称" align="center" />
-          <el-table-column prop="lastModify" :formatter="formatTime" label="最后一次修改时间" align="center" />
-          <el-table-column align="center" label="操作" width="139">
+          <el-table-column align="center" label="操作" width="150">
             <template slot-scope="scope">
-              <el-button
-                :type="scope.row.selected?'success':'primary'"
-                icon="el-icon-check"
-                :disabled="scope.row.selected"
-                @click.stop="handleActive(scope.$index, scope.row)"
-              />
-              <el-button
-                type="primary"
-                icon="el-icon-download"
-                @click.stop="handleExport(scope.$index, scope.row)"
-              />
-              <el-button
-                v-if="!scope.row.selected"
-                type="danger"
-                icon="el-icon-delete"
-                @click.stop="handleDelete(scope.$index, scope.row)"
-              />
+              <el-tooltip class="item" effect="dark" content="激活" placement="top">
+                <el-button
+                  :type="scope.row.selected?'success':'primary'"
+                  icon="el-icon-check"
+                  :disabled="scope.row.selected"
+                  @click.stop="handleActive(scope.$index, scope.row)"
+                />
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="导出" placement="top">
+                <el-button
+                  type="primary"
+                  icon="el-icon-download"
+                  @click.stop="handleExport(scope.$index, scope.row)"
+                />
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                <el-button
+                  v-if="!scope.row.selected"
+                  type="danger"
+                  icon="el-icon-delete"
+                  @click.stop="handleDelete(scope.$index, scope.row)"
+                />
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
       </el-row>
     </el-col>
-    <el-col :span="16">
-      <div :style="commonStyle" class="config-edit">
-        <preview v-if="isPreview" :basic-info="basicInfo" :board-settings="boardSettings" :algorithm-settings="algorithmSettings" :store-config="storeConfig" :clock-config-info="clockConfigInfo" @edit="edit" />
-        <configEdit v-else :active="active" :basic-info="basicInfo" :board-settings="boardSettings" :algorithm-settings="algorithmSettings" :store-config="storeConfig" :clock-config-info="clockConfigInfo" @saveSuccess="saveSuccess" @cancel="cancel" @importFile="importFile" />
+    <el-col :span="17">
+      <el-row v-if="isShowChassis" class="center" style="margin-top:5px">
+        <chassis ref="chassis" @onclick="cardChange" />
+      </el-row>
+      <div class="config-edit">
+        <configEdit ref="configEdit" :basic-info="basicInfo" :board-settings="boardSettings" :algorithm-settings="algorithmSettings" :output-settings="outputSettings" :store-config="storeConfig" :clock-config-info="clockConfigInfo" @saveSuccess="saveSuccess" @isShowChassis="setShowChassis" @importFile="importFile" />
       </div>
     </el-col>
   </el-row>
@@ -44,95 +72,94 @@
 
 <script>
 import configEdit from './configedit/index'
-import preview from './preview/index'
+import chassis from '../monitor/board/diagram/index'
+
 import app from '@/common/js/app'
-import util from '@/common/js/util'
-// import FileSaver from 'file-saver'
 export default {
   components: {
     configEdit,
-    preview
+    chassis
   },
   data() {
     return {
-      commonStyle: {},
+      tableHeight: 0,
       isHighlightCurrentRow: true,
-      time: ['年', '月', '日', '时', '分', '秒', '毫秒'],
-      canJumpToPreview: false,
       currentCheckedRowId: 0,
-      isPreview: false,
-      settings: [],
-      active: 0,
-      basicInfo: {},
-      boardSettings: [],
-      algorithmSettings: {
-        algorithms: [],
-        variables: []
+      settingTableDatas: [],
+      basicInfo: {
+        name: '',
+        line: '',
+        train: ''
       },
+      boardSettings: [],
+      algorithmSettings: [],
       storeConfig: {
-        storeVariables: {
-          ecnGroups: [],
-          mvbGroups: [],
-          adGroups: []
-        }
+        rawStrategy: 0,
+        resultStrategy: 1,
+        rawSpace: 60,
+        ecnGroups: [],
+        mvbGroups: [],
+        adGroups: []
       },
       clockConfigInfo: {
         timeOn: false,
         busType: '',
         ecnGroup: null,
         mvbGroup: null
-      }
+      },
+      outputSettings: {
+        commonSegments: [],
+        algorithms: []
+      },
+      loading: null,
+      isShowChassis: false
     }
   },
-  mounted() {
-    this.listAllProtocols()
+  created() {
     // 页面改变时,更改尺寸
     window.addEventListener('resize', this.changeHeight)
     this.changeHeight()
   },
+  mounted() {
+    localStorage.setItem('settingId', null)
+    this.listAllProtocols()
+    this.$bus.$on('launch', (event) => {
+      this.$refs.chassis.listBoards()
+    })
+  },
+  destroyed() {
+    this.$bus.$off('launch')
+    window.removeEventListener('resize', this.changeHeight)
+  },
   methods: {
     changeHeight() {
-      this.commonStyle = { height: document.body.offsetHeight - 62 + 'px' }
+      this.tableHeight = document.body.offsetHeight - 109 + 'px'
+    },
+    cardChange(board) {
+      this.$bus.$emit('cardChange', {
+        slotId: board.slotID,
+        type: board.boardType
+      })
     },
     newSetting() {
-      this.canJumpToPreview = false
+      this.isShowChassis = false
+      localStorage.setItem('settingId', null)
       this.isHighlightCurrentRow = false
       this.basicInfo = {
-        name: '1',
-        line: '2',
-        train: '3',
-        IP: '4'
+        name: '',
+        line: '',
+        train: ''
       }
-      this.boardSettings = [{
-        type: 'MVB',
-        enable: true,
-        slotId: 1,
-        ip: '2',
-        fileOriginalName: '',
-        variables: []
-      }]
-      this.algorithmSettings = {
-        algorithms: [{
-          name: '123',
-          enable: true,
-          slotId: 1,
-          filename: '',
-          mvbGroups: [],
-          ecnGroups: [],
-          adGroups: []
-        }],
-        variables: []
-      }
+      this.boardSettings = []
+      this.algorithmSettings = []
       this.storeConfig = {
-        rawStrategy: 1,
-        rawSpace: 0,
-        reaultStrategy: 0,
-        resultSpace: 100,
-        storeVariables: {
-          ecnGroups: [],
-          mvbGroups: [],
-          adGroups: []
-        }
+        rawStrategy: 0,
+        rawSpace: 60,
+        resultStrategy: 1,
+        resultSpace: 40,
+        ecnGroups: [],
+        mvbGroups: [],
+        adGroups: []
       }
       this.clockConfigInfo = {
         timeOn: false,
@@ -140,150 +167,83 @@ export default {
         ecnGroup: null,
         mvbGroup: null
       }
-      this.isPreview = false
-      this.active = 0
-      this.$bus.$emit('changeActive', 0)
+      this.outputSettings = {
+        commonSegments: [],
+        algorithms: []
+      }
+      this.$refs.configEdit.setActive(0)
     },
     listAllProtocols() {
       app.get('list_all_protocols').then(data => {
         if (data.code === 0) {
-          this.settings = data.data
+          this.settingTableDatas = data.data
         }
       })
     },
     rowClick(row) {
+      this.$refs.configEdit.setActive(0)
+      this.isShowChassis = false
       this.isHighlightCurrentRow = true
       const param = {
         id: row.id
       }
+      localStorage.setItem('settingId', row.id)
       this.currentCheckedRowId = row.id
       app.get('get_setting_by_id', param).then(response => {
         if (response.code === 0) {
-          this.canJumpToPreview = true
           this.initAllData(response.data)
         }
-        this.isPreview = true
+      })
+      app.get('result_output_setting', param).then(response => {
+        if (response.code === 0) {
+          this.outputSettings = response.data
+        }
       })
     },
     initAllData(data) {
       const info = data.setting
       this.basicInfo = {}
       this.boardSettings = []
-      this.algorithmSettings = {}
+      this.algorithmSettings = []
       this.storeConfig = {}
       this.clockConfigInfo = {}
       this.basicInfo.name = info.name
       this.basicInfo.line = info.line
       this.basicInfo.train = info.train
       this.boardSettings = info.boardSettings
-      this.algorithmSettings.algorithms = info.algorithmSettings
-      this.storeConfig.rawStrategy = info.rawStrategy
-      this.storeConfig.rawSpace = info.rawSpace
-      this.storeConfig.resultStrategy = info.resultStrategy
-      this.storeConfig.resultSpace = info.resultSpace
-      this.storeConfig.storeVariables = info.storeVariables
-      this.clockConfigInfo.timeOn = info.timeOn
-      this.algorithmSettings.variables = []
+      this.algorithmSettings = info.algorithmSettings
+      this.storeConfig = info.storeSetting
 
-      data.variableGroups.forEach(element => {
-        const btaElement = {
-          type: element.type,
-          slotId: element.slotId,
-          variables: element.variables
+      this.reSetBoardSettingsIp()
+      if (this.storeConfig === null) {
+        this.storeConfig = {
+          rawStrategy: 0,
+          rawSpace: 60,
+          resultStrategy: 1,
+          resultSpace: 40,
+          ecnGroups: [],
+          mvbGroups: [],
+          adGroups: []
         }
-        this.algorithmSettings.variables.push(btaElement)
-        info.boardSettings.forEach(board => {
-          if (board.type === element.type && board.slotId === element.slotId) {
-            board.variables = element.variables
+      }
+      this.clockConfigInfo = info.timeSetting
+      if (this.clockConfigInfo === null) {
+        this.clockConfigInfo = {
+          type: 'local',
+          busType: '',
+          ecnGroup: null,
+          mvbGroup: null
+        }
+      }
+    },
+    reSetBoardSettingsIp() {
+      this.boardSettings.forEach(boardSetting => {
+        if (boardSetting.ips && boardSetting.ips !== null && boardSetting.ips.length !== 0) {
+          for (let index = 0; index < boardSetting.ips.length; index++) {
+            boardSetting['ip' + (index + 1)] = boardSetting.ips[index]
           }
-        })
+        }
       })
-      if (info.timeVariables !== null) {
-        this.initClockConfigInfo(info)
-      }
-      this.integrationAlgorithmVariables()
-      this.integrationStoreConfigVariables()
-    },
-    initClockConfigInfo(info) {
-      if (info.timeVariables.ecnGroup) {
-        this.clockConfigInfo.busType = 'TRDP'
-        this.clockConfigInfo.ecnGroup = info.timeVariables.ecnGroup
-        this.initTime(this.clockConfigInfo.ecnGroup.variables)
-      } else {
-        this.clockConfigInfo.busType = 'MVB'
-        this.clockConfigInfo.mvbGroup = info.timeVariables.mvbGroup
-        this.initTime(this.clockConfigInfo.mvbGroup.variables)
-      }
-    },
-    initTime(variables) {
-      for (let index = 0; index < variables.length; index++) {
-        const element = variables[index]
-        element.time = this.time[index]
-      }
-    },
-    // 整合算法变量
-    integrationAlgorithmVariables() {
-      this.algorithmSettings.algorithms.forEach(algorithm => {
-        const variables = []
-        algorithm.mvbGroups.forEach(element => {
-          variables.push({
-            type: 'MVB',
-            slotId: element.slotId,
-            variables: element.variables
-          })
-        })
-        algorithm.ecnGroups.forEach(element => {
-          variables.push({
-            type: 'ECN',
-            slotId: element.slotId,
-            variables: element.variables
-          })
-        })
-        algorithm.adGroups.forEach(element => {
-          variables.push({
-            type: 'AD',
-            slotId: element.slotId,
-            variables: element.variables
-          })
-        })
-        algorithm.variables = variables
-      })
-    },
-    // 整合存储配置变量
-    integrationStoreConfigVariables() {
-      const variables = []
-      this.storeConfig.storeVariables.mvbGroups.forEach(element => {
-        variables.push({
-          type: 'MVB',
-          slotId: element.slotId,
-          variables: element.variables
-        })
-      })
-      this.storeConfig.storeVariables.ecnGroups.forEach(element => {
-        variables.push({
-          type: 'ECN',
-          slotId: element.slotId,
-          variables: element.variables
-        })
-      })
-      this.storeConfig.storeVariables.adGroups.forEach(element => {
-        variables.push({
-          type: 'AD',
-          slotId: element.slotId,
-          variables: element.variables
-        })
-      })
-      this.storeConfig.variables = variables
-    },
-    edit(active) {
-      this.active = active
-      this.isPreview = false
-    },
-    // 格式化创建时间
-    formatTime(row, column) {
-      return (row.lastModify = row.lastModify
-        ? util.formatDate(new Date(row.lastModify), 'yyyy-MM-dd hh:mm')
-        : '')
     },
     handleActive(index, rows) {
       this.$confirm('确认激活该配置？', '提示', {
@@ -292,16 +252,73 @@ export default {
         const param = {
           settingId: rows.id
         }
-        app.post('activate_protocol', param).then(data => {
-          if (data.code === 0) {
-            this.$message({
-              message: '激活成功',
-              type: 'success'
-            })
+        this.initLoading()
+        app.post('activate_protocol', param).then(response => {
+          if (response.code === 0) {
+            const data = response.data
+            switch (data.result) {
+              case 0:
+                this.activationSuccess()
+                break
+              case 1:
+                this.verifyFail(data)
+                break
+              case 2:
+                this.startFail(data)
+                break
+
+              default:
+                break
+            }
             this.listAllProtocols()
+            this.closeLoading()
           }
+        }).catch(() => {
+          this.listAllProtocols()
+          this.closeLoading()
         })
       }).catch(() => {})
+    },
+    activationSuccess() {
+      this.$message({
+        message: '激活成功',
+        type: 'success'
+      })
+      this.$bus.$emit('launch', 'launch')
+    },
+    verifyFail(data) {
+      const errors = data.validateResult.errors
+      const warnings = data.validateResult.warnings
+      let msg = ''
+      if (errors !== null) {
+        errors.forEach(element => {
+          if (msg !== '') {
+            msg += '</br></br>'
+          }
+          msg += element
+        })
+      }
+      if (warnings !== null) {
+        warnings.forEach(element => {
+          if (msg !== '') {
+            msg += '</br></br>'
+          }
+          msg += element
+        })
+      }
+
+      this.$message({
+        dangerouslyUseHTMLString: true,
+        message: msg,
+        type: 'error'
+      })
+    },
+    startFail(data) {
+      this.$message({
+        dangerouslyUseHTMLString: true,
+        message: '启动失败',
+        type: 'error'
+      })
     },
     handleDelete(index, rows) {
       this.$confirm('确认删除选中记录？', '提示', {
@@ -322,7 +339,7 @@ export default {
       }).catch(() => {})
     },
     handleExport(index, rows) {
-      const url = 'http://localhost:8080/setting/export'
+      const url = 'http://172.10.90.1:8080/setting/export'
       const fileForm = this.$refs.fileForm
       const input = this.$refs.input
       fileForm.setAttribute('action', url)
@@ -333,11 +350,11 @@ export default {
       this.listAllProtocols()
     },
     cancel() {
-      if (this.canJumpToPreview) {
-        this.rowClick({
-          id: this.currentCheckedRowId
-        })
-      }
+      // if (this.canJumpToPreview) {
+      //   this.rowClick({
+      //     id: this.currentCheckedRowId
+      //   })
+      // }
     },
     importFile(fileobj) {
       const formData = new FormData()
@@ -353,6 +370,23 @@ export default {
       }).catch(response => {
         console.log(response)
       })
+    },
+    initLoading() {
+      this.loading = this.$loading({
+        lock: true,
+        text: '配置激活中',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+    },
+    closeLoading() {
+      if (this.loading !== null) {
+        this.loading.close()
+        this.loading = null
+      }
+    },
+    setShowChassis(value) {
+      this.isShowChassis = value
     }
   }
 }
@@ -364,6 +398,33 @@ export default {
   font-size: 10px;
   border-radius: 15px;
 }
+/* #config .el-button{
+  padding: 7px 15px;
+  font-size: 12px;
+  line-height: 1;
+  border-radius: 3px;
+} */
+#config .el-input__inner{
+  font-size: 13px;
+  height: 32px;
+  line-height: 32px;
+}
+#config .el-table__expanded-cell[class*=cell] {
+    padding: 10px 10px;
+    background: #f6f6f6;
+}
+#config .el-form-item {
+    margin-bottom: 0px;
+}
+#config .el-dialog__body {
+    padding: 10px 10px;
+    color: #606266;
+    font-size: 14px;
+    word-break: break-all;
+}
+#config label {
+    font-weight: 500;
+}
 .config-list{
     margin-left:5px;
     margin-top: 5px;
@@ -374,11 +435,13 @@ export default {
 .config-edit{
     margin-right:5px;
     margin-top: 5px;
+    margin-bottom: 5px;
     border-radius: 2px;
     border: 1px solid #CCCCCC;
     line-height: 1px;
 }
-/* #config .el-table__body tr.current-row>td {
+#config .el-table__body tr.current-row>td {
   background-color: #CCFFFF!important;
-} */
+}
+
 </style>

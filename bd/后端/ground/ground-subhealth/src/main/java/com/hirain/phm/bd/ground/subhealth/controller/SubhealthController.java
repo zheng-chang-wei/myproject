@@ -8,6 +8,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -23,6 +25,7 @@ import com.hirain.phm.bd.ground.common.model.ResponseBo;
 import com.hirain.phm.bd.ground.common.page.PageService;
 import com.hirain.phm.bd.ground.common.page.QueryRequest;
 import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailParams;
+import com.hirain.phm.bd.ground.subhealth.param.SubhealthDetailResponseParams;
 import com.hirain.phm.bd.ground.subhealth.service.SubhealthDataService;
 import com.hirain.phm.bd.ground.subhealth.service.SubhealthInfoService;
 import com.hirain.phm.bd.ground.subhealth.service.SubhealthQueryService;
@@ -60,20 +63,25 @@ public class SubhealthController {
 	@Autowired
 	private PageService pageService;
 
-	@GetMapping("/getAllSubhealthInfo")
-	public ResponseBo getAllSubhealthInfo() {
+	@GetMapping("/subhealthInfo")
+	public ResponseBo getSubhealthInfoByProject(String project) {
 		try {
-			return ResponseBo.ok(infoService.selectAll());
+			return ResponseBo.ok(infoService.selectByProject(project));
 		} catch (Exception e) {
 			log.error("获取亚健康列表失败", e);
 			return ResponseBo.error("获取亚健康列表失败");
 		}
 	}
 
-	@GetMapping("/findSubhealthDetailsByParams")
+	@GetMapping("/list")
 	public ResponseBo findSubhealthDetailsByParams(QueryRequest request, SubhealthDetailParams subhealthDetailParams) {
 		try {
-			return ResponseBo.ok(pageService.selectByPageNumSize(request, () -> queryService.selectByParams(subhealthDetailParams)));
+			Map<String, Object> pageInfo = pageService.selectByPageNumSize(request, () -> queryService.selectByParams(subhealthDetailParams));
+			@SuppressWarnings("unchecked")
+			List<SubhealthDetailResponseParams> details = (List<SubhealthDetailResponseParams>) pageInfo.get("rows");
+			queryService.getRepairAndSolution(details);
+			pageInfo.put("rows", details);
+			return ResponseBo.ok(pageInfo);
 		} catch (Exception e) {
 			log.error("亚健康记录查询失败", e);
 			return ResponseBo.error("亚健康记录查询失败");
@@ -102,9 +110,9 @@ public class SubhealthController {
 		}, ResponseBo.error("查询失败"));
 	}
 
-	@GetMapping("/dashboard")
-	public ResponseBo selectToday(String project, String trainNo) {
-		return SafeRunner.run(() -> ResponseBo.ok(queryService.selectToday(project, trainNo)), ResponseBo.error("查询失败"));
+	@GetMapping("/dashboard/today/bode")
+	public ResponseBo selectToday() {
+		return SafeRunner.run(() -> ResponseBo.ok(queryService.selectToday()), ResponseBo.error("查询失败"));
 	}
 
 	@GetMapping("/dashboard/annual")

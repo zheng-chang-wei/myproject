@@ -28,6 +28,8 @@ import com.hirain.phm.synapsis.setting.BusDataType;
 import com.hirain.phm.synapsis.setting.Variable;
 import com.hirain.phm.synapsis.util.JaxbUtil;
 
+import lombok.ToString;
+
 /**
  * @Version 1.0
  * @Author jianwen.xin@hirain.com
@@ -127,13 +129,15 @@ public class DataFileParserImpl implements DataFileParser {
 		ByteBuffer buffer = ByteBuffer.wrap(dataContent.getDatas()).order(BYTE_ORDER);
 		while (buffer.hasRemaining()) {
 			Frame frame = parseFrame(buffer);
+			System.out.println(frame);
 			LocalDateTime timestamp = timestamp(frame);
+			System.out.println(timestamp);
 			ByteBuffer dataBuffer = ByteBuffer.wrap(frame.data).order(BYTE_ORDER);
 			for (int i = 0, j = 0; i < header.getVariables().size() && j < variableDatas.size(); i++) {
 				Variable v1 = header.getVariables().get(i);
 				VariableData data = variableDatas.get(j);
 				Variable v2 = data.getVariable();
-				if (v1.equals(v2)) {
+				if (isEqual(v1, v2)) {
 					VariableValue variableValue = new VariableValue();
 					variableValue.setFrameIndex(frame.index);
 					variableValue.setTimestamp(timestamp);
@@ -148,6 +152,15 @@ public class DataFileParserImpl implements DataFileParser {
 			}
 		}
 		return variableDatas;
+	}
+
+	/**
+	 * @param v1
+	 * @param v2
+	 * @return
+	 */
+	public boolean isEqual(Variable v1, Variable v2) {
+		return v1.getName().equals(v2.getName());
 	}
 
 	/**
@@ -201,6 +214,7 @@ public class DataFileParserImpl implements DataFileParser {
 	 */
 	private LocalDateTime timestamp(Frame frame) {
 		LocalDateTime timestamp = LocalDateTime.ofEpochSecond(frame.second, (int) (frame.micro * 1000), ZoneOffset.ofHours(8));
+		System.out.println(timestamp);
 		return timestamp;
 	}
 
@@ -220,6 +234,7 @@ public class DataFileParserImpl implements DataFileParser {
 		return frame;
 	}
 
+	@ToString
 	private class Frame {
 
 		int index;

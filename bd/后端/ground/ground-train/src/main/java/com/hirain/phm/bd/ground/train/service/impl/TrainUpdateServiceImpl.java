@@ -29,6 +29,7 @@ public class TrainUpdateServiceImpl implements TrainUpdateService {
 			for (ICar car : info.getCars()) {
 				count += car.getDoors().size();
 			}
+			System.err.println(message.getTrain() + ":" + count);
 			train.setDoorCount(count);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -38,20 +39,20 @@ public class TrainUpdateServiceImpl implements TrainUpdateService {
 
 	@Override
 	public void upadateOnline(WillMessage message) {
-		int trainID = trainService.select(message.getProject(), message.getTrain()).getId();
-		Train train = new Train();
-		train.setId(trainID);
-		train.setTrainOnline(message.getOn());
-		trainService.updateNotNull(train);
+		Train train = trainService.select(message.getProject(), message.getTrain());
+		if (train != null) {
+			train.setTrainOnline(message.getOn());
+			trainService.updateNotNull(train);
+		}
 	}
 
 	@Override
 	public void updateOffset(OffsetMessage message) {
-		Integer trainId = trainService.select(message.getProject(), message.getTrain()).getId();
-		Train train = new Train();
-		train.setId(trainId);
-		train.setOffset(message.getOffset());
-		trainService.updateNotNull(train);
+		Train train = trainService.select(message.getProject(), message.getTrain());
+		if (train != null) {
+			train.setOffset(message.getOffset());
+			trainService.updateNotNull(train);
+		}
 	}
 
 }

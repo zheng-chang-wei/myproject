@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import com.hirain.phm.bd.ground.common.data.BaseValueService;
+import com.hirain.phm.bd.ground.dictionary.service.BaseValueService;
 import com.hirain.phm.bd.ground.fault.domain.FaultData;
 import com.hirain.phm.bd.ground.fault.param.FaultDataResponse;
 import com.hirain.phm.bd.ground.fault.service.FaultDataService;

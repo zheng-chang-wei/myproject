@@ -42,13 +42,16 @@ public class MqttEncryptConsumerConfig {
 	@Autowired
 	private MqttProperties properties;
 
+	@Autowired
+	private MqttSslProperties sslProperties;
+
 	public MqttConnectOptions encryptedConnectOptions() {
 		MqttConnectOptions options = new MqttConnectOptions();
-		options.setServerURIs(new String[] { properties.getSslUrl() });
+		options.setServerURIs(new String[] { sslProperties.getUrl() });
 		options.setKeepAliveInterval(properties.getKeepAlive());
 		try {
-			options.setSocketFactory(SslUtil.getSocketFactory(properties.getCaFile(), properties.getClientFile(), properties.getKeyFile(),
-					properties.getSslPassword()));
+			options.setSocketFactory(SslUtil.getSocketFactory(sslProperties.getCaFile(), sslProperties.getClientFile(), sslProperties.getKeyFile(),
+					sslProperties.getPassword()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -75,7 +78,7 @@ public class MqttEncryptConsumerConfig {
 	public MessageProducer inbound() {
 		// Topic==train-ground
 		MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(properties.getClientId() + "_inbound_encrypt",
-				encryptedClientFactory(), properties.getEncryptTopic());
+				encryptedClientFactory(), sslProperties.getTopic());
 		adapter.setCompletionTimeout(properties.getCompletionTimeout());
 		adapter.setConverter(new DefaultPahoMessageConverter());
 		adapter.setQos(properties.getQos());

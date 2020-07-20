@@ -23,6 +23,8 @@ import lombok.Data;
 @Data
 public class SettingVO {
 
+	private Integer id;
+
 	/**
 	 * 配置名称
 	 */
@@ -38,37 +40,12 @@ public class SettingVO {
 	 */
 	private String train;
 
-	/**
-	 * 原始数据存储策略
-	 */
-	private Integer rawStrategy;
-
-	/**
-	 * 原始数据存储空间占比
-	 */
-	private Integer rawSpace;
-
-	/**
-	 * 分析数据存储策略
-	 */
-	private Integer resultStrategy;
-
-	/**
-	 * 分析数据存储空间占比
-	 */
-	private Integer resultSpace;
-
-	/**
-	 * 时间来源，true：总线，false：系统
-	 */
-	private Boolean timeOn;
-
 	private List<BoardSettingVO> boardSettings;
 
 	private List<AlgorithmSettingVO> algorithmSettings;
 
-	private StoreVariablesVO storeVariables;
+	private StoreSettingVO storeSetting;
 
-	private TimeVariablesVO timeVariables;
+	private TimeSettingVO timeSetting;
 
 }

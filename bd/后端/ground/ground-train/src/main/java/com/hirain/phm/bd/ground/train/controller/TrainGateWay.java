@@ -26,7 +26,7 @@ import com.hirain.phm.bd.ground.train.service.TrainService;
  *               Nov 4, 2019 jianwen.xin@hirain.com 1.0 create file
  */
 @Component
-public class TrainGateWay {
+public class TrainGateWay implements ProjectGateWay {
 
 	@Autowired
 	private TrainService trainService;
@@ -62,6 +62,10 @@ public class TrainGateWay {
 		return projectService.selectAll();
 	}
 
+	/** 
+	 * @see com.hirain.phm.bd.ground.train.controller.ProjectGateWay#selectProjectByName(java.lang.String)
+	 */
+	@Override
 	public Project selectProjectByName(String project) {
 		return projectService.selectByName(project);
 	}

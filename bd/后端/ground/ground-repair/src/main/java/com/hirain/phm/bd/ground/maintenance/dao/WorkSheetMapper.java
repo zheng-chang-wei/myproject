@@ -14,7 +14,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 
 import com.hirain.phm.bd.ground.common.config.CommonMapper;
 import com.hirain.phm.bd.ground.maintenance.domain.WorkSheet;
-import com.hirain.phm.bd.ground.maintenance.param.WorkSheetQueryParam;
 
 /**
  * @Version 1.0
@@ -42,27 +41,22 @@ public interface WorkSheetMapper extends CommonMapper<WorkSheet> {
 	@SelectProvider(type = SheetMapperProvider.class, method = "selectEditSheet")
 	List<WorkSheet> selectEditSheet(@Param("ids") List<Long> ids);
 
-	/**
-	 * @param param
-	 */
 	@SelectProvider(type = SheetMapperProvider.class, method = "listWorkSheetWithDetail")
 	@Results({
 
 			@Result(property = "detail", column = "detail_id", one = @One(select = "com.hirain.phm.bd.ground.maintenance.dao.WorkDetailMapper.selectDetail"))
 
 	})
-	List<WorkSheet> listWorkSheetWithDetail(WorkSheetQueryParam param);
+	List<WorkSheet> listWorkSheetWithDetail(String project, String train, Integer faultType, Long userId, Integer limit, Integer offset);
 
-	/**
-	 * @param param
-	 */
 	@SelectProvider(type = SheetMapperProvider.class, method = "listWorkSheetOfProjects")
 	@Results({
 
 			@Result(property = "detail", column = "detail_id", one = @One(select = "com.hirain.phm.bd.ground.maintenance.dao.WorkDetailMapper.selectDetail"))
 
 	})
-	List<WorkSheet> listWorkSheetOfProjects(@Param("ids") List<Long> ids, String train, Integer faultType);
+	List<WorkSheet> listWorkSheetOfProjects(@Param("ids") List<Long> ids, String train, Integer faultType, Long userId, Integer limit,
+			Integer offset);
 
 	@SelectProvider(type = SheetMapperProvider.class, method = "selectBySheetId")
 	@Results({
@@ -75,6 +69,12 @@ public interface WorkSheetMapper extends CommonMapper<WorkSheet> {
 	@Select("select fault_type from t_worksheet group by fault_type")
 	List<Integer> getFaultTypes();
 
+	@SelectProvider(type = SheetMapperProvider.class, method = "countWorkSheetOfProjects")
+	Integer countWorkSheetOfProjects(@Param("ids") List<Long> ids, String train, Integer faultType, Long userId);
+
+	@SelectProvider(type = SheetMapperProvider.class, method = "countWorksheetWithDetail")
+	Integer countWorksheetWithDetail(String project, String train, Integer faultType, Long userId);
+
 	class SheetMapperProvider {
 
 		public String selectBySheetId(long id) {
@@ -86,26 +86,47 @@ public interface WorkSheetMapper extends CommonMapper<WorkSheet> {
 			return sql;
 		}
 
-		public String listWorkSheetWithDetail(WorkSheetQueryParam param) {
+		public String listWorkSheetWithDetail(String project, String train, Integer faultType, Long userId, Integer limit, Integer offset) {
 			String sql = "select tws.*,tp.name project, tu.user_name user, tm.mode_name fault_mode from t_worksheet tws ";
 			sql += "left join t_project tp on tws.project_id=tp.id ";
 			sql += "left join t_user tu on tu.user_id=tws.user_id ";
 			sql += "left join t_mode tm on tm.id=tws.mode_id ";
-			sql += "where true ";
-			if (param.getProject() != null) {
+			sql += "where ((tws.state='创建工单' and (tws.user_id is NULL or tws.user_id=#{userId})) ";
+			sql += " or tws.state <> '创建工单')";
+			if (project != null) {
 				sql += "and tp.name=#{project} ";
 			}
-			if (param.getTrainNo() != null) {
-				sql += "and tws.train_id=#{trainNo} ";
+			if (train != null) {
+				sql += "and tws.train_id=#{train} ";
 			}
-			if (param.getFaultType() != null) {
+			if (faultType != null) {
 				sql += "and tws.fault_type=#{faultType} ";
 			}
-			sql += "order by tws.fault_time desc ";
+			sql += "order by tws.fault_time desc, tws.id desc ";
+			if (limit != null && offset != null) {
+				sql += " limit " + offset + "," + limit;
+			}
 			return sql;
 		}
 
-		public String listWorkSheetOfProjects(List<Long> ids, String train, Integer faultType) {
+		public String countWorksheetWithDetail(String project, String train, Integer faultType, Long userId) {
+			String sql = "select count(tws.id) from t_worksheet tws ";
+			sql += "left join t_project tp on tws.project_id=tp.id ";
+			sql += "where ((tws.state='创建工单' and (tws.user_id is NULL or tws.user_id=#{userId}))";
+			sql += "or tws.state <> '创建工单')";
+			if (project != null) {
+				sql += "and tp.name=#{project} ";
+			}
+			if (train != null) {
+				sql += "and tws.train_id=#{train} ";
+			}
+			if (faultType != null) {
+				sql += "and tws.fault_type=#{faultType} ";
+			}
+			return sql;
+		}
+
+		public String listWorkSheetOfProjects(List<Long> ids, String train, Integer faultType, Long userId, Integer limit, Integer offset) {
 			String sql = "select tws.*,tp.name project, tu.user_name user, tm.mode_name fault_mode from t_worksheet tws ";
 			sql += "left join t_project tp on tws.project_id=tp.id ";
 			sql += "left join t_user tu on tu.user_id=tws.user_id ";
@@ -117,13 +138,36 @@ public interface WorkSheetMapper extends CommonMapper<WorkSheet> {
 				sb.append(t).append(",");
 			});
 			sql += sb.substring(0, sb.length() - 1) + ") ";
+			sql += " and (tws.user_id is NULL or tws.user_id=#{userId})";
 			if (train != null) {
 				sql += "and tws.train_id=#{trainNo} ";
 			}
 			if (faultType != null) {
 				sql += "and tws.fault_type=#{faultType} ";
 			}
-			sql += "order by tws.fault_time desc ";
+			sql += "order by tws.fault_time desc, tws.id desc  ";
+			if (limit != null && offset != null) {
+				sql += " limit " + offset + "," + limit;
+			}
+			return sql;
+		}
+
+		public String countWorkSheetOfProjects(List<Long> ids, String train, Integer faultType, Long userId) {
+			String sql = "select count(tws.id) from t_worksheet tws ";
+			sql += "where tws.state='创建工单' and tws.project_id in ";
+			StringBuilder sb = new StringBuilder();
+			sb.append("(");
+			ids.forEach(t -> {
+				sb.append(t).append(",");
+			});
+			sql += sb.substring(0, sb.length() - 1) + ") ";
+			sql += " and (tws.user_id is NULL or tws.user_id=#{userId})";
+			if (train != null) {
+				sql += "and tws.train_id=#{trainNo} ";
+			}
+			if (faultType != null) {
+				sql += "and tws.fault_type=#{faultType} ";
+			}
 			return sql;
 		}
 

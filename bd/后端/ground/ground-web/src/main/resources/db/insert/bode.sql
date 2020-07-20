@@ -17,6 +17,8 @@ INSERT INTO `t_menu` VALUES ('5', '0', '维修履历', '/repairhistory', null, n
 INSERT INTO `t_menu` VALUES ('6', '0', '系统设置', '/system', null, null, '0', null, '2019-09-19 19:00:00', null);
 INSERT INTO `t_menu` VALUES ('7', '0', '权限管理', '/authorityManagement', null, null, '0', null, '2019-09-19 19:00:00', null);
 INSERT INTO `t_menu` VALUES ('8', '0', '统计', '/statistics', null, null, '0', null, '2020-02-11 16:07:21', null);
+INSERT INTO t_menu VALUES(9, 0, '历史数据', '/historydata', NULL, NULL, '0', NULL, '2020-03-06 17:53:00.000', NULL);
+
 
 -- 角色-菜单关系
 INSERT INTO t_ground_role_menu (GROUND_ROLE_ID, MENU_ID)
@@ -29,6 +31,7 @@ VALUES
 (1, 6),
 (1, 7),
 (1, 8),
+(1,9),
 (2, 1),
 (2, 2),
 (2, 3),
@@ -68,15 +71,6 @@ VALUES
 ('跟踪', 6),
 ('问题解决', 5);
 
-insert into t_subhealth_type (subhealth_name,subhealth_code)
-values
-('行程开关异常',1),
-('电机工况异常',2),
-('闭锁组件异常',3),
-('车门V型',4),
-('开关门阻力过大',5),
-('尺带张紧力过松',6),
-('网络干扰异常',7);
 
 INSERT INTO t_push
 (`type`, code, num, `level`, treatment_id, repair_id, description)
@@ -147,14 +141,14 @@ VALUES
 (2, '下线处理', '下线处理'),
 (3, '回库处理', '对正线载客运营无影响，建议完成当日运营后回库检查');
 
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(1, '1.电机连接线是否虚接；
 2.检查电机有无损坏；
 3.检查门控器是否损坏', '1.紧固电机连接线端子或者更换电机连接线；
 2.更换电机；
 3.更换门控器');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(2, '1.检查锁闭机构有无卡滞；
 2.检查是否存在异物；
@@ -163,7 +157,7 @@ VALUES(2, '1.检查锁闭机构有无卡滞；
 2.清除机构中的异物；
 3.更换门控器；
 4.更换电机');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(3, '1.检查开关间隙是否符合标准；
 2.检查开关连接线是否异常；
@@ -172,7 +166,7 @@ VALUES(3, '1.检查开关间隙是否符合标准；
 2.紧固或更换开关连接线；
 3.更换开关；
 4.调整开关扭矩');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(4, '1.检查锁闭开关是否能正常触发；
 2.检查门到位开关是否能正常触发；
@@ -186,7 +180,7 @@ VALUES(4, '1.检查锁闭开关是否能正常触发；
 3.关连接线；
 4.更换开关；
 5.调整开关扭矩');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(5, '1.检查开关间隙是否符合标准；
 2.检查开关连接线是否异常；
@@ -196,58 +190,58 @@ VALUES(5, '1.检查开关间隙是否符合标准；
 3.关连接线；
 4.更换开关；
 5.调整开关扭矩');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(6, '1.检查编码器线是否虚接；
 2.检查编码器是否异常；
 3.检查门控器是否异常', '1.紧固或更换编码器线缆；
 2.更换电机编码器；
 3.更换门控器');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(7, '1.检查是否有外力阻挡或机械卡滞；
 2.检查门控器线路和连接件', '1.清除异物；
 2.调整机械结构；
 3.更换门控器');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(8, '检查输出电路的接线是否有虚接或短路', '1.调整异常接线部位；
 2.排除短路故障部件');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(9, '1.通信的电气连线中断，或者连接器虚接，接触不良；
 2.检查门控器是否异常', '1.紧固或更换电气连接线；
 2.更换门控器');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(10, '1.内网通信的电气线路中断，或者连接器虚接，接触不良；
 2.检查门控器是否异常', '1.紧固或更换电气连接线；
 2.更换门控器');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(11, '1.检查通讯线缆是否虚接；
 2.检查门控器是否在线异常', '1.紧固或更换通讯线缆；
 2.更换门控器');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(12, '旋转立柱下摆臂的上下高度', '调整旋转立柱下摆臂的上下高度');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(13, '门板上的偏心销', '调节门板上的偏心销至车门V型正常');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(14, '1.检查锁闭大拉杆是否过紧；
 2.检查锁闭件铜垫片是否磨损；
 3.检查电机是否松动或动作异常', '1.调整锁闭大拉杆；
 2.更换锁闭磨损件；
 3.紧固或更换电机');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(15, '1.检查电机支架是否紧固；
 2.检查电机固定螺栓是否松动', '1.紧固或更换电机支架；
 2.紧固或更换电机固定螺栓；
 3.更换电机');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(16, '1检查开关间隙是否符合标准；
 2.检查开关连接线是否异常；
@@ -257,7 +251,7 @@ VALUES(16, '1检查开关间隙是否符合标准；
 3.关连接线；
 4.更换开关；
 5.调整开关扭矩');
-INSERT INTO phm_bd_ground.t_repair_suggestion
+INSERT INTO t_repair_suggestion
 (id, suggestion, solution)
 VALUES(17, '1.检查齿带是否有开裂；
 2.检查齿带是否张紧力变松；

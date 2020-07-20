@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hirain.phm.synapsis.setting.AlgorithmSetting;
 import com.hirain.phm.synapsis.setting.Setting;
@@ -44,6 +45,14 @@ public class AlgorithmSettingServiceImpl implements AlgorithmSettingService, Alg
 	@Autowired
 	private SettingMapper settingMapper;
 
+	@Override
+	public List<AlgorithmSetting> selectBySettingId(Integer settingId) {
+		Example example = new Example(AlgorithmSetting.class);
+		Criteria criteria = example.createCriteria();
+		criteria.andEqualTo("settingId", settingId);
+		return mapper.selectByExample(example);
+	}
+
 	/**
 	 * @see com.hirain.phm.synapsis.setting.db.AlgorithmSettingQuery#getAlgorithmSetting(int)
 	 */
@@ -66,9 +75,11 @@ public class AlgorithmSettingServiceImpl implements AlgorithmSettingService, Alg
 	}
 
 	/**
-	 * @see com.hirain.phm.synapsis.setting.db.AlgorithmSettingQuery#getVariables(int)
+	 * @param id
+	 * @return
+	 * @deprecated 没有被调用，可考虑移除
 	 */
-	@Override
+	@Deprecated
 	public List<VariableGroup> getVariables(int id) {
 		List<VariableGroup> variables = groupService.selectByAlgorithm(id);
 		return variables;
@@ -78,6 +89,7 @@ public class AlgorithmSettingServiceImpl implements AlgorithmSettingService, Alg
 	 * @see com.hirain.phm.synapsis.setting.service.AlgorithmSettingService#saveList(java.lang.Integer, java.util.List)
 	 */
 	@Override
+	@Transactional
 	public void saveList(Integer settingId, List<AlgorithmSetting> algorithmSettings) {
 		for (AlgorithmSetting algorithmSetting : algorithmSettings) {
 			algorithmSetting.setSettingId(settingId);
@@ -89,10 +101,10 @@ public class AlgorithmSettingServiceImpl implements AlgorithmSettingService, Alg
 	}
 
 	/**
-	 * @see com.hirain.phm.synapsis.setting.service.AlgorithmSettingService#delete(int)
+	 * @see com.hirain.phm.synapsis.setting.service.AlgorithmSettingService#deleteBySettingId(int)
 	 */
 	@Override
-	public void delete(int settingId) {
+	public void deleteBySettingId(int settingId) {
 		List<AlgorithmSetting> settings = mapper.selectSetting(settingId);
 		for (AlgorithmSetting setting : settings) {
 			groupService.deleteAlgorithmVariables(setting.getId(), setting.getVariableGroups());

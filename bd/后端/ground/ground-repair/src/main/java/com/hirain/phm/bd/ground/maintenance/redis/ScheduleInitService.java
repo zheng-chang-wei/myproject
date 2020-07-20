@@ -11,11 +11,14 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @Version 1.0
@@ -31,12 +34,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(1)
+@ConfigurationProperties("repair.integration")
 public class ScheduleInitService implements ApplicationRunner {
 
 	@Autowired
 	private Scheduler scheduler;
 
-	@Value("${repair.worksheet.integration.period}")
+	@Setter
+	@Getter
 	private String cronExpression;
 
 	/**

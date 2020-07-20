@@ -28,6 +28,8 @@ public class Algorithm {
 
 	private int slotId;
 
+	private String board;
+
 	private RunStatus status;
 
 	private boolean enable;

@@ -3,20 +3,25 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.setting.service.impl;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hirain.phm.synapsis.setting.BoardSetting;
 import com.hirain.phm.synapsis.setting.Setting;
 import com.hirain.phm.synapsis.setting.VariableGroup;
+import com.hirain.phm.synapsis.setting.common.BaseService;
 import com.hirain.phm.synapsis.setting.dao.BoardSettingMapper;
 import com.hirain.phm.synapsis.setting.dao.SettingMapper;
 import com.hirain.phm.synapsis.setting.db.BoardSettingQuery;
+import com.hirain.phm.synapsis.setting.property.BoardProperty;
 import com.hirain.phm.synapsis.setting.service.BoardSettingService;
 import com.hirain.phm.synapsis.setting.service.VariableGroupService;
+
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.entity.Example.Criteria;
 
 /**
  * @Version 1.0
@@ -31,7 +36,7 @@ import com.hirain.phm.synapsis.setting.service.VariableGroupService;
  *               Dec 3, 2019 jianwen.xin@hirain.com 1.0 create file
  */
 @Service
-public class BoardSettingServiceImpl implements BoardSettingQuery, BoardSettingService {
+public class BoardSettingServiceImpl extends BaseService<BoardSetting> implements BoardSettingQuery, BoardSettingService {
 
 	@Autowired
 	private BoardSettingMapper mapper;
@@ -41,6 +46,19 @@ public class BoardSettingServiceImpl implements BoardSettingQuery, BoardSettingS
 
 	@Autowired
 	private SettingMapper settingMapper;
+
+	@Override
+	public List<BoardSetting> selectBySettingId(Integer settingId) {
+		Example example = new Example(BoardSetting.class);
+		Criteria criteria = example.createCriteria();
+		criteria.andEqualTo("settingId", settingId);
+		List<BoardSetting> list = mapper.selectByExample(example);
+		list.forEach(b -> {
+			BoardProperty property = JSONObject.parseObject(b.getContent(), BoardProperty.class);
+			b.setProperty(property);
+		});
+		return list;
+	}
 
 	/**
 	 * @see com.hirain.phm.synapsis.setting.db.BoardSettingQuery#getBoardSetting(int)
@@ -56,9 +74,9 @@ public class BoardSettingServiceImpl implements BoardSettingQuery, BoardSettingS
 	}
 
 	/**
-	 * @see com.hirain.phm.synapsis.setting.db.BoardSettingQuery#getVariables(int)
+	 * @deprecated 可考虑移除
 	 */
-	@Override
+	@Deprecated
 	public List<VariableGroup> getVariables(int boardId) {
 		List<VariableGroup> variables = groupService.selectByBoard(boardId);
 		return variables;
@@ -71,15 +89,9 @@ public class BoardSettingServiceImpl implements BoardSettingQuery, BoardSettingS
 	public void saveList(int settingId, List<BoardSetting> boardSettings) {
 		for (BoardSetting boardSetting : boardSettings) {
 			boardSetting.setSettingId(settingId);
+			String content = JSONObject.toJSONString(boardSetting.getProperty());
+			boardSetting.setContent(content);
 			mapper.insertGenerateKey(boardSetting);
-		}
-		for (BoardSetting boardSetting : boardSettings) {
-			groupService.saveBoardVariables(boardSetting.getId(), boardSetting.getVariableGroups());
-			if (boardSetting.getGroup() != null) {
-				groupService.insertVariables(Arrays.asList(boardSetting.getGroup()));
-				boardSetting.setFilename(String.valueOf(boardSetting.getGroup().getId()));
-				mapper.updateByKey(boardSetting);
-			}
 		}
 	}
 
@@ -92,15 +104,14 @@ public class BoardSettingServiceImpl implements BoardSettingQuery, BoardSettingS
 	}
 
 	/**
-	 * @see com.hirain.phm.synapsis.setting.service.BoardSettingService#delete(int)
+	 * @see com.hirain.phm.synapsis.setting.service.BoardSettingService#deleteBySettingId(int)
 	 */
 	@Override
-	public void delete(int settingId) {
-		List<BoardSetting> boards = mapper.selectSetting(settingId);
-		for (BoardSetting board : boards) {
-			groupService.deleteBoardVariables(board.getId(), board.getVariableGroups());
-		}
-		mapper.deleteBySettingId(settingId);
+	public void deleteBySettingId(int settingId) {
+		Example example = new Example(BoardSetting.class);
+		Criteria criteria = example.createCriteria();
+		criteria.andEqualTo("settingId", settingId);
+		deleteByExample(example);
 	}
 
 }

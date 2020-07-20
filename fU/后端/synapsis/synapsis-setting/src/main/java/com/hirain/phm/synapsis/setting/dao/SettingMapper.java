@@ -3,14 +3,16 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.setting.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.One;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 
-import com.hirain.phm.synapsis.setting.CommonMapper;
 import com.hirain.phm.synapsis.setting.Setting;
+import com.hirain.phm.synapsis.setting.common.CommonMapper;
 
 /**
  * @Version 1.0
@@ -24,7 +26,7 @@ import com.hirain.phm.synapsis.setting.Setting;
  *               <p>
  *               Dec 3, 2019 jianwen.xin@hirain.com 1.0 create file
  */
-public interface SettingMapper extends CommonMapper<Setting>{
+public interface SettingMapper extends CommonMapper<Setting> {
 
 	/**
 	 * @return
@@ -36,18 +38,14 @@ public interface SettingMapper extends CommonMapper<Setting>{
 	@Results({
 
 			@Result(property = "id", column = "id", id = true),
-			@Result(property = "timeVariables", column = "id", one = @One(select = "com.hirain.phm.synapsis.setting.dao.VariableGroupMapper.selectTimeVariables")),
-			@Result(property = "storeVariables", column = "id", many = @Many(select = "com.hirain.phm.synapsis.setting.dao.VariableGroupMapper.selectStoreVariables")),
-			@Result(property = "boardSettings", column = "id", many = @Many(select = "com.hirain.phm.synapsis.setting.dao.BoardSettingMapper.selectSetting")),
+			@Result(property = "timeSetting", column = "id", one = @One(select = "com.hirain.phm.synapsis.setting.dao.TimeSettingMapper.selectDetail")),
+			@Result(property = "storeSetting", column = "id", many = @Many(select = "com.hirain.phm.synapsis.setting.dao.StoreSettingMapper.selectDetail")),
 			@Result(property = "algorithmSettings", column = "id", many = @Many(select = "com.hirain.phm.synapsis.setting.dao.AlgorithmSettingMapper.selectSetting"))
 
 	})
 	Setting selectDetails(int id);
 
-	/**
-	 * 
-	 */
-	@Select("select id from t_setting order by last_modify offset 0 rows fetch next 1 rows only")
-	int selectOldest();
+	@Select("select * from t_setting order by last_modify desc")
+	List<Setting> selectAllByTime();
 
 }

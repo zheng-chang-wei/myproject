@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hirain.phm.synapsis.annotation.Log;
 import com.hirain.phm.synapsis.rbac.domain.User;
 import com.hirain.phm.synapsis.rbac.service.UserService;
 import com.hirain.phm.synapsis.response.ResultBean;
@@ -46,11 +47,13 @@ public class UserController {
 	}
 
 	@PostMapping("/user")
+	@Log("更新用户")
 	public ResultBean<String> insertOrUpdate(@RequestBody User user) {
 		return new ResultBean<>(userService.addOrUpdate(user));
 	}
 
 	@PostMapping("/user/delete")
+	@Log("删除用户")
 	public ResultBean<String> delete(int id) {
 		return new ResultBean<>(userService.deleteUser(id));
 	}

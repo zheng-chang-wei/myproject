@@ -1,0 +1,17 @@
+hdfs:
+  default-fs: hdfs://192.168.40.31:8022
+kafka:
+  consumer:
+    group-prefix: store-test1-
+    servers: 192.168.40.31:9092
+  producer:
+    servers: 192.168.40.31:9092,192.168.40.33:9092
+logging:
+  level:
+    org:
+      apache:
+        kafka: 'OFF'
+store:
+  file:
+    interval: 1
+    root: D:/data

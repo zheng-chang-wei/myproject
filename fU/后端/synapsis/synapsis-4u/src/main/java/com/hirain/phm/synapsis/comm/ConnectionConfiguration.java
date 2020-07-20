@@ -3,12 +3,15 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.comm;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.hirain.phm.synapsis.connection.Connection;
 import com.hirain.phm.synapsis.udp.UDPServer;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @Version 1.0
@@ -23,9 +26,11 @@ import com.hirain.phm.synapsis.udp.UDPServer;
  *               Dec 2, 2019 jianwen.xin@hirain.com 1.0 create file
  */
 @Configuration
+@ConfigurationProperties("synapsis.local")
 public class ConnectionConfiguration {
 
-	@Value("${synapsis.local.port}")
+	@Getter
+	@Setter
 	private int port;
 
 	@Bean("CPU_CONTROL")

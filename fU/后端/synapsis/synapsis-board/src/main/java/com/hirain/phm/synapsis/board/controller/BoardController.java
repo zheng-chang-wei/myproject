@@ -41,6 +41,11 @@ public class BoardController {
 		return new ResultBean<>(boardService.getBoards());
 	}
 
+	@GetMapping("/list/force")
+	public ResultBean<List<Board>> listForce() {
+		return new ResultBean<>(boardService.scanBoards());
+	}
+
 	@GetMapping("/count")
 	public ResultBean<BoardStatisticsResponse> count() {
 		return new ResultBean<>(boardService.count());

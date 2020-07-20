@@ -42,4 +42,7 @@ public interface DerbyMapper<T> {
 	 */
 	@UpdateProvider(type = DerbyProvider.class, method = "dynamicSQL")
 	int updateByKey(T record);
+
+	@UpdateProvider(type = DerbyProvider.class, method = "dynamicSQL")
+	int updateNotNullByKey(T record);
 }

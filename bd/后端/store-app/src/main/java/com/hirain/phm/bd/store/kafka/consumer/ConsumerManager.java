@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import com.hirain.phm.bd.common.pinyin.PinyinUtil;
 import com.hirain.phm.bd.message.header.MessageHeader;
+import com.hirain.phm.bd.store.StoreProperties;
 import com.hirain.phm.bd.store.kafka.KafkaConsumerProperties;
 
 /**
@@ -46,8 +46,8 @@ public class ConsumerManager {
 	@Autowired
 	private ConsumerFactory<String, Object> consumerFactory;
 
-	@Value("${kafka.original.topic.prefix}")
-	private String topicPrefix;
+	@Autowired
+	private StoreProperties storeProps;
 
 	private Map<String, AbstractMessageListenerContainer<?, ?>> kafkaContainerMap = new ConcurrentHashMap<>();
 
@@ -59,7 +59,7 @@ public class ConsumerManager {
 
 	public void createAndStart(MessageHeader header) {
 		String pinyin = PinyinUtil.getFullSpell(header.getCity());
-		String topic = topicPrefix + pinyin + "-" + header.getLine();
+		String topic = storeProps.getTopicPrefix() + pinyin + "-" + header.getLine();
 		System.err.println(topic);
 		if (kafkaContainerMap.keySet().contains(topic)) {
 			return;

@@ -49,4 +49,13 @@ public class DerbyProvider extends MapperTemplate {
 		sql.append(SqlHelper.wherePKColumns(entityClass, true));
 		return sql.toString();
 	}
+
+	public String updateNotNullByKey(MappedStatement ms) {
+		Class<?> entityClass = getEntityClass(ms);
+		StringBuilder sql = new StringBuilder();
+		sql.append(SqlHelper.updateTable(entityClass, tableName(entityClass)));
+		sql.append(SynapsisSqlHelper.updateSetColumns(entityClass, null, true, false));
+		sql.append(SqlHelper.wherePKColumns(entityClass, true));
+		return sql.toString();
+	}
 }

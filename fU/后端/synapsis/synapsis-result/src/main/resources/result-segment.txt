@@ -1,1 +1,230 @@
-[{"length":23,"segments":[{"byteLen":1,"dataType":"UINT8","index":0,"name":"公共包头长度"},{"byteLen":1,"dataType":"UIN8","index":1,"name":"年"},{"byteLen":1,"dataType":"UIN8","index":2,"name":"月"},{"byteLen":1,"dataType":"UIN8","index":3,"name":"日"},{"byteLen":1,"dataType":"UIN8","index":4,"name":"时"},{"byteLen":1,"dataType":"UIN8","index":5,"name":"分"},{"byteLen":1,"dataType":"UIN8","index":6,"name":"秒"},{"byteLen":2,"dataType":"UIN16","index":7,"name":"毫秒"},{"byteLen":1,"dataType":"UIN8","index":8,"name":"经度（下位）"},{"byteLen":1,"dataType":"UIN8","index":9,"name":"经度（中下位）"},{"byteLen":1,"dataType":"UIN8","index":10,"name":"经度（中上位）"},{"byteLen":1,"dataType":"UIN8","index":11,"name":"经度（上位）"},{"byteLen":1,"dataType":"UIN8","index":12,"name":"经度方向"},{"byteLen":1,"dataType":"UIN8","index":13,"name":"纬度（下位）"},{"byteLen":1,"dataType":"UIN8","index":14,"name":"纬度（中下位）"},{"byteLen":1,"dataType":"UIN8","index":15,"name":"纬度（中上位）"},{"byteLen":1,"dataType":"UIN8","index":16,"name":"纬度（上位）"},{"byteLen":1,"dataType":"UIN8","index":17,"name":"纬度方向"},{"byteLen":2,"dataType":"BCD","index":18,"name":"协议版本号"},{"byteLen":2,"dataType":"UINT16","index":19,"name":"CRC校验"}],"type":0},{"length":23,"segments":[{"byteLen":2,"dataType":"UINT16","index":0,"name":"包头类型"},{"byteLen":2,"dataType":"UINT16","index":1,"name":"算法ID"},{"byteLen":1,"dataType":"UINT8","index":2,"name":"算法包头长度"},{"byteLen":1,"dataType":"UIN8","index":3,"name":"年"},{"byteLen":1,"dataType":"UIN8","index":4,"name":"月"},{"byteLen":1,"dataType":"UIN8","index":5,"name":"日"},{"byteLen":1,"dataType":"UIN8","index":6,"name":"时"},{"byteLen":1,"dataType":"UIN8","index":7,"name":"分"},{"byteLen":1,"dataType":"UIN8","index":8,"name":"秒"},{"byteLen":2,"dataType":"UIN16","index":9,"name":"毫秒"},{"byteLen":1,"dataType":"UIN8","index":10,"name":"算法供应商代码"},{"byteLen":2,"dataType":"BCD","index":11,"name":"算法版本"},{"byteLen":2,"dataType":"UINT16","index":12,"name":"生命信号"},{"byteLen":1,"dataType":"UINT8","index":13,"name":"车和端"},{"byteLen":1,"dataType":"UINT8","index":14,"name":"设备顺序编号"},{"byteLen":1,"dataType":"UINT8","index":15,"name":"模型子系统类型"},{"byteLen":2,"dataType":"UINT16","index":16,"name":"CRC校验"}],"type":1}]
+[{
+	"length": 23,
+	"segments": [{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 0,
+		"name": "公共包头长度"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 1,
+		"name": "年"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 2,
+		"name": "月"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 3,
+		"name": "日"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 4,
+		"name": "时"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 5,
+		"name": "分"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 6,
+		"name": "秒"
+	},
+	{
+		"byteLen": 2,
+		"dataType": "UINT16",
+		"index": 7,
+		"name": "毫秒"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 8,
+		"name": "经度（下位）"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 9,
+		"name": "经度（中下位）"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 10,
+		"name": "经度（中上位）"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 11,
+		"name": "经度（上位）"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 12,
+		"name": "经度方向"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 13,
+		"name": "纬度（下位）"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 14,
+		"name": "纬度（中下位）"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 15,
+		"name": "纬度（中上位）"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 16,
+		"name": "纬度（上位）"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 17,
+		"name": "纬度方向"
+	},
+	{
+		"byteLen": 2,
+		"dataType": "BCD",
+		"index": 18,
+		"name": "协议版本号"
+	},
+	{
+		"byteLen": 2,
+		"dataType": "UINT16",
+		"index": 19,
+		"name": "CRC校验"
+	}],
+	"type": 0
+},
+{
+	"length": 23,
+	"segments": [{
+		"byteLen": 2,
+		"dataType": "UINT16",
+		"index": 0,
+		"name": "包头类型"
+	},
+	{
+		"byteLen": 2,
+		"dataType": "UINT16",
+		"index": 1,
+		"name": "算法ID"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 2,
+		"name": "算法包头长度"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 3,
+		"name": "年"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 4,
+		"name": "月"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 5,
+		"name": "日"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 6,
+		"name": "时"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 7,
+		"name": "分"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 8,
+		"name": "秒"
+	},
+	{
+		"byteLen": 2,
+		"dataType": "UINT16",
+		"index": 9,
+		"name": "毫秒"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 10,
+		"name": "算法供应商代码"
+	},
+	{
+		"byteLen": 2,
+		"dataType": "BCD",
+		"index": 11,
+		"name": "算法版本"
+	},
+	{
+		"byteLen": 2,
+		"dataType": "UINT16",
+		"index": 12,
+		"name": "生命信号"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 13,
+		"name": "车和端"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 14,
+		"name": "设备顺序编号"
+	},
+	{
+		"byteLen": 1,
+		"dataType": "UINT8",
+		"index": 15,
+		"name": "模型子系统类型"
+	},
+	{
+		"byteLen": 2,
+		"dataType": "UINT16",
+		"index": 16,
+		"name": "CRC校验"
+	}],
+	"type": 1
+}]

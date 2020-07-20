@@ -12,44 +12,43 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hirain.qsy.shaft.dao.ManageMapper;
 
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ManageMapperTest {
+public class ManageMapperTest extends BaseTest {
 
 	@Autowired
 	ManageMapper manageMapper;
 
-	// @Test
+	@Test
 	public void createInitialDataTableTest() {
 		manageMapper.createInitialDataTable(1, partitions());
 		int count = manageMapper.existInitialDataTable(1);
 		assertEquals(1, count);
 	}
 
-	// @Test
+	@Test
 	public void createTableTest() {
 		manageMapper.createExceptionDataTable(1, partitions());
 	}
 
-	// @Test
+	@Test
 	public void dropTableTest() {
 		manageMapper.dropTable("t_initial_data_1");
 	}
 
-	// @Test
+	@Test
 	public void lastPartitionTest() {
 		String lastPartition = manageMapper.lastPartition("t_initial_data_1");
 		System.out.println(lastPartition);
 
 	}
 
-	// @Test
+	@Test
 	public void addPartitionTest() {
-		Date date = new Date(2019 - 1900, 10, 2);
+		Date date = new Date();
 		addPartition(1, date);
 	}
 

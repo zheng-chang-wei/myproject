@@ -13,6 +13,7 @@ const DetectionByCar = () => import("pages/detection/detectionByCar");
 const StatisticsByCar = () => import("pages/statistics/statisticsByCar");
 const StatisticsByPoint = () => import("pages/statistics/statisticsByPoint");
 const HistoryData = () => import("pages/history/historyData");
+const Test = () => import("pages/test");
 
 
 Vue.use(Router)
@@ -26,13 +27,18 @@ export default new Router({
 			path: "/login",
 			component: Login
 		},
+
 		{
 			path: "/main",
 			component: Main,
 			children: [{
 					path: "",
 					redirect: "/home"
-				},
+			},
+			{
+				path: "/test",
+				component: Test
+			},
 				{
 					path: "/home",
 					component: Home,

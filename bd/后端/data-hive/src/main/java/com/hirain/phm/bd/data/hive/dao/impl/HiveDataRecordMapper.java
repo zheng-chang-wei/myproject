@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import com.hirain.phm.bd.data.hive.HiveProperties;
 import com.hirain.phm.bd.data.hive.dao.DataRecordMapper;
+import com.hirain.phm.bd.data.hive.file.FileProperties;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Version 1.0
@@ -24,6 +26,7 @@ import com.hirain.phm.bd.data.hive.dao.DataRecordMapper;
  *               Mar 5, 2020 jianwen.xin@hirain.com 1.0 create file
  */
 @Service
+@Slf4j
 public class HiveDataRecordMapper implements DataRecordMapper {
 
 	@Autowired
@@ -31,7 +34,7 @@ public class HiveDataRecordMapper implements DataRecordMapper {
 	private JdbcTemplate template;
 
 	@Autowired
-	private HiveProperties properties;
+	private FileProperties properties;
 
 	@Override
 	public void createTable(String tableName) {
@@ -50,6 +53,7 @@ public class HiveDataRecordMapper implements DataRecordMapper {
 		sb.append("partitioned by (date string) ");
 		sb.append("row format delimited fields terminated by '" + properties.getSeperator() + "' lines terminated by '\n' ");
 		sb.append("stored as textfile");
+		log.info(sb.toString());
 		template.execute(sb.toString());
 	}
 
@@ -62,6 +66,7 @@ public class HiveDataRecordMapper implements DataRecordMapper {
 		StringBuffer sb = new StringBuffer();
 		sb.append("load data inpath '").append(filepath).append("' into table ").append(tableName);
 		sb.append(" partition(date=").append(partition).append(")");
+		log.info(sb.toString());
 		template.execute(sb.toString());
 	}
 

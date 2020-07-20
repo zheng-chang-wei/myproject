@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<root>
+    <container type="head">
+        <segment index="0" name="公共包头长度" data-type="UINT8" byte-len="1"/>
+        <segment index="1" name="年" data-type="UINT8" byte-len="1"/>
+        <segment index="2" name="月" data-type="UINT8" byte-len="1"/>
+        <segment index="3" name="日" data-type="UINT8" byte-len="1"/>
+        <segment index="4" name="时" data-type="UINT8" byte-len="1"/>
+        <segment index="5" name="分" data-type="UINT8" byte-len="1"/>
+        <segment index="6" name="秒" data-type="UINT8" byte-len="1"/>
+        <segment index="7" name="毫秒" data-type="UINT16" byte-len="2"/>
+        <segment index="8" name="经度（下位）" data-type="UINT8" byte-len="1"/>
+        <segment index="9" name="经度（中下位）" data-type="UINT8" byte-len="1"/>
+        <segment index="10" name="经度（中上位）" data-type="UINT8" byte-len="1"/>
+        <segment index="11" name="经度（上位）" data-type="UINT8" byte-len="1"/>
+        <segment index="12" name="经度方向" data-type="UINT8" byte-len="1"/>
+        <segment index="13" name="纬度（下位）" data-type="UINT8" byte-len="1"/>
+        <segment index="14" name="纬度（中下位）" data-type="UINT8" byte-len="1"/>
+        <segment index="15" name="纬度（中上位）" data-type="UINT8" byte-len="1"/>
+        <segment index="16" name="纬度（上位）" data-type="UINT8" byte-len="1"/>
+        <segment index="17" name="纬度方向" data-type="UINT8" byte-len="1"/>
+        <segment index="18" name="协议版本号" data-type="BCD" byte-len="2"/>
+        <segment index="19" name="保留字" data-type="BYTE[]" byte-len="26"/>
+        <segment index="20" name="CRC校验" data-type="UINT16" byte-len="2"/>
+    </container>
+    <container type="data">
+        <segment index="0" name="包头类型" data-type="UINT16" byte-len="2"/>
+        <segment index="1" name="算法ID" data-type="UINT16" byte-len="2"/>
+        <segment index="2" name="算法包头长度" data-type="UINT8" byte-len="1"/>
+        <segment index="3" name="年" data-type="UINT8" byte-len="1"/>
+        <segment index="4" name="月" data-type="UINT8" byte-len="1"/>
+        <segment index="5" name="日" data-type="UINT8" byte-len="1"/>
+        <segment index="6" name="时" data-type="UINT8" byte-len="1"/>
+        <segment index="7" name="分" data-type="UINT8" byte-len="1"/>
+        <segment index="8" name="秒" data-type="UINT8" byte-len="1"/>
+        <segment index="9" name="毫秒" data-type="UINT16" byte-len="2"/>
+        <segment index="10" name="算法供应商代码" data-type="UINT8" byte-len="1"/>
+        <segment index="11" name="算法版本" data-type="BCD" byte-len="2"/>
+        <segment index="12" name="生命信号" data-type="UINT16" byte-len="2"/>
+        <segment index="13" name="车和端" data-type="UINT8" byte-len="1"/>
+        <segment index="14" name="设备顺序编号" data-type="UINT8" byte-len="1"/>
+        <segment index="15" name="模型子系统类型" data-type="UINT8" byte-len="1"/>
+        <segment index="16" name="CRC校验" data-type="UINT16" byte-len="2"/>
+        <segment index="17" name="结果包长度" data-type="UINT8" byte-len="1"/>
+        <segment index="18" name="项点名称" data-type="CHAR[]" byte-len="16"/>
+        <segment index="19" name="项点判定结果" data-type="BOOL8" byte-len="1"/>
+    </container>
+</root>

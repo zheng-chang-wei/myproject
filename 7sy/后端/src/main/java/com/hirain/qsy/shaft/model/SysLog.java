@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Table(name = "t_log")
@@ -40,6 +41,7 @@ public class SysLog implements Serializable {
 	@Column(name = "IP")
 	private String ip;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "CREATE_TIME")
 	private Date createTime;
 

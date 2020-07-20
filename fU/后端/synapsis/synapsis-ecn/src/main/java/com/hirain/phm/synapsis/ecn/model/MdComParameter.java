@@ -55,40 +55,40 @@ public class MdComParameter extends SheetAndLine {
 	@XmlAttribute(name = "callback")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String callback;
+	protected String callback = "on";
 
 	@XmlAttribute(name = "confirm-timeout")
-	protected String confirmTimeOut;
+	protected String confirmTimeOut = "1000000";
 
 	@XmlAttribute(name = "connect-timeout")
-	protected String connectTimeOut;
+	protected String connectTimeOut = "6000000";
 
 	@XmlAttribute(name = "marshall")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String marshall;
+	protected String marshall = "off";
 
 	@XmlAttribute(name = "num-sessions")
-	protected String numSessions;
+	protected String numSessions = "1000";
 
 	@XmlAttribute(name = "protocol")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String protocol;
+	protected String protocol = "UDP";
 
 	@XmlAttribute(name = "qos")
-	protected String qos;
+	protected String qos = "3";
 
 	@XmlAttribute(name = "reply-timeout")
-	protected String replyTimeOut;
+	protected String replyTimeOut = "5000000";
 
 	@XmlAttribute(name = "tcp-port")
-	protected String tcpPort;
+	protected String tcpPort = "17225";
 
 	@XmlAttribute(name = "ttl")
-	protected String ttl;
+	protected String ttl = "64";
 
 	@XmlAttribute(name = "udp-port")
-	protected String udpPort;
+	protected String udpPort = "17225";
 
 }

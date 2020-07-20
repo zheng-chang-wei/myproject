@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -283,7 +284,8 @@ public class UserExcelServiceImpl implements UserExcelService {
 		final Iterator<Cell> cellIterator = row.cellIterator();
 		while (cellIterator.hasNext()) {
 			final Cell cell = cellIterator.next();
-			cell.setCellType(Cell.CELL_TYPE_STRING);
+			// cell.setCellType(Cell.CELL_TYPE_STRING);
+			cell.setCellType(CellType.STRING);
 			values.add(cell.getStringCellValue());
 		}
 		return values;

@@ -9,9 +9,9 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
-import com.hirain.phm.synapsis.setting.CommonMapper;
 import com.hirain.phm.synapsis.setting.ECNVariable;
 import com.hirain.phm.synapsis.setting.Variable;
+import com.hirain.phm.synapsis.setting.common.CommonMapper;
 
 /**
  * @Version 1.0

@@ -26,7 +26,6 @@ import com.hirain.phm.bd.ground.maintenance.service.RbacService;
  *               Feb 28, 2020 jianwen.xin@hirain.com 1.0 create file
  */
 @Service
-//@Profile({ "dev", "local" })
 public class RbacServiceImpl implements RbacService {
 
 	@Autowired

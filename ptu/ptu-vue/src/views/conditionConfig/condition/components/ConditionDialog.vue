@@ -179,7 +179,6 @@ export default {
     featureChange(value) {
     },
     handleDelLogical() {
-      this.$refs.logicalTable.selection
       this.$refs.logicalTable.selection.forEach(element => {
         const index = this.logicalTableDatas.indexOf(element)
         this.logicalTableDatas.splice(index, 1)
@@ -217,7 +216,7 @@ export default {
 
               this.$message({
                 type: 'success',
-                message: '保存成功'
+                message: '保存成功,刷新页面方能启用'
               })
               this.$emit('getCondition')
             }

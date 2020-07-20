@@ -11,12 +11,16 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.hirain.phm.bd.ground.common.data.BaseValueService;
+import com.hirain.phm.bd.ground.dictionary.service.BaseValueService;
 import com.hirain.phm.bd.ground.fault.dao.FaultDataMapper;
 import com.hirain.phm.bd.ground.fault.domain.FaultData;
 import com.hirain.phm.bd.ground.fault.domain.FaultDataContainer;
+import com.hirain.phm.bd.ground.fault.domain.FaultDetail;
 import com.hirain.phm.bd.ground.fault.param.FaultDataResponse;
 import com.hirain.phm.bd.ground.fault.service.FaultDataService;
+import com.hirain.phm.bd.ground.fault.service.FaultDetailService;
+import com.hirain.phm.bd.ground.train.controller.TrainGateWay;
+import com.hirain.phm.bd.ground.train.domain.Train;
 import com.hirain.phm.bd.message.CommonMessage;
 import com.hirain.phm.bd.message.decode.KeyValueDecoder;
 import com.hirain.phm.bd.message.decode.RunDataFrame;
@@ -42,9 +46,15 @@ public class FaultDataServiceImpl implements FaultDataService {
 	private FaultDataMapper mapper;
 
 	@Autowired
+	private FaultDetailService detailService;
+
+	@Autowired
 	private BaseValueService baseValueService;
 
 	private KeyValueDecoder decoder = new KeyValueDecoder();
+
+	@Autowired
+	private TrainGateWay trainGw;
 
 	/**
 	 * @see com.hirain.phm.bd.ground.fault.service.FaultDataService#getFaultData(java.lang.Long)
@@ -59,14 +69,17 @@ public class FaultDataServiceImpl implements FaultDataService {
 		return null;
 	}
 
+	@Override
 	public FaultDataResponse getFaultData(Long id, List<String> variables) throws Exception {
 		FaultDataContainer container = mapper.selectByPrimaryKey(id);
 		FaultDataResponse response = new FaultDataResponse();
 		List<String> keys = JSONObject.parseArray(container.getKeys(), String.class);
-		response.setKeys(keys);
+		response.setKeys(variables);
+		FaultDetail faultDetail = detailService.selectByKey(id);
+		Train train = trainGw.findTrainById(faultDetail.getTrainId());
 		List<List<String>> baseValues = new ArrayList<>();
-		for (String key : keys) {
-			baseValues.add(baseValueService.getBaseValue(0, key));
+		for (String key : variables) {
+			baseValues.add(baseValueService.getBaseValue(train.getProjectId(), key));
 		}
 		response.setBaseValues(baseValues);
 

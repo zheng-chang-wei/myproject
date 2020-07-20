@@ -41,4 +41,9 @@ public interface ECNVariableQuery {
 
 	Map<Long, String> getComIdCycle(Device device);
 
+	/**
+	 * @param device
+	 */
+	String getEndian(Device device);
+
 }

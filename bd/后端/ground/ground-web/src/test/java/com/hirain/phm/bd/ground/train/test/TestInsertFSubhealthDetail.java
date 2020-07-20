@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hirain.phm.bd.ground.GroundWebApplication;
-import com.hirain.phm.bd.ground.push.dao.PushInfoMapper;
 import com.hirain.phm.bd.ground.subhealth.dao.SubhealthDetailMapper;
 import com.hirain.phm.bd.ground.subhealth.dao.SubhealthInfoMapper;
 import com.hirain.phm.bd.ground.subhealth.domain.SubhealthDetail;
@@ -53,9 +52,6 @@ public class TestInsertFSubhealthDetail {
 	SubhealthInfoMapper subhealthInfoMapper;
 
 	@Autowired
-	PushInfoMapper pushInfoMapper;
-
-	@Autowired
 	ProjectMapper projectMapper;
 
 	@Test
@@ -64,14 +60,14 @@ public class TestInsertFSubhealthDetail {
 		List<Train> trains = trainService.selectAll();
 		for (Train train : trains) {
 			for (SubhealthInfo subhealthInfo : subhealthInfos) {
-				Integer subhealthInfoId = subhealthInfo.getTypeCode();
+				Integer subhealthInfoId = subhealthInfo.getSubhealthCode();
 				SubhealthDetail subhealthDetail = new SubhealthDetail();
 				subhealthDetail.setCarNo(1);
 				subhealthDetail.setDebugMode(false);
 				subhealthDetail.setDoorAddr(1);
 				subhealthDetail.setStartTime(new Date());
 				subhealthDetail.setEndTime(new Date());
-				subhealthDetail.setSubhealthTypeId(subhealthInfoId);
+				subhealthDetail.setSubhealthInfoId(subhealthInfoId);
 				subhealthDetail.setStatistics(true);
 				subhealthDetail.setTrainId(train.getId());
 				subhealthDetailMapper.insert(subhealthDetail);

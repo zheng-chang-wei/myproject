@@ -1,14 +1,11 @@
 package com.hirain.phm.bd.ground.bigdata;
 
-import java.util.List;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import com.hirain.phm.bd.data.DataQueryService;
-import com.hirain.phm.bd.data.bean.DataParam;
-import com.hirain.phm.bd.data.bean.DataRecord;
+import com.hirain.phm.bd.ground.bigdata.service.TestDataQueryServiceImpl;
 
 import tk.mybatis.spring.annotation.MapperScan;
 
@@ -22,17 +19,6 @@ public class BigDataTestApplication {
 
 	@Bean
 	public DataQueryService get() {
-		return new DataQueryService() {
-
-			@Override
-			public List<DataRecord> select(DataParam param) {
-				return null;
-			}
-
-			@Override
-			public int count(DataParam param) {
-				return 0;
-			}
-		};
+		return new TestDataQueryServiceImpl();
 	}
 }

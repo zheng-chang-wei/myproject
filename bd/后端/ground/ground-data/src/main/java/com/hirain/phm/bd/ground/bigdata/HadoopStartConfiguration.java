@@ -3,7 +3,7 @@
  ******************************************************************************/
 package com.hirain.phm.bd.ground.bigdata;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -23,15 +23,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class HadoopStartConfiguration implements ApplicationRunner {
 
-	@Value("${hdfs.username}")
-	private String hadoopUsername;
+	@Autowired
+	private HdfsProperties props;
 
 	/**
 	 * @see org.springframework.boot.ApplicationRunner#run(org.springframework.boot.ApplicationArguments)
 	 */
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		System.setProperty("HADOOP_USER_NAME", hadoopUsername);
+		System.setProperty("HADOOP_USER_NAME", props.getUsername());
 		System.out.println(System.getProperty("HADOOP_USER_NAME"));
 	}
 

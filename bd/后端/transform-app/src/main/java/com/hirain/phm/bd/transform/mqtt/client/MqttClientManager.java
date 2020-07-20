@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.hirain.phm.bd.transform.mqtt.MqttProperties;
+import com.hirain.phm.bd.transform.mqtt.MqttSslProperties;
 import com.hirain.phm.bd.transform.mqtt.SslUtil;
 
 /**
@@ -40,6 +41,9 @@ public class MqttClientManager {
 	@Autowired
 	private MqttProperties mqttProps;
 
+	@Autowired
+	private MqttSslProperties sslProperties;
+
 	/**
 	 * @param clientId
 	 */
@@ -49,7 +53,7 @@ public class MqttClientManager {
 		}
 		if (!clients.containsKey(clientId)) {
 			MqttMessageClient client = getClient();
-			client.init(mqttProps.getHostUrl(), clientId, new String[] { realtimeTopic, historyTopic }, new int[] { 0, 1 });
+			client.init(mqttProps.getUrl(), clientId, new String[] { realtimeTopic, historyTopic }, new int[] { 0, 1 });
 			clients.put(clientId, client);
 			client.start();
 		}
@@ -64,7 +68,7 @@ public class MqttClientManager {
 	@Bean
 	public MqttConnectOptions messageConnectOptions() {
 		MqttConnectOptions options = new MqttConnectOptions();
-		options.setServerURIs(new String[] { mqttProps.getSslUrl() });
+		options.setServerURIs(new String[] { sslProperties.getUrl() });
 		options.setKeepAliveInterval(mqttProps.getKeepAlive());
 		options.setCleanSession(false);
 		options.setAutomaticReconnect(true);
@@ -78,6 +82,7 @@ public class MqttClientManager {
 
 	@Bean
 	public SocketFactory socketFactory() throws Exception {
-		return SslUtil.getSocketFactory(mqttProps.getCaFile(), mqttProps.getClientFile(), mqttProps.getKeyFile(), mqttProps.getSslPassword());
+		return SslUtil.getSocketFactory(sslProperties.getCaFile(), sslProperties.getClientFile(), sslProperties.getKeyFile(),
+				sslProperties.getPassword());
 	}
 }

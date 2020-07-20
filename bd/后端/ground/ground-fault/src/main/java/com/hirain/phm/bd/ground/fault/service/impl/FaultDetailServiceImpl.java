@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,8 +20,9 @@ import com.hirain.phm.bd.ground.fault.dao.FaultDetailMapper;
 import com.hirain.phm.bd.ground.fault.domain.FaultDetail;
 import com.hirain.phm.bd.ground.fault.domain.FaultInfo;
 import com.hirain.phm.bd.ground.fault.param.AnnualCountResponse;
-import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParms;
-import com.hirain.phm.bd.ground.fault.param.FaultDetailWithSuggestionParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailResponseParams;
+import com.hirain.phm.bd.ground.fault.param.FaultInfoDTO;
 import com.hirain.phm.bd.ground.fault.service.FaultDataService;
 import com.hirain.phm.bd.ground.fault.service.FaultDetailService;
 import com.hirain.phm.bd.ground.fault.service.FaultInfoService;
@@ -52,7 +54,7 @@ public class FaultDetailServiceImpl extends BaseService<FaultDetail> implements 
 	private FaultDataService dataService;
 
 	@Override
-	public List<FaultDetailWithSuggestionParams> findFaultDetailsByParams(FaultDetailRequestParms faultDetailParms) {
+	public List<FaultDetailResponseParams> findFaultDetailsByParams(FaultDetailRequestParams faultDetailParms) {
 		return faultDetailMapper.findFaultDetailsByParms(faultDetailParms);
 
 	}
@@ -133,19 +135,28 @@ public class FaultDetailServiceImpl extends BaseService<FaultDetail> implements 
 	 * @see com.hirain.phm.bd.ground.fault.service.FaultDetailService#selectToday()
 	 */
 	@Override
-	public List<FaultDetailWithSuggestionParams> selectToday(String projectName, String trainNo) {
-		return faultDetailMapper.selectToday(projectName, trainNo);
-	}
-
-	/** 
-	 * @see com.hirain.phm.bd.ground.fault.service.FaultDetailService#selectToday()
-	 */
-	@Override
-	public List<FaultDetailWithSuggestionParams> selectToday() {
+	public List<FaultDetailResponseParams> selectToday() {
 		String todayDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(LocalDateTime.now());
 		String startTime = todayDate + " 00:00:00";
 		String endTime = todayDate + " 23:59:59";
-		return faultDetailMapper.selectToday4Bode(startTime, endTime);
+		List<FaultDetailResponseParams> details = faultDetailMapper.selectToday(startTime, endTime);
+		getRepairAndSolution(details);
+		return details;
+	}
+
+	@Override
+	public void getRepairAndSolution(List<FaultDetailResponseParams> details) {
+		Map<Integer, FaultInfoDTO> map = new HashMap<>();
+		details.forEach(d -> {
+			FaultInfoDTO dto = map.get(d.getFaultInfoId());
+			if (dto == null) {
+				FaultInfo info = faultInfoService.selectWithDetail(d.getFaultInfoId());
+				dto = FaultInfoDTO.valueOf(info);
+				map.put(info.getId(), dto);
+			}
+			d.setRepair(dto.getRepair());
+			d.setSolution(dto.getSolution());
+		});
 	}
 
 	/**

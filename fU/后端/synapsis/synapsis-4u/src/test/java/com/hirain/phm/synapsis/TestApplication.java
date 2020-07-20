@@ -21,7 +21,7 @@ import tk.mybatis.spring.annotation.MapperScan;
  *               Dec 3, 2019 jianwen.xin@hirain.com 1.0 create file
  */
 @SpringBootApplication(scanBasePackages = "com.hirain.phm.synapsis")
-@MapperScan(basePackages = { "com.hirain.phm.synapsis.*.dao" })
+@MapperScan(basePackages = { "com.hirain.phm.synapsis.*.dao", "com.hirain.phm.synapsis.result.ecn.dao" })
 public class TestApplication {
 
 	public static void main(String[] args) {

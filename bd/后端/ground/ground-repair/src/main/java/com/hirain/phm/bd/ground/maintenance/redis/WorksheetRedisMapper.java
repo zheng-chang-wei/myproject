@@ -126,10 +126,9 @@ public class WorksheetRedisMapper {
 		redis.hset(sheetId + "-department", map);
 	}
 
-	public boolean checkDepart(Long sheetId, String deptName) {
+	public Object checkDepart(Long sheetId, String deptName) {
 		Object result = redis.hmget(sheetId + "-department", deptName);
-		boolean check = "true".equals(result);
-		return check;
+		return result;
 	}
 
 	public void integrateSheets() {

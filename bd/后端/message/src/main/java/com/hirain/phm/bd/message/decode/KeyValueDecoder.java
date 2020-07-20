@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class KeyValueDecoder implements IDoorMessageDecoder {
 	static {
 		ClassLoader loader = KeyValueDecoder.class.getClassLoader();
 		InputStream stream = loader.getResourceAsStream("key.txt");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charset.forName("utf-8")));
 		keys = new ArrayList<>();
 		String line;
 		try {

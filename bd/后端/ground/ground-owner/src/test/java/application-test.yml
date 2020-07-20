@@ -1,0 +1,25 @@
+owner:
+   tooken: 123123
+   url: http://localhost:10000
+   timed:
+    temp-dir: D:/test
+kafka:
+  producer:
+    servers: localhost:9092
+mqtt:
+  ssl:
+    cert-file: F:/ssl/ca.crt
+    client-file: F:/ssl/client.crt
+    key-file: F:/ssl/client.key
+spring:
+  mail:
+    default-encoding: UTF-8
+    host: smtp.hirain.com
+    password: Secretmakes16
+    username: jianwen.xin@hirain.com
+  redis:
+    host: 192.168.40.34
+
+ground:
+  mail:
+    from: jianwen.xin@hirain.com

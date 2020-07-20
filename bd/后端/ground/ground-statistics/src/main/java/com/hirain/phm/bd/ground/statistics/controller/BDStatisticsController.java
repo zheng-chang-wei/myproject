@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hirain.phm.bd.ground.common.model.ResponseBo;
+import com.hirain.phm.bd.ground.dictionary.service.DoorTypeService;
 import com.hirain.phm.bd.ground.maintenance.param.FaultStatisticsRequestParm;
-import com.hirain.phm.bd.ground.maintenance.service.DoorTypeService;
 import com.hirain.phm.bd.ground.maintenance.service.EffectService;
 import com.hirain.phm.bd.ground.maintenance.service.FaultModeService;
 import com.hirain.phm.bd.ground.maintenance.service.FaultStageService;

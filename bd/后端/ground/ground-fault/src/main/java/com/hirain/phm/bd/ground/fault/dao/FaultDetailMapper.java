@@ -7,8 +7,8 @@ import org.apache.ibatis.annotations.SelectProvider;
 import com.github.pagehelper.util.StringUtil;
 import com.hirain.phm.bd.ground.common.config.CommonMapper;
 import com.hirain.phm.bd.ground.fault.domain.FaultDetail;
-import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParms;
-import com.hirain.phm.bd.ground.fault.param.FaultDetailWithSuggestionParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailResponseParams;
 
 /**
  * @Version 1.0
@@ -25,24 +25,18 @@ import com.hirain.phm.bd.ground.fault.param.FaultDetailWithSuggestionParams;
 public interface FaultDetailMapper extends CommonMapper<FaultDetail> {
 
 	@SelectProvider(type = FaultDetailMapperProvider.class, method = "findFaultDetailsByParms")
-	List<FaultDetailWithSuggestionParams> findFaultDetailsByParms(FaultDetailRequestParms faultDetailParms);
-
-	/**
-	 * @return
-	 */
-	@SelectProvider(type = FaultDetailMapperProvider.class, method = "selectToday")
-	List<FaultDetailWithSuggestionParams> selectToday(String projectName, String trainNo);
+	List<FaultDetailResponseParams> findFaultDetailsByParms(FaultDetailRequestParams faultDetailParms);
 
 	/**
 	 * @author zepei.tao
 	 */
-	@SelectProvider(type = FaultDetailMapperProvider.class, method = "selectToday4Bode")
-	List<FaultDetailWithSuggestionParams> selectToday4Bode(String startTime, String endTime);
+	@SelectProvider(type = FaultDetailMapperProvider.class, method = "selectToday")
+	List<FaultDetailResponseParams> selectToday(String startTime, String endTime);
 
 	class FaultDetailMapperProvider {
 
-		public String selectToday(String projectName, String trainNo) {
-			String sql = "select tp.name project,tt.train_no,td.id,td.car_no,td.door_addr,td.debug_mode,td.fault_time,ti.fault_name,tts.outline suggestion,tts.suggestion treatment, trs.suggestion repair"
+		public String selectToday(String startTime, String endTime) {
+			String sql = "select tp.name project,tt.train_no,td.id,td.fault_info_id,td.car_no,td.door_addr,td.debug_mode,td.fault_time,ti.fault_name"
 
 					+ " from t_fault_detail td " +
 
@@ -50,44 +44,9 @@ public interface FaultDetailMapper extends CommonMapper<FaultDetail> {
 
 					" left join t_train tt on tt.id=td.train_id" +
 
-					" left join t_project tp on tp.id=tt.project_id" +
+					" left join t_project tp on tp.id=tt.project_id";
 
-					" left join t_push ts on ti.fault_code=ts.code" +
-
-					" left join t_treatment_suggestion tts on ts.treatment_id=tts.id" +
-
-					" left join t_repair_suggestion trs on ts.repair_id=trs.id";
-
-			sql += " where ts.type=0";
-			if (StringUtil.isNotEmpty(projectName)) {
-				sql += " and tp.name=#{projectName}";
-			}
-			if (StringUtil.isNotEmpty(trainNo)) {
-				sql += " and tt.train_no=#{trainNo}";
-			}
-			sql += " order by td.fault_time desc";
-			sql += " LIMIT 20";
-			return sql;
-		}
-
-		public String selectToday4Bode(String startTime, String endTime) {
-			String sql = "select tp.name project,tt.train_no,td.id,td.car_no,td.door_addr,td.debug_mode,td.fault_time,ti.fault_name,tts.outline suggestion,tts.suggestion treatment, trs.suggestion repair"
-
-					+ " from t_fault_detail td " +
-
-					" left join t_fault_info ti on td.fault_info_id=ti.id" +
-
-					" left join t_train tt on tt.id=td.train_id" +
-
-					" left join t_project tp on tp.id=tt.project_id" +
-
-					" left join t_push ts on ti.fault_code=ts.code" +
-
-					" left join t_treatment_suggestion tts on ts.treatment_id=tts.id" +
-
-					" left join t_repair_suggestion trs on ts.repair_id=trs.id";
-
-			sql += " where ts.type=0";
+			sql += " where true";
 			if (StringUtil.isNotEmpty(startTime)) {
 				sql += " and td.fault_time >= #{startTime}";
 			}
@@ -98,7 +57,7 @@ public interface FaultDetailMapper extends CommonMapper<FaultDetail> {
 			return sql;
 		}
 
-		public String findFaultDetailsByParms(FaultDetailRequestParms faultDetailParms) {
+		public String findFaultDetailsByParms(FaultDetailRequestParams faultDetailParms) {
 			String sql = "SELECT" +
 
 					" tp.name project," +
@@ -106,6 +65,8 @@ public interface FaultDetailMapper extends CommonMapper<FaultDetail> {
 					"	tt.train_no," +
 					// 故障详情id
 					"	td.id," +
+					// faultInfoId
+					" td.fault_info_id," +
 					// 车厢号
 					"	td.car_no," +
 					// 门地址
@@ -119,9 +80,8 @@ public interface FaultDetailMapper extends CommonMapper<FaultDetail> {
 					// 故障名称
 					"	ti.fault_name," +
 					// 故障代码
-					"	ti.fault_code," +
+					"	ti.fault_code" +
 
-					"tts.suggestion treatment, trs.suggestion repair, ts.description description, trs.solution solution" +
 					// 故障详情表
 					" FROM t_fault_detail td " +
 					// 故障信息表
@@ -130,12 +90,6 @@ public interface FaultDetailMapper extends CommonMapper<FaultDetail> {
 					"LEFT JOIN t_train tt ON tt.id = td.train_id " +
 
 					"LEFT JOIN t_project tp on tp.id=tt.project_id " +
-
-					" left join t_push ts on ti.fault_code=ts.code" +
-
-					" left join t_treatment_suggestion tts on ts.treatment_id=tts.id" +
-
-					" left join t_repair_suggestion trs on ts.repair_id=trs.id " +
 
 					"where true";
 			if (StringUtil.isNotEmpty(faultDetailParms.getProject())) {
@@ -165,7 +119,6 @@ public interface FaultDetailMapper extends CommonMapper<FaultDetail> {
 			if (StringUtil.isNotEmpty(faultDetailParms.getFaultCode())) {
 				sql += " and ti.fault_code = #{faultCode}";
 			}
-			sql += " and ts.type = 0";
 			sql += " order by td.fault_time desc";
 			return sql;
 		}

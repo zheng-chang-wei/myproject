@@ -1,0 +1,51 @@
+ground:
+  mail:
+    from: jianwen.xin@hirain.com
+    url-prefix: http://58.33.15.3:8083/#/mail
+    mobile-prefix: http://58.33.15.3:8083/#/mobile/mail
+  train: 
+#   每两分钟检查一次在线
+    heart-cron: 0 0/1 * * * ?
+#   判断车辆是否下线的最大断连次数 
+    max-break-count: 1
+hdfs:
+  default-fs: hdfs://192.168.40.31:8022
+kafka:
+  consumer:
+    group-id: groundapp-xin1
+    group-prefix: ground-xin1-
+    servers: 192.168.40.31:9092
+  producer:
+    servers: 192.168.40.31:9092
+mqtt:
+  ssl:
+    cert-file: F:/ssl/ca.crt
+    client-file: F:/ssl/client.crt
+    key-file: F:/ssl/client.key
+repair:
+  integration:
+    cron-expression: 0 0 1 1/1 * ? *
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/phm_bd_ground?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+  mail:
+    default-encoding: UTF-8
+    host: smtp.hirain.com
+    password: Secretmakes16
+    port: 465
+    properties:
+      mail:
+        imap:
+          ssl:
+            socketFactory:
+              fallback: false
+        smtp:
+          ssl:
+            enable: true
+            socketFactory:
+              class: com.hirain.phm.bd.ground.mail.MailSSLSocketFactory
+    username: jianwen.xin@hirain.com
+  redis:
+    host: 192.168.40.34

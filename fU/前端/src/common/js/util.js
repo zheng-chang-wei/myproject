@@ -39,7 +39,42 @@ export default {
     }
     return fmt
   },
-  getUrlKey(name) {
-    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ''])[1].replace(/\+/g, '%20')) || null
+  getAllVariables(allVariables) {
+    let variables = []
+    for (let i = 0; i < allVariables.length; i++) {
+      variables = variables.concat(allVariables[i].variables)
+    }
+    return variables
+  },
+  isInvalid(element, type, variables) {
+    for (let i = 0; i < variables.length; i++) {
+      const variable = variables[i]
+      if (this.isEquals(element, variable, type)) {
+        return false
+      }
+    }
+    return true
+  },
+  isEquals(variable1, variable2, type) {
+    if (type === 'MVB') {
+      if (variable1.name === variable2.name && variable1.signalName === variable2.signalName && variable1.device === variable2.device && variable1.deviceName === variable2.deviceName) {
+        return true
+      }
+    } else if (type === 'ECN') {
+      if (variable1.name === variable2.name && variable1.signalName === variable2.signalName && variable1.comId === variable2.comId && variable1.sourceIp === variable2.sourceIp) {
+        return true
+      }
+    } else if (type.indexOf('AD') !== -1) {
+      if (variable1.name === variable2.name) {
+        return true
+      }
+    }
+    return false
+  },
+  isEmpty(array) {
+    if (array !== undefined && array !== null && array.length > 0) {
+      return false
+    }
+    return true
   }
 }

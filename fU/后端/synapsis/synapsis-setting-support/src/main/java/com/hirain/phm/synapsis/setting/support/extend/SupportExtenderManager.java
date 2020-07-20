@@ -3,7 +3,10 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.setting.support.extend;
 
+import java.util.Collection;
+
 import com.hirain.phm.synapsis.setting.Setting;
+import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.support.domain.ValidateResult;
 
 /**
@@ -20,7 +23,7 @@ import com.hirain.phm.synapsis.setting.support.domain.ValidateResult;
  */
 public interface SupportExtenderManager {
 
-	void activate(int settingId) throws Exception;
+	void activate(ExtenderSetting extenderSetting) throws Exception;
 
 	ValidateResult validate(int settingId, Setting setting);
 
@@ -28,4 +31,10 @@ public interface SupportExtenderManager {
 	 * @param settingId
 	 */
 	void delete(int settingId) throws Exception;
+
+	/**
+	 * @param setting
+	 * @return
+	 */
+	Collection<? extends VariableGroup> getVariableGroup(int settingId);
 }

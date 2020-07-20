@@ -25,4 +25,11 @@ public class ResultQueryParam {
 	private Date start;
 
 	private Date end;
+	
+	private String name;
+	
+	private String algorithm;
+	
+	private String subsystem;
+	
 }

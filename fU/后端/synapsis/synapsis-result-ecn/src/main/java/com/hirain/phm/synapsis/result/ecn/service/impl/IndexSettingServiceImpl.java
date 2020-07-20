@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hirain.phm.synapsis.result.ecn.dao.AlgorithmIndexMapper;
 import com.hirain.phm.synapsis.result.ecn.dao.AlgorithmIndexSettingMapper;
@@ -39,6 +40,7 @@ public class IndexSettingServiceImpl implements AlgorithmIndexSettingService {
 	 * @see com.hirain.phm.synapsis.result.ecn.service.AlgorithmIndexSettingService#save(java.util.List)
 	 */
 	@Override
+	@Transactional
 	public void save(List<AlgorithmIndexSetting> algorithmIndexSetting) {
 		for (AlgorithmIndexSetting setting : algorithmIndexSetting) {
 			save(setting);

@@ -41,11 +41,11 @@ public class TestObjectUtils {
 		BoardSetting boardSetting = new BoardSetting();
 		boardSetting.setId(count++);
 		boardSetting.setEnable(true);
-		boardSetting.setIp("192.168.40.31");
+		// boardSetting.setIp("192.168.40.31");
 		boardSetting.setSlotId(slotId);
 		boardSetting.setType(type.name());
-		boardSetting.setFilename("xxx.xls");
-		boardSetting.setFileOriginalName("xxxx.xls");
+		// boardSetting.setVariableSource("xxx.xls");
+		// boardSetting.setFileOriginalName("xxxx.xls");
 		return boardSetting;
 	}
 
@@ -74,11 +74,11 @@ public class TestObjectUtils {
 		setting.setTrain("2");
 		setting.setName("配置2");
 		setting.setLastModify(new Date());
-		setting.setRawStrategy(1);
-		setting.setRawSpace(20);
-		setting.setResultStrategy(1);
-		setting.setResultSpace(80);
-		setting.setTimeOn(true);
+		// setting.setRawStrategy(1);
+		// setting.setRawSpace(20);
+		// setting.setResultStrategy(1);
+		// setting.setResultSpace(80);
+		// setting.setTimeOn(true);
 		setting.setSelected(false);
 
 		AlgorithmSetting algorithmSetting = new AlgorithmSetting();
@@ -104,7 +104,7 @@ public class TestObjectUtils {
 		adVariable.setId((long) count++);
 		adVariable.setChnId(1);
 		adGroup.setVariables(Arrays.asList(adVariable));
-		adSetting.setVariableGroups(Arrays.asList(adGroup));
+		// adSetting.setVariableGroups(Arrays.asList(adGroup));
 
 		BoardSetting ecnSetting = createBoardSetting(3, BoardType.ECN);
 		VariableGroup ecnGroup = createVariableGroup(ecnSetting.getSlotId(), VariableType.ECN.name());
@@ -115,9 +115,9 @@ public class TestObjectUtils {
 
 		algorithmSetting.setVariableGroups(Arrays.asList(mvbGroup, ecnGroup, adGroup));
 
-		setting.setTimeVariables(mvbGroup);
+		// setting.setTimeVariables(mvbGroup);
 
-		setting.setStoreVariables(Arrays.asList(mvbGroup, ecnGroup, adGroup));
+		// setting.setStoreVariables(Arrays.asList(mvbGroup, ecnGroup, adGroup));
 
 		setting.setAlgorithmSettings(Arrays.asList(algorithmSetting));
 		setting.setBoardSettings(Arrays.asList(mvbSetting, ecnSetting, adSetting));

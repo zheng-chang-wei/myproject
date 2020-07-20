@@ -1,18 +1,17 @@
 package com.hirain.dome;
 
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hirain.qsy.shaft.model.User;
 import com.hirain.qsy.shaft.service.UserService;
 
-//@RunWith(SpringRunner.class)
-//@SpringBootTest(classes = Application.class)
-public class UserTest {
+public class UserTest extends BaseTest {
 
 	@Autowired
 	UserService userService;
 
-	// @Test
+	@Test
 	public void insertUser() {
 		for (int i = 4; i < 34; i++) {
 

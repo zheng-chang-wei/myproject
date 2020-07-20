@@ -61,6 +61,10 @@ public class AlgorithmSettingVO {
 	 */
 	private Integer subsystemId;
 
+	private String videoIp;
+
+	private String videoUrl;
+
 	private List<MVBGroupVO> mvbGroups;
 
 	private List<ECNGroupVO> ecnGroups;

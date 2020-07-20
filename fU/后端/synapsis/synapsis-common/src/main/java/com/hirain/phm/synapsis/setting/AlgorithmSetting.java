@@ -16,7 +16,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
@@ -39,7 +38,6 @@ import lombok.Data;
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "AlgorithmSetting")
-@XmlType(propOrder = { "enable", "slotId", "name", "code", "type", "filename", "subsystem", "variableGroups", })
 public class AlgorithmSetting {
 
 	@Id
@@ -81,6 +79,12 @@ public class AlgorithmSetting {
 	@Transient
 	@XmlElement(name = "subsystem", required = true)
 	private String subsystem;
+
+	@XmlTransient
+	private String videoIp;
+
+	@XmlElement
+	private String videoUrl;
 
 	@Transient
 	@XmlElementWrapper(name = "variableGroups")

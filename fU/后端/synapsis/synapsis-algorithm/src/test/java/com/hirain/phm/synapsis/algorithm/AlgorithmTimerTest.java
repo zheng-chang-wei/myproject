@@ -68,7 +68,7 @@ public class AlgorithmTimerTest {
 	 */
 	private void checkStatus() throws InterruptedException {
 		for (int i = 0; i < 5; i++) {
-			List<AlgorithmPacket> list = service.list();
+			List<AlgorithmPacket> list = service.list(null).getData();
 			System.out.println(list);
 			TimeUnit.SECONDS.sleep(2);
 		}

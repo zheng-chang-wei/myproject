@@ -45,5 +45,4 @@ public class GlobVariableConfig {
 	// excel时间字段的转化字段OperateExcelUtils.class
 	public static String acquisitionTime = "采集时间";
 
-	public static String pythonURL = "http://10.40.16.190:5000/predict";
 }

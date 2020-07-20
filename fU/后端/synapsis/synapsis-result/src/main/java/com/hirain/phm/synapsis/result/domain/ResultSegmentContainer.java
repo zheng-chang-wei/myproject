@@ -5,6 +5,13 @@ package com.hirain.phm.synapsis.result.domain;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import lombok.Data;
 
 /**
@@ -20,11 +27,16 @@ import lombok.Data;
  *               Jan 21, 2020 jianwen.xin@hirain.com 1.0 create file
  */
 @Data
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "container")
 public class ResultSegmentContainer {
 
+	@XmlAttribute
 	private int type;
 
+	@XmlTransient
 	private int length;
 
+	@XmlElementRef(name = "segment")
 	private List<ResultSegment> segments;
 }

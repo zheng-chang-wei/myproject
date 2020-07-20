@@ -13,9 +13,39 @@
  */
 package com.hirain.phm.bd.ground.subhealth.service;
 
+import java.util.List;
+
 import com.hirain.phm.bd.ground.common.service.IService;
 import com.hirain.phm.bd.ground.subhealth.domain.SubhealthInfo;
 
 public interface SubhealthInfoService extends IService<SubhealthInfo> {
+
+	/**
+	 * @param project
+	 * @return
+	 */
+	List<SubhealthInfo> selectAllWithDetail(String project);
+
+	/**
+	 * @param info
+	 */
+	boolean chechDuplicate(SubhealthInfo info);
+
+	/**
+	 * @param project
+	 * @return
+	 */
+	List<SubhealthInfo> selectByProject(String project);
+
+	/**
+	 * @param subhealthInfoId
+	 * @return
+	 */
+	SubhealthInfo selectWithDetail(Integer subhealthInfoId);
+
+	/**
+	 * @param list
+	 */
+	void insertList(List<SubhealthInfo> list);
 
 }

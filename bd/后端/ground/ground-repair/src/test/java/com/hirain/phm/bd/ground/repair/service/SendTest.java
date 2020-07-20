@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hirain.phm.bd.ground.common.event.UnifiedFaultRecord;
-import com.hirain.phm.bd.ground.push.service.PushFaultService;
+import com.hirain.phm.bd.ground.common.push.PushFaultService;
 import com.hirain.phm.bd.ground.repair.TestApplication;
 import com.hirain.phm.bd.ground.repair.util.TestObjectCreater;
 

@@ -4,7 +4,6 @@
 package com.hirain.phm.bd.ground.fault;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.hirain.phm.bd.ground.fault.param.FaultDetailWithSuggestionParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailResponseParams;
 import com.hirain.phm.bd.ground.fault.service.FaultDetailService;
 import com.hirain.phm.bd.ground.util.RedisUtil;
 
@@ -91,19 +90,8 @@ public class TestDashboard {
 
 	@Test
 	public void selectToday() {
-		List<FaultDetailWithSuggestionParams> result = service.selectToday("", "");
-		assertEquals(3, result.size());
-
-		FaultDetailWithSuggestionParams detail = result.get(0);
-		assertNotNull(detail.getTreatment());
-		assertNotNull(detail.getRepair());
-		System.out.println(detail.getTreatment());
-		System.out.println(detail.getRepair());
-	}
-
-	@Test
-	public void selectToday4Bode() {
-		List<FaultDetailWithSuggestionParams> result = service.selectToday();
+		List<FaultDetailResponseParams> result = service.selectToday();
 		System.out.println(result.size());
+		result.forEach(System.out::println);
 	}
 }

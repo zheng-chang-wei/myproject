@@ -55,7 +55,7 @@ public class DefaultVariableTypeHelper implements VariableTypeHelper {
 		Variable selected = variableGroup.getVariables().get(0);
 		boolean hasVariable = false;
 		for (Variable variable : headerGroup.getVariables()) {
-			if (variable.getSignalName().equals(selected.getSignalName())) {
+			if (variable.getName().equals(selected.getName())) {
 				hasVariable = true;
 				break;
 			}

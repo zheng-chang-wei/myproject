@@ -58,6 +58,8 @@ const appApi = {
 	get_axle_exception_state_data:'/exceptiondata/getdata',//获取轴的异常状态信息
 	get_axle_exception_data:'/exceptiondata/getAxledata',//获取异常轴的具体数值
 
+	test:'/pullAndSave',
+	test2:'/pull'
 }
 
 // for (var i in appApi) {

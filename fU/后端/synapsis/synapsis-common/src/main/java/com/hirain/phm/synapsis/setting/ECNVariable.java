@@ -29,7 +29,7 @@ import lombok.EqualsAndHashCode;
  */
 @Table(name = "t_ecn_variable")
 @Data
-@EqualsAndHashCode(callSuper = true, of = { "comId", "sourceIp", "name" })
+@EqualsAndHashCode(callSuper = true, of = { "comId", "sourceIp" })
 @XmlRootElement(name = "ECNVariable")
 public class ECNVariable extends Variable {
 
@@ -54,10 +54,9 @@ public class ECNVariable extends Variable {
 	@XmlAttribute(name = "bitLen", required = true)
 	private Integer bitLen;
 
-	@XmlAttribute(name = "name", required = true)
-	private String name;
-
 	@XmlAttribute(name = "unit", required = true)
 	private String unit;
 
+	@XmlAttribute(name = "signalName", required = true)
+	private String signalName;
 }

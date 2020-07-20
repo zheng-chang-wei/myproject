@@ -3,9 +3,9 @@
  ******************************************************************************/
 package com.hirain.phm.bd.ground.digital.service;
 
-import com.hirain.phm.bd.ground.digital.controller.ResultQueryRequest;
 import com.hirain.phm.bd.ground.digital.domain.DigitalTwinPacket;
-import com.hirain.phm.bd.ground.digital.response.ResultQueryResponse;
+import com.hirain.phm.bd.ground.digital.param.ResultQueryRequest;
+import com.hirain.phm.bd.ground.digital.param.ResultQueryResponse;
 
 /**
  * @Version 1.0

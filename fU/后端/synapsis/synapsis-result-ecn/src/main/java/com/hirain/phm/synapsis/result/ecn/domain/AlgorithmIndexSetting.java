@@ -48,7 +48,7 @@ public class AlgorithmIndexSetting {
 	private Long comId;
 
 	@XmlAttribute
-	private String cycle;
+	private String cycleTime;
 
 	@Transient
 	@XmlElementWrapper(name = "algorithms")

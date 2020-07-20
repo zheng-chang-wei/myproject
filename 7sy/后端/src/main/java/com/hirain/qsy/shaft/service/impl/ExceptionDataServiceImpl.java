@@ -2,6 +2,7 @@ package com.hirain.qsy.shaft.service.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -9,12 +10,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hirain.qsy.shaft.common.model.ResponseBo;
 import com.hirain.qsy.shaft.common.util.ReadExcelUtil;
 import com.hirain.qsy.shaft.dao.ExceptionDataMapper;
 import com.hirain.qsy.shaft.dao.ManageMapper;
@@ -23,10 +22,10 @@ import com.hirain.qsy.shaft.model.AxleExceptionData;
 import com.hirain.qsy.shaft.model.AxleExceptionStateData;
 import com.hirain.qsy.shaft.model.ExceptionData;
 import com.hirain.qsy.shaft.model.ThresholdData;
-import com.hirain.qsy.shaft.model.User;
 import com.hirain.qsy.shaft.service.ExceptionDataService;
+import com.hirain.qsy.shaft.service.RedisCacheService;
+import com.hirain.qsy.shaft.service.SendDataToPythonService;
 import com.hirain.qsy.shaft.service.TrainInfoService;
-import com.hirain.qsy.shaft.websocket.WebSocketServer;
 
 @Service("exceptionDataService")
 public class ExceptionDataServiceImpl extends BaseService<ExceptionData> implements ExceptionDataService {
@@ -39,6 +38,18 @@ public class ExceptionDataServiceImpl extends BaseService<ExceptionData> impleme
 
 	@Autowired
 	ManageMapper manageMapper;
+
+	@Autowired
+	private SendDataToPythonService sendDataToPythonService;
+
+	@Autowired
+	private RedisCacheService redisCacheService;
+
+	public void saveData(String params, List<Date> acquisitionTimeList, List<String> primaryKeyList, Integer trainId) throws Exception {
+		List<ExceptionData> exceptionDataList = sendDataToPythonService.postData(params, acquisitionTimeList, primaryKeyList);
+		redisCacheService.cache(exceptionDataList, trainId);
+		saveList(exceptionDataList, trainId);
+	}
 
 	/**
 	 * 批量插入
@@ -173,15 +184,11 @@ public class ExceptionDataServiceImpl extends BaseService<ExceptionData> impleme
 	@Transactional
 	public void deleteByTrainNumAndTime(Integer trainId, String deadline) {
 		exceptionDataMapper.deleteByTrianIdAndAcquisitionTime(trainId, deadline);
-		User user = (User) SecurityUtils.getSubject().getPrincipal();
-		WebSocketServer.sendMessage(user.getUsername(), ResponseBo.ok("删除成功"));
 	}
 
 	@Override
 	@Transactional
 	public void dropTable(Integer trainId) {
 		manageMapper.dropTable("t_exception_data_" + trainId);
-		User user = (User) SecurityUtils.getSubject().getPrincipal();
-		WebSocketServer.sendMessage(user.getUsername(), ResponseBo.ok("删除成功"));
 	}
 }

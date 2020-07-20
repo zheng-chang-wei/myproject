@@ -4,6 +4,7 @@
 package com.hirain.phm.synapsis.result.ecn.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,9 +34,20 @@ public class ECNResultController {
 	private ResultSettingService service;
 
 	@PostMapping("/save")
-	public ResultBean<String> save(Integer settingId, @RequestBody AlgorithmOutputVO vo) {
-		service.save(settingId, vo);
+	public ResultBean<String> save(@RequestBody AlgorithmOutputVO vo) {
+		service.save(vo.getSettingId(), vo);
 		return new ResultBean<>("保存成功");
+	}
+
+	/**
+	 * 获取输出配置
+	 * 
+	 * @param settingId
+	 * @return
+	 */
+	@GetMapping("/getOutputSetting")
+	public ResultBean<AlgorithmOutputVO> getOutputSetting(Integer id) {
+		return new ResultBean<>(service.getResultSetting(id));
 	}
 
 }

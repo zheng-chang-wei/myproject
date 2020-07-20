@@ -6,6 +6,7 @@ package com.hirain.phm.bd.store.service.impl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -93,6 +94,7 @@ public class MessageUnpackerImpl implements MessageUnpacker {
 				}
 			}
 		}
+		Collections.sort(records, (o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()));
 		return records;
 	}
 

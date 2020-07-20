@@ -6,6 +6,8 @@ package com.hirain.phm.synapsis.data.service;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import com.hirain.phm.synapsis.data.param.FileTreeNode;
 import com.hirain.phm.synapsis.data.param.NodeLevel;
 import com.hirain.phm.synapsis.exception.SynapsisException;
@@ -68,5 +70,22 @@ public interface DataFileService {
 	 * @throws SynapsisException
 	 */
 	List<FileTreeNode> listRoot(Date startDate, Date endDate) throws SynapsisException;
+
+	/**
+	 * 删除指定路径的文件
+	 * 
+	 * @param filePath
+	 *            文件绝对路径
+	 */
+	boolean deleteFile(String filePath);
+
+	/**
+	 * 下载文件到指定路径
+	 * 
+	 * @param sourceFilePath
+	 *            源文件路径
+	 * @return
+	 */
+	void downloadFile(HttpServletResponse response, String... sourceFilePath) throws Exception;
 
 }

@@ -4,6 +4,7 @@ import com.hirain.ptu.common.config.CommonMapper;
 import com.hirain.ptu.common.exception.CustomException;
 import com.hirain.ptu.common.model.AttributeMap;
 import com.hirain.ptu.common.utils.ReadExcelUtil;
+import com.hirain.ptu.common.utils.VerifyUtil;
 import com.hirain.ptu.dao.ComIdObjectMapper;
 import com.hirain.ptu.dao.CsPortObjectMapper;
 import com.hirain.ptu.model.ComIdObject;
@@ -42,19 +43,29 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
   @Override
   public void comIdImport(MultipartFile file) throws Exception {
     File targetFile = transferFile(file);
-    List<ComIdObject> comIdObjectList = getComIdObjectsFromFile(targetFile);
-    deleteAll(comIdObjectMapper);
-    comIdObjectMapper.insertList(comIdObjectList);
-    targetFile.delete();
+    try {
+      List<ComIdObject> comIdObjectList = getComIdObjectsFromFile(targetFile);
+      deleteAll(comIdObjectMapper);
+      comIdObjectMapper.insertList(comIdObjectList);
+    } catch (Exception e) {
+      throw e;
+    } finally {
+      targetFile.delete();
+    }
   }
 
   @Override
   public void csPortImport(MultipartFile file) throws Exception {
     File targetFile = transferFile(file);
-    List<CsPortObject> comIdObjectList = getCsPortObjectsFromFile(targetFile);
-    deleteAll(csPortObjectMapper);
-    csPortObjectMapper.insertList(comIdObjectList);
-    targetFile.delete();
+    try {
+      List<CsPortObject> comIdObjectList = getCsPortObjectsFromFile(targetFile);
+      deleteAll(csPortObjectMapper);
+      csPortObjectMapper.insertList(comIdObjectList);
+    } catch (Exception e) {
+      throw e;
+    } finally {
+      targetFile.delete();
+    }
   }
 
   @Override
@@ -88,6 +99,7 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
     List<ComIdObject> comIdObjectList = new ArrayList<>();
     try {
       List<String> heads = getHeads(sheet);
+      verifyTopRow(heads, AttributeMap.comIdMapData);
       for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
         Row row = sheet.getRow(i);
         ComIdObject comIdObject = new ComIdObject();
@@ -95,7 +107,7 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
         comIdObjectList.add(comIdObject);
       }
     } catch (Exception e) {
-      throw new CustomException("文件格式错误");
+      throw new CustomException(e.getMessage());
     }
 
     return comIdObjectList;
@@ -107,6 +119,7 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
     List<CsPortObject> csPortObjects = new ArrayList<>();
     try {
       List<String> heads = getHeads(sheet);
+      verifyTopRow(heads, AttributeMap.csPortMapData);
       for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
         Row row = sheet.getRow(i);
         CsPortObject csPortObject = new CsPortObject();
@@ -114,7 +127,7 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
         csPortObjects.add(csPortObject);
       }
     } catch (Exception e) {
-      throw new CustomException("文件格式错误");
+      throw new CustomException(e.getMessage());
     }
     return csPortObjects;
   }
@@ -132,15 +145,26 @@ public class ObjectConfigServiceImpl implements ObjectConfigService {
   private void setProperty(List<String> heads, Row row, Object obj, Map<String, String> map)
       throws IllegalAccessException, InvocationTargetException {
     for (int j = 1; j < row.getLastCellNum(); j++) {
-      String head = heads.get(j);
-      if (map.containsKey(head)) {
-        String cellValue = getCellValue(row.getCell(j));
-        String proName = map.get(head);
-        BeanUtils.setProperty(obj, proName, cellValue);
-      } else {
-        System.out.println(head);
+      String cellValue = getCellValue(row.getCell(j));
+      String proName = map.get(heads.get(j));
+      if ("ip".equals(proName)) {
+        if (!VerifyUtil.verifyIp(cellValue)) {
+          throw new CustomException("文件第" + (row.getRowNum() + 1) + "行IP格式错误");
+        }
+      }
+      BeanUtils.setProperty(obj, proName, cellValue);
+    }
+  }
+
+  /** 校验首行是否符合要求 */
+  private boolean verifyTopRow(List<String> heads, Map<String, String> map) {
+    for (int i = 1; i < heads.size(); i++) {
+      String head = heads.get(i);
+      // 判断
+      if (!map.containsKey(head)) {
         throw new CustomException("文件格式错误");
       }
     }
+    return true;
   }
 }

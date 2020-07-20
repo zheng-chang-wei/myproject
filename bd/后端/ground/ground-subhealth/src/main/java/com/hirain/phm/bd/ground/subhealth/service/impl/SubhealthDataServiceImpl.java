@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.hirain.phm.bd.ground.common.data.BaseValueService;
+import com.hirain.phm.bd.ground.dictionary.service.BaseValueService;
 import com.hirain.phm.bd.ground.subhealth.dao.SubhealthDataMapper;
 import com.hirain.phm.bd.ground.subhealth.domain.SubhealthData;
 import com.hirain.phm.bd.ground.subhealth.domain.SubhealthDataContainer;
@@ -77,6 +77,7 @@ public class SubhealthDataServiceImpl implements SubhealthDataService {
 	 * @return
 	 * @throws Exception
 	 */
+	@Override
 	public SubhealthDataResponse getSubhealthData(int subhealthId, List<String> variables) throws Exception {
 		SubhealthDataContainer container = mapper.selectByPrimaryKey(subhealthId);
 		SubhealthDataResponse response = new SubhealthDataResponse();
@@ -84,9 +85,9 @@ public class SubhealthDataServiceImpl implements SubhealthDataService {
 			List<String> keys = JSONObject.parseArray(container.getKeys(), String.class);
 			response.setId(subhealthId);
 			response.setState(DoorState.values()[container.getState()].getMessage());
-			response.setKeys(keys);
+			response.setKeys(variables);
 			List<List<String>> baseValues = new ArrayList<>();
-			for (String key : keys) {
+			for (String key : variables) {
 				baseValues.add(baseValueService.getBaseValue(0, key));
 			}
 			response.setBaseValues(baseValues);

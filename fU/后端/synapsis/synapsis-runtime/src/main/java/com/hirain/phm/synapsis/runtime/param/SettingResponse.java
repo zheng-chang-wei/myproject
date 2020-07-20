@@ -3,9 +3,6 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.runtime.param;
 
-import java.util.List;
-
-import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.support.param.SettingVO;
 
 import lombok.Data;
@@ -27,6 +24,4 @@ public class SettingResponse {
 
 	private SettingVO setting;
 
-	// 数据流文件中的变量组。
-	private List<VariableGroup> variableGroups;
 }

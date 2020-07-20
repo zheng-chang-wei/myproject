@@ -82,10 +82,13 @@ public class AuthRealm extends AuthorizingRealm {
 		// 通过用户名到数据库查询用户信息
 		User user = this.userService.findByName(userName);
 
-		if (user == null)
+		if (user == null) {
 			throw new UnknownAccountException("用户名或密码错误！");
-		if (!password.equals(user.getPassword()))
+		}
+		if (!password.equals(user.getPassword())) {
 			throw new IncorrectCredentialsException("用户名或密码错误！");
+		}
+
 		return new SimpleAuthenticationInfo(user, password, getName());
 	}
 

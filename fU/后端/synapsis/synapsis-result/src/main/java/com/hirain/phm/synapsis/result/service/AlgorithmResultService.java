@@ -43,4 +43,6 @@ public interface AlgorithmResultService {
 	 */
 	AlgorithmResult selectById(long resultId);
 
+	void deleteById(long resultId);
+
 }

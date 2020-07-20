@@ -520,10 +520,10 @@ export default {
 			this.retrieveForm.type = this.trainType
 			this.getStatisticsTrainNum()
 			this.retrieveForm.num = this.trainNum
-			let d = new Date(this.endTime)
+			let d = new Date(this.endTime.replace(/-/g,  "/"))
+			this.retrieveForm.endtime = new Date(this.endTime.replace(/-/g,  "/"))
 			d.setMonth(d.getMonth() - 1)
-			this.retrieveForm.endtime = util.formatDate(new Date(this.endTime), "yyyy-MM-dd hh:mm:ss")
-			this.retrieveForm.starttime = util.formatDate(new Date(d), "yyyy-MM-dd hh:mm:ss")
+			this.retrieveForm.starttime = d
 			this.getAxleExceptionData()
 		} else {
 			this.retrieveForm.starttime = localStorage.getItem('detection_starttime')
@@ -566,14 +566,12 @@ export default {
 				this.$message.warning('请选择完整时间');
 				return false;
 			}
-			vm.retrieveForm.starttime = util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss")
-			vm.retrieveForm.endtime = util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss")
 			this.saveQueryCondition()
 			let param = {
 				trainType: vm.retrieveForm.type,
 				trainNum: vm.retrieveForm.num,
-				startDate: vm.retrieveForm.starttime,
-				endDate: vm.retrieveForm.endtime
+				startDate: util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss"),
+				endDate: util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss")
 			};
 			this.isLoading = true
 			this.clearChart()
@@ -632,8 +630,6 @@ export default {
 				this.$message.warning('请选择完整时间');
 				return false;
 			}
-			vm.retrieveForm.starttime = util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss")
-			vm.retrieveForm.endtime = util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss")
 			localStorage.setItem('axleName', axleName)
 			this.setTitle()
 			this.$refs.retrieveForm.validate(valid => {
@@ -643,9 +639,9 @@ export default {
 					let param = {
 						trainType: vm.retrieveForm.type,
 						trainNum: vm.retrieveForm.num,
-						startDate: vm.retrieveForm.starttime,
-						endDate: vm.retrieveForm.endtime,
-						axleName: axleName,
+						startDate: util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss"),
+						endDate: util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss"),
+						axleName: axleName
 					};
 					app.get("get_axle_exception_data", param).then(data => {
 						if (data.msg) {

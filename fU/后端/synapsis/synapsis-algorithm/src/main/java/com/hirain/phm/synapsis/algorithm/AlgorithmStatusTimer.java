@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.hirain.phm.synapsis.algorithm.message.AlgorithmStatusRequest;
@@ -45,9 +44,6 @@ public class AlgorithmStatusTimer {
 	@Autowired
 	private BoardQuery boardQuery;
 
-	@Value("${udp.send.timeout:10}")
-	private int timeout;
-
 	@Autowired
 	private Communication communication;
 
@@ -58,8 +54,8 @@ public class AlgorithmStatusTimer {
 
 	private ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, getClass().getName()));
 
-	@Value("${synapsis.algorithm.status.period:10000}")
-	private int period;
+	@Autowired
+	private AlgorithmConfig config;
 
 	/**
 	 * 启动定时查询算法状态
@@ -70,7 +66,7 @@ public class AlgorithmStatusTimer {
 			while (!stop.get()) {
 				checkStatus();
 				try {
-					TimeUnit.MILLISECONDS.sleep(period);
+					TimeUnit.MILLISECONDS.sleep(config.getStatusPeriod());
 				} catch (InterruptedException e) {
 				}
 			}
@@ -97,10 +93,10 @@ public class AlgorithmStatusTimer {
 			message.setSid(SidConstant.ALGORITHM_STATUS_COMMAND);
 			message.setData(request);
 			try {
-				Message<?> result = communication.send(message, timeout);
+				Message<?> result = communication.send(message, config.getTimeout());
 				if (result != null) {
 					AlgorithmStatusResponse data = (AlgorithmStatusResponse) result.getData();
-					service.update(data.getStatusMap());
+					service.update(board.getSlotID(), data.getStatusMap());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

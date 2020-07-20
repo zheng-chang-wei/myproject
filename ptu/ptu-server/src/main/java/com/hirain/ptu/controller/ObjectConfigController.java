@@ -19,7 +19,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * @author changwei.zheng
+ * @date 2020/6/23 14:00
+ * @describe 对象配置相关接口
+ */
 @RestController
 @RequestMapping("/objectConfig")
 public class ObjectConfigController {

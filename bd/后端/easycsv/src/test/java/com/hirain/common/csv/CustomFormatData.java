@@ -34,7 +34,7 @@ public class CustomFormatData {
 	@CsvProperty("时间")
 	private Date timestamp;
 
-	@CsvProperty(value = "布尔值", converter = CustomValueConverter.class)
+	@CsvProperty(value = "布尔值", converter = BooleanValueConverter.class)
 	private boolean bool;
 
 	/**

@@ -1,0 +1,81 @@
+kafka:
+  producer:
+    acks: 1
+    batch-size: 4096
+    buffer-memory: 40960
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    linger: 1
+    retries: 1
+    value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+logging:
+  level:
+    com:
+      hirain:
+        phm:
+          bd:
+            ground:
+              dao: DEBUG
+mqtt:
+  ssl:
+    password: 123456
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+owner:
+  timed:
+    faults:
+    - 门电机开路故障
+    - 门电机过流故障
+    - 门门板开关故障
+    - 门绿色环线故障
+    - 门锁闭开关故障
+    - 门编码器故障
+    - 门开关门超时故障
+    - 门输出短路故障
+    - 外网通讯故障
+    - 内网通讯故障
+    - 隔离
+    - 防挤压
+    - 紧急解锁
+    subhealths:
+    - 尺带张紧力过松
+    - 行程开关异常
+    - 电机工况异常
+    - 网络干扰异常
+    - 闭锁组件异常
+repair:
+  integration:
+      cron-expression: 0 0 1 1/1 * ? *
+server:
+  port: 8082
+spring:
+  application:
+    name: ground-app
+  datasource:
+    druid:
+      db-type: com.alibaba.druid.pool.DruidDataSource
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      password: 123456
+      url: jdbc:mysql://localhost:3306/phm_bd_ground?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+      username: root
+  mail:
+    port: 465
+    properties:
+      mail:
+        imap:
+          ssl:
+            socketFactory:
+              fallback: false
+        smtp:
+          ssl:
+            enable: true
+            socketFactory:
+              class: com.hirain.phm.bd.ground.owner.MailSSLSocketFactory
+  profiles:
+    active: test
+  redis:
+    database: 1
+    password: 123456
+    port: 6379
+    timeout: 1000

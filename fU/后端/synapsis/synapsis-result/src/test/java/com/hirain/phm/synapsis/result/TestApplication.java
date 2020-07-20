@@ -4,10 +4,16 @@
 package com.hirain.phm.synapsis.result;
 
 import java.util.Date;
+import java.util.List;
+import java.util.function.Supplier;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
+import com.hirain.phm.synapsis.page.PageService;
+import com.hirain.phm.synapsis.page.QueryRequest;
+import com.hirain.phm.synapsis.response.PageResultBean;
 import com.hirain.phm.synapsis.result.domain.AlgorithmHeader;
 import com.hirain.phm.synapsis.result.domain.AlgorithmResult;
 import com.hirain.phm.synapsis.result.domain.CommonHeader;
@@ -32,6 +38,17 @@ public class TestApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TestApplication.class, args);
+	}
+
+	@Bean
+	public PageService pageService() {
+		return new PageService() {
+
+			@Override
+			public <T> PageResultBean<List<T>> selectByPage(QueryRequest request, Supplier<List<T>> s) {
+				return null;
+			}
+		};
 	}
 
 	/**

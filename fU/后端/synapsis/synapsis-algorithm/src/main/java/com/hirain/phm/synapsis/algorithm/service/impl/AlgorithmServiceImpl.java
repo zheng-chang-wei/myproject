@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,11 @@ import com.hirain.phm.synapsis.algorithm.param.Record;
 import com.hirain.phm.synapsis.algorithm.param.SubsystemCount;
 import com.hirain.phm.synapsis.algorithm.service.AlgorithmService;
 import com.hirain.phm.synapsis.algorithm.service.RecordMapper;
+import com.hirain.phm.synapsis.board.BoardQuery;
+import com.hirain.phm.synapsis.board.IBoard;
+import com.hirain.phm.synapsis.page.QueryRequest;
+import com.hirain.phm.synapsis.response.PageResultBean;
 import com.hirain.phm.synapsis.setting.AlgorithmSetting;
-import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.db.AlgorithmSettingQuery;
 
 import lombok.Setter;
@@ -47,17 +51,26 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 	private AlgorithmSettingQuery query;
 
 	@Autowired
+	private BoardQuery boardQuery;
+
+	@Autowired
 	private RecordMapper recordMapper;
 
 	@Override
 	public void init(List<AlgorithmSetting> settings) {
 		algorithms.clear();
+		List<IBoard> boards = boardQuery.getBoards("PHM");
+		Map<Integer, IBoard> map = boards.stream().collect(Collectors.toMap(b -> b.getSlotID(), b -> b));
 		for (AlgorithmSetting setting : settings) {
 			Algorithm algorithm = new Algorithm();
 			algorithm.setCode(setting.getCode());
 			algorithm.setName(setting.getName());
 			algorithm.setSubsystem(setting.getSubsystem());
 			algorithm.setSlotId(setting.getSlotId());
+			IBoard board = map.get(algorithm.getSlotId());
+			if (board != null) {
+				algorithm.setBoard(board.getBoardType().name() + "[" + algorithm.getSlotId() + "]");
+			}
 			algorithm.setEnable(setting.getEnable());
 			algorithm.setStatus(RunStatus.Idle);
 			algorithms.add(algorithm);
@@ -65,42 +78,35 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 	}
 
 	/**
-	 * @see com.hirain.phm.synapsis.algorithm.service.AlgorithmService#list()
+	 * @see com.hirain.phm.synapsis.algorithm.service.AlgorithmService#list(QueryRequest)
 	 */
 	@Override
-	public List<AlgorithmPacket> list() {
+	public PageResultBean<List<AlgorithmPacket>> list(QueryRequest request) {
+		System.err.println(request);
+		if (request == null || request.getPageNum() == 0 && request.getPageSize() == 0) {
+			request = new QueryRequest();
+			request.setPageSize(algorithms.size());
+			request.setPageNum(1);
+		}
+		int min = request.getPageSize() * (request.getPageNum() - 1) + 1;
+		int max = request.getPageSize() * request.getPageNum();
+		List<Algorithm> list = algorithms.stream().filter(a -> a.getCode() >= min && a.getCode() <= max).collect(Collectors.toList());
 		List<AlgorithmPacket> packets = new ArrayList<>();
-		for (Algorithm algorithm : algorithms) {
+		for (Algorithm algorithm : list) {
 			AlgorithmPacket packet = new AlgorithmPacket();
 			packet.setData(algorithm);
-			AlgorithmSetting setting = getSetting(algorithm.getCode());
-			if (setting != null) {
-				List<VariableGroup> groups = setting.getVariableGroups();
-				Map<String, Integer> variable = new HashMap<>();
-				if (groups != null) {
-					for (VariableGroup group : groups) {
-						Integer count = variable.get(group.getType().toLowerCase());
-						if (count == null) {
-							count = 0;
-							variable.put(group.getType().toLowerCase(), count);
-						}
-						if (group.getVariables() != null) {
-							count += group.getVariables().size();
-						}
-					}
-				}
-				packet.setVariable(variable);
-			}
 			packets.add(packet);
 		}
-		return packets;
+		PageResultBean<List<AlgorithmPacket>> result = new PageResultBean<>(packets, algorithms.size());
+		return result;
 	}
 
 	@Override
-	public void update(Map<Integer, RunStatus> statusMap) {
-		for (Algorithm algorithm : algorithms) {
+	public void update(int slotId, Map<Integer, RunStatus> statusMap) {
+		List<Algorithm> list = algorithms.stream().filter(a -> a.getSlotId() == slotId).collect(Collectors.toList());
+		for (Algorithm algorithm : list) {
 			RunStatus status = statusMap.get(algorithm.getCode());
-			if (algorithm.getStatus() != RunStatus.Idle && !isEqual(status, algorithm.getStatus())) {
+			if (!isEqual(status, algorithm.getStatus())) {
 				recordMapper.addRecord(algorithm, algorithm.getStatus(), status);
 			}
 			algorithm.setStatus(status);

@@ -37,7 +37,7 @@ public class MqttPublicProducerConfig {
 
 	public MqttConnectOptions mqttConnectOptions() {
 		MqttConnectOptions options = new MqttConnectOptions();
-		options.setServerURIs(new String[] { properties.getHostUrl() });
+		options.setServerURIs(new String[] { properties.getUrl() });
 		options.setKeepAliveInterval(2);
 		return options;
 	}

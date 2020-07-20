@@ -9,28 +9,25 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hirain.phm.synapsis.annotation.Log;
 import com.hirain.phm.synapsis.protocol.ParseResult;
-import com.hirain.phm.synapsis.protocol.ProtocolService;
+import com.hirain.phm.synapsis.protocol.ProtocolStreamService;
 import com.hirain.phm.synapsis.response.ResultBean;
 import com.hirain.phm.synapsis.runtime.param.ActivateResponse;
 import com.hirain.phm.synapsis.runtime.param.ProtocolResponse;
 import com.hirain.phm.synapsis.runtime.param.SettingResponse;
-import com.hirain.phm.synapsis.runtime.param.UpdateResponse;
 import com.hirain.phm.synapsis.runtime.service.RuntimeService;
 import com.hirain.phm.synapsis.setting.Setting;
 import com.hirain.phm.synapsis.setting.Subsystem;
-import com.hirain.phm.synapsis.setting.Variable;
 import com.hirain.phm.synapsis.setting.db.SettingDbService;
-import com.hirain.phm.synapsis.setting.support.param.SettingVO;
-import com.hirain.phm.synapsis.setting.support.variable.VariableConvertManager;
+import com.hirain.phm.synapsis.util.SettingFileConfig;
 
 /**
  * @Version 1.0
@@ -55,13 +52,10 @@ public class SettingController {
 	private RuntimeService runtimeService;
 
 	@Autowired
-	private ProtocolService parseService;
+	private ProtocolStreamService parseService;
 
 	@Autowired
-	private VariableConvertManager variableConvert;
-
-	@Value("${setting.file.temporary}")
-	private String temporaryDirectory;// 存放资源文件的临时目录
+	private SettingFileConfig config;
 
 	@GetMapping("/all")
 	public ResultBean<List<Setting>> listAll() {
@@ -80,6 +74,11 @@ public class SettingController {
 		return new ResultBean<>(response);
 	}
 
+	@GetMapping("/subsystems")
+	public ResultBean<List<Subsystem>> subsystems() {
+		return new ResultBean<>(settingService.selectAllSubsystems());
+	}
+
 	/**
 	 * 上传数据流文件
 	 * 
@@ -93,11 +92,9 @@ public class SettingController {
 		try {
 			String fileName = runtimeService.upload(file);// 上传文件到临时目录
 			response.setPath(fileName);
-			String filePath = temporaryDirectory + File.separator + fileName;
+			String filePath = config.getTemp() + File.separator + fileName;
 			// Excel转对象
-			ParseResult parseResult = parseService.parse(type, filePath);
-			List<? extends Variable> variables = variableConvert.convert(type, parseResult.getData());
-			response.setVariables(variables);
+			ParseResult parseResult = parseService.read(type, filePath);
 			response.setErrors(parseResult.getErrors());
 		} catch (Exception e) {
 			throw e;
@@ -117,37 +114,19 @@ public class SettingController {
 		return new ResultBean<>(fileName);
 	}
 
-	/**
-	 * 更新配置
-	 * 
-	 * @param frontSetting
-	 * @return
-	 * @throws Exception
-	 */
-	@PostMapping("/update")
-	public ResultBean<UpdateResponse> saveSetting(@RequestBody SettingVO frontSetting) throws Exception {
-		return new ResultBean<>(runtimeService.saveSetting(frontSetting));
-	}
-
 	/*
 	 * 激活配置
 	 */
 	@PostMapping("/activate")
 	public ResultBean<ActivateResponse> activateSetting(int settingId) throws Exception {
-		return new ResultBean<>(runtimeService.validateAndActivate(settingId));
+		return new ResultBean<>(runtimeService.launchSetting(settingId));
 	}
 
 	@PostMapping("/delete")
+	@Transactional
+	@Log("删除配置")
 	public ResultBean<String> delete(int settingId) throws Exception {
 		return new ResultBean<>(runtimeService.deleteSetting(settingId));
-	}
-
-	/**
-	 * 查询所有子系统
-	 */
-	@GetMapping("/selectAllSubsystems")
-	public ResultBean<List<Subsystem>> selectAllSubsystems() {
-		return new ResultBean<>(runtimeService.selectAllSubsystems());
 	}
 
 	/**

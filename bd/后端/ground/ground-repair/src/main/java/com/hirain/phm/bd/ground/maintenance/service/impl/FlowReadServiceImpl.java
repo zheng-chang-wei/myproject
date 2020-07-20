@@ -20,13 +20,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hirain.phm.bd.ground.authority.controller.RBACGateWay;
 import com.hirain.phm.bd.ground.authority.domain.User;
 import com.hirain.phm.bd.ground.common.event.FaultTopType;
+import com.hirain.phm.bd.ground.common.page.QueryRequest;
 import com.hirain.phm.bd.ground.maintenance.domain.RepairOption;
 import com.hirain.phm.bd.ground.maintenance.domain.StepType;
 import com.hirain.phm.bd.ground.maintenance.domain.WorkSheet;
 import com.hirain.phm.bd.ground.maintenance.domain.WorkStep;
 import com.hirain.phm.bd.ground.maintenance.param.FaultType;
 import com.hirain.phm.bd.ground.maintenance.param.SheetCountResponse;
-import com.hirain.phm.bd.ground.maintenance.param.Suggestion;
 import com.hirain.phm.bd.ground.maintenance.param.WorkSheetQueryParam;
 import com.hirain.phm.bd.ground.maintenance.param.WorkSheetRecord;
 import com.hirain.phm.bd.ground.maintenance.param.WorksheetPacket;
@@ -36,9 +36,7 @@ import com.hirain.phm.bd.ground.maintenance.service.RbacService;
 import com.hirain.phm.bd.ground.maintenance.service.StepTypeService;
 import com.hirain.phm.bd.ground.maintenance.service.WorkSheetService;
 import com.hirain.phm.bd.ground.maintenance.service.WorkStepService;
-import com.hirain.phm.bd.ground.push.domain.PushInfo;
-import com.hirain.phm.bd.ground.push.service.SuggestionService;
-import com.hirain.phm.bd.ground.train.controller.TrainGateWay;
+import com.hirain.phm.bd.ground.train.controller.ProjectGateWay;
 import com.hirain.phm.bd.ground.train.domain.Project;
 import com.hirain.phm.bd.ground.util.RedisUtil;
 
@@ -74,13 +72,10 @@ public class FlowReadServiceImpl implements FlowReadService {
 	private StepTypeService typeService;
 
 	@Autowired
-	private TrainGateWay trainGW;
+	private ProjectGateWay trainGW;
 
 	@Autowired
 	private RedisUtil redisUtil;
-
-	@Autowired
-	private SuggestionService suggestionService;
 
 	@Autowired
 	private WorksheetRedisMapper redisMapper;
@@ -98,10 +93,13 @@ public class FlowReadServiceImpl implements FlowReadService {
 	}
 
 	@Override
-	public List<WorkSheetRecord> listWorkSheets(WorkSheetQueryParam param) {
+	public List<WorkSheetRecord> listWorkSheets(WorkSheetQueryParam param, QueryRequest queryRequest) {
 		User user = rbacService.getCurrentUser();
 		List<Integer> roles = rbacService.getRepairRoles(user);
 		List<StepType> types = filter(roles, typeService.selectAll());
+
+		param.setOffset(queryRequest.getPageSize() * (queryRequest.getPageNum() - 1));
+		param.setLimit(queryRequest.getPageSize());
 		List<WorkSheet> sheets = listSheets(user, isOnlyAfterSales(types), param);
 
 		// 工单类型和维修权限ID的Map映射
@@ -135,6 +133,37 @@ public class FlowReadServiceImpl implements FlowReadService {
 		return records;
 	}
 
+	public Integer countWorkSheets(WorkSheetQueryParam param) {
+		User user = rbacService.getCurrentUser();
+		List<Integer> roles = rbacService.getRepairRoles(user);
+		List<StepType> types = filter(roles, typeService.selectAll());
+		return countSheets(user, isOnlyAfterSales(types), param);
+	}
+
+	/**
+	 * @param user
+	 * @param onlyAfterSales
+	 * @param param
+	 * @return
+	 */
+	private Integer countSheets(User user, boolean onlyAfterSales, WorkSheetQueryParam param) {
+		if (onlyAfterSales) {
+			List<Long> projects = rbacService.getProjects(user);
+			if (param.getProject() != null) {
+				Project project = trainGW.selectProjectByName(param.getProject());
+				if (projects.contains(Long.valueOf(project.getId()))) {
+					projects.clear();
+					projects.add(Long.valueOf(project.getId()));
+				} else {
+					return 0;
+				}
+			}
+			return sheetService.countWorkSheetOfProjects(projects, param, user.getUserId());
+		} else {
+			return sheetService.countWorkSheetWithDetail(param, user.getUserId());
+		}
+	}
+
 	private List<WorkSheet> listSheets(User user, boolean onlyAfterSales, WorkSheetQueryParam param) {
 		if (onlyAfterSales) {
 			List<Long> projects = rbacService.getProjects(user);
@@ -147,9 +176,9 @@ public class FlowReadServiceImpl implements FlowReadService {
 					return null;
 				}
 			}
-			return sheetService.listWorkSheetOfProjects(projects, param);
+			return sheetService.listWorkSheetOfProjects(projects, param, user.getUserId());
 		} else {
-			return sheetService.listWorkSheetWithDetail(param);
+			return sheetService.listWorkSheetWithDetail(param, user.getUserId());
 		}
 	}
 
@@ -196,9 +225,6 @@ public class FlowReadServiceImpl implements FlowReadService {
 		WorksheetPacket packet = new WorksheetPacket();
 		packet.setSheet(sheet);
 		packet.setSteps(steps);
-		if (sheet.getFaultCode() != null) {
-			packet.setSuggestion(findSuggestion(sheet.getFaultType(), sheet.getFaultCode()));
-		}
 		User user = (User) SecurityUtils.getSubject().getPrincipal();
 		packet.setOption(getRepairOption(sheet, user));
 		return packet;
@@ -214,16 +240,6 @@ public class FlowReadServiceImpl implements FlowReadService {
 			}
 		});
 		return steps;
-	}
-
-	private Suggestion findSuggestion(int type, int code) {
-		PushInfo pushInfo = suggestionService.findPushInfo(type, code);
-		String treatment = suggestionService.findTreatmentSuggestion(pushInfo.getTreatmentId());
-		String repair = suggestionService.findRepairSuggestion(pushInfo.getRepairId());
-		Suggestion suggestion = new Suggestion();
-		suggestion.setTreatment(treatment);
-		suggestion.setRepair(repair);
-		return suggestion;
 	}
 
 	/**
@@ -295,10 +311,12 @@ public class FlowReadServiceImpl implements FlowReadService {
 	}
 
 	private String getFaultTopTypeByCode(Integer code) {
-		FaultTopType[] values = FaultTopType.values();
-		for (FaultTopType faultTopType : values) {
-			if (faultTopType.getCode() == code) {
-				return faultTopType.getName();
+		if (code != null) {
+			FaultTopType[] values = FaultTopType.values();
+			for (FaultTopType faultTopType : values) {
+				if (faultTopType.getCode() == code) {
+					return faultTopType.getName();
+				}
 			}
 		}
 		return null;

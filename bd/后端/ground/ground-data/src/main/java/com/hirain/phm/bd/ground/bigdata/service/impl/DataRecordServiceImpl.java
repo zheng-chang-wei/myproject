@@ -22,7 +22,9 @@ import com.hirain.phm.bd.ground.bigdata.param.DataResponse;
 import com.hirain.phm.bd.ground.bigdata.param.RawData;
 import com.hirain.phm.bd.ground.bigdata.service.DataRecordService;
 import com.hirain.phm.bd.ground.bigdata.service.DataRedisService;
-import com.hirain.phm.bd.ground.common.data.BaseValueService;
+import com.hirain.phm.bd.ground.dictionary.service.BaseValueService;
+import com.hirain.phm.bd.ground.train.controller.ProjectGateWay;
+import com.hirain.phm.bd.ground.train.domain.Project;
 import com.hirain.phm.bd.message.data.RecordData;
 import com.hirain.phm.bd.message.decode.RunDataFrame;
 
@@ -49,6 +51,9 @@ public class DataRecordServiceImpl implements DataRecordService {
 
 	@Autowired
 	private BaseValueService baseValueService;
+
+	@Autowired
+	private ProjectGateWay projectGW;
 
 	private static String TIME_INDEX = "时间";
 
@@ -123,9 +128,10 @@ public class DataRecordServiceImpl implements DataRecordService {
 		DataResponse response = new DataResponse();
 		List<String> keys = recordData.getKeys();
 		response.setKeys(variables);
+		Project project = projectGW.selectProjectByName(record.getProject());
 		List<List<String>> baseValues = new ArrayList<>();
 		for (String key : variables) {
-			baseValues.add(baseValueService.getBaseValue(0, key));
+			baseValues.add(baseValueService.getBaseValue(project.getId(), key));
 		}
 		response.setBaseValues(baseValues);
 

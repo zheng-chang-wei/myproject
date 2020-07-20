@@ -51,12 +51,12 @@ public class Source extends SheetAndLine {
 	@XmlAttribute(name = "name")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String name;
+	protected String Source_name;
 
 	@XmlAttribute(name = "uri1")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NMTOKEN")
-	protected String uri1;
+	protected String Source_uri;
 
 	@XmlAttribute(name = "uri2")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)

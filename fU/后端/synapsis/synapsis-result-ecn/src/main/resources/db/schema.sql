@@ -4,6 +4,7 @@ setting_id INT,
 length INT,
 data_length INT,
 group_id INT,
+endian varchar(20),
 PRIMARY KEY(id)
 );
 

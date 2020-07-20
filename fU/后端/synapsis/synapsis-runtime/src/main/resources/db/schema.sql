@@ -10,6 +10,7 @@ raw_space int,
 result_space int,
 time_on boolean,
 selected boolean,
+user_name varchar(50),
 PRIMARY KEY(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

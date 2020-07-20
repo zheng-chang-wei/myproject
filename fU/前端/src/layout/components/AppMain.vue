@@ -37,14 +37,18 @@ export default {
     padding-right: 15px;
   }
 }
-.el-button{
-  padding: 9px 15px;
-  font-size: 12px;
-  border-radius: 3px;
+.red{
+  border: 1px solid red;
 }
-.el-input__inner{
-  font-size: 13px;
-  height: 32px;
-  line-height: 32px;
+.center {
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+.vcenter {
+  display: flex;
+  align-items: center;
 }
 </style>

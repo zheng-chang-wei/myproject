@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import tk.mybatis.spring.annotation.MapperScan;
 
 @SpringBootApplication(scanBasePackages = "com.hirain.phm.bd.ground")
-@MapperScan("com.hirain.phm.bd.ground.**.dao")
+@MapperScan({ "com.hirain.phm.bd.ground.**.dao", "com.hirain.phm.bd.ground.**.**.dao" })
 @EnableFeignClients
 public class TestApplication {
 

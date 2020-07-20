@@ -21,8 +21,6 @@ import com.hirain.phm.bd.ground.maintenance.service.RbacService;
  *               <p>
  *               Feb 28, 2020 jianwen.xin@hirain.com 1.0 create file
  */
-//@Profile("test")
-//@Service
 public class TestRbacServiceImple implements RbacService {
 
 	/**

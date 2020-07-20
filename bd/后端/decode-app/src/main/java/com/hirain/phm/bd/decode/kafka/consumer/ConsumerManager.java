@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.hirain.phm.bd.common.pinyin.PinyinUtil;
 import com.hirain.phm.bd.decode.kafka.KafkaConsumerProperties;
+import com.hirain.phm.bd.decode.kafka.KafkaTopicProperties;
 import com.hirain.phm.bd.message.header.MessageHeader;
 
 /**
@@ -44,18 +44,15 @@ public class ConsumerManager {
 	@Autowired
 	private ConsumerFactory<String, Object> consumerFactory;
 
-	@Value("${kafka.topic.realtime}")
-	private String realtimePrefix;
-
-	@Value("${kafka.topic.history}")
-	private String historyPrefix;
+	@Autowired
+	private KafkaTopicProperties topicProperties;
 
 	private Map<String, AbstractMessageListenerContainer<?, ?>> kafkaContainerMap = new ConcurrentHashMap<>();
 
 	public void createAndStart(MessageHeader header) {
 		String pinyin = PinyinUtil.getFullSpell(header.getCity());
-		String topic = historyPrefix + pinyin + "-" + header.getLine();
-		String realTopic = realtimePrefix + pinyin + "-" + header.getLine();
+		String topic = topicProperties.getHistory() + pinyin + "-" + header.getLine();
+		String realTopic = topicProperties.getRealtime() + pinyin + "-" + header.getLine();
 		if (kafkaContainerMap.keySet().contains(topic)) {
 			return;
 		}

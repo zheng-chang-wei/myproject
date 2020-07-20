@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.listener.BatchMessageListener;
 
+import com.hirain.phm.bd.ground.common.event.MessageEvent;
+
 /**
  * @Version 1.0
  * @Author jianwen.xin@hirain.com

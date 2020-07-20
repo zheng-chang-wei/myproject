@@ -24,7 +24,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class FaultDetailWithSuggestionParams extends FaultDetailCommonParms {
+public class FaultDetailWithSuggestionParams extends FaultDetailCommonParams {
 
 	/**
 	 * 

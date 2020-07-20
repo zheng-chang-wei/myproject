@@ -21,8 +21,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hirain.phm.bd.ground.fault.domain.FaultInfo;
-import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParms;
-import com.hirain.phm.bd.ground.fault.param.FaultDetailWithSuggestionParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailRequestParams;
+import com.hirain.phm.bd.ground.fault.param.FaultDetailResponseParams;
 import com.hirain.phm.bd.ground.fault.service.FaultDetailService;
 import com.hirain.phm.bd.ground.fault.service.FaultInfoService;
 import com.hirain.phm.bd.message.train.FaultMessage;
@@ -60,10 +60,10 @@ public class TestFaultEvent {
 		publisher.publishEvent(packet);
 		TimeUnit.MILLISECONDS.sleep(500);
 
-		FaultDetailRequestParms param = new FaultDetailRequestParms();
+		FaultDetailRequestParams param = new FaultDetailRequestParams();
 		param.setProject(packet.getProject());
 		param.setTrainNo(packet.getTrain());
-		List<FaultDetailWithSuggestionParams> details = service.findFaultDetailsByParams(param);
+		List<FaultDetailResponseParams> details = service.findFaultDetailsByParams(param);
 		assertNotNull(details);
 		assertFalse(details.isEmpty());
 		assertEquals(packet.getProject(), details.get(0).getProject());

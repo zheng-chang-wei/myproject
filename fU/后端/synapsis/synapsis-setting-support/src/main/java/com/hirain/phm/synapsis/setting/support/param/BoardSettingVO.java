@@ -3,8 +3,6 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.setting.support.param;
 
-import java.util.List;
-
 import lombok.Data;
 
 /**
@@ -31,7 +29,7 @@ public class BoardSettingVO {
 	/**
 	 * 前面板IP
 	 */
-	private String ip;
+	private String[] ips;
 
 	/**
 	 * 卡槽号
@@ -48,7 +46,16 @@ public class BoardSettingVO {
 	 */
 	private String filename;
 
-	private String fileOriginalName;
+	private String originalName;
 
-	private List<ADVariableVO> variables;
+	/**
+	 * 信任线，mvb卡有值，0：both 1:line_A 2:line_B
+	 */
+	private Integer trustLine;
+
+	/**
+	 * 模式 mvb卡有值：emd ; esd
+	 */
+	private String mode;
+
 }

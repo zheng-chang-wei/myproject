@@ -52,4 +52,9 @@ public class ResultBean<T> implements Serializable {
 		this.msg = msg;
 		this.code = FAIL;
 	}
+
+	public static <T> ResultBean<T> error(String msg) {
+		ResultBean<T> resultBean = new ResultBean<>(msg, null);
+		return resultBean;
+	}
 }

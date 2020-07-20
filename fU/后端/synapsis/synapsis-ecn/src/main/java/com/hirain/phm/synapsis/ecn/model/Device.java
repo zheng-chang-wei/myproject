@@ -54,4 +54,7 @@ public class Device extends SheetAndLine {
 	@XmlSchemaType(name = "NCName")
 	protected String type;
 
+	@XmlAttribute(name = "endian")
+	protected String endian;
+
 }

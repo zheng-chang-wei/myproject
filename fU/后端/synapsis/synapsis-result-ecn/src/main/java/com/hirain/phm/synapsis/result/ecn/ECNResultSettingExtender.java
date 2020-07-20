@@ -3,13 +3,20 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.result.ecn;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hirain.phm.synapsis.exception.SynapsisException;
 import com.hirain.phm.synapsis.result.ecn.service.ResultSettingService;
 import com.hirain.phm.synapsis.setting.Setting;
+import com.hirain.phm.synapsis.setting.VariableGroup;
 import com.hirain.phm.synapsis.setting.support.domain.ValidateResult;
+import com.hirain.phm.synapsis.setting.support.extend.ExtenderSetting;
 import com.hirain.phm.synapsis.setting.support.extend.SettingSupportExtender;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Version 1.0
@@ -25,15 +32,18 @@ import com.hirain.phm.synapsis.setting.support.extend.SettingSupportExtender;
  *               Jan 21, 2020 jianwen.xin@hirain.com 1.0 create file
  */
 @Component("ecn-result")
+@Slf4j
 public class ECNResultSettingExtender implements SettingSupportExtender {
 
+	@Autowired
 	private ResultSettingService ecnSettingService;
 
 	@Override
-	public void activate(int settingId) throws Exception {
+	public void activate(ExtenderSetting extenderSetting) throws Exception {
 		try {
-			ecnSettingService.genearteSettingFile(settingId);
+			ecnSettingService.genearteSettingFile(extenderSetting.getSettingId(), extenderSetting.getGroups());
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			throw new SynapsisException("算法结果上传ECN总线配置文件生成失败。", e);
 		}
 	}
@@ -49,5 +59,13 @@ public class ECNResultSettingExtender implements SettingSupportExtender {
 	@Override
 	public void delete(int settingId) throws Exception {
 		ecnSettingService.delete(settingId);
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.setting.support.extend.SettingSupportExtender#getVariableGroups(int)
+	 */
+	@Override
+	public List<VariableGroup> getVariableGroups(int settingId) {
+		return ecnSettingService.getVariableGroups(settingId);
 	}
 }

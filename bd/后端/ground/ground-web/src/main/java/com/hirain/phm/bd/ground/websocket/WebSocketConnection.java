@@ -19,6 +19,8 @@ import com.hirain.phm.bd.ground.realtime.domain.MonitorOption;
 import com.hirain.phm.bd.ground.realtime.service.IOptionTextService;
 import com.hirain.phm.bd.message.decode.DecodePacket;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @Version 1.0
  * @Author jianwen.xin@hirain.com
@@ -33,6 +35,7 @@ import com.hirain.phm.bd.message.decode.DecodePacket;
  */
 @Component
 @ServerEndpoint(value = "/websocket")
+@Slf4j
 public class WebSocketConnection {
 
 	static private IOptionTextService textService;
@@ -55,6 +58,7 @@ public class WebSocketConnection {
 
 	@OnClose
 	public void onClose() {
+		log.info(monitorOption + ":websocket close");
 		WebSocketServer.removeConnection(textService.getKey(monitorOption), this);
 	}
 

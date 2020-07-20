@@ -52,7 +52,7 @@ public class UploadFileServiceImpl implements UploadService {
     if (file.isEmpty()) {
       throw new IOException("文件为空");
     }
-    String uploadRoot = System.getProperty("user.dir") + "//imgs";
+    String uploadRoot = System.getProperty("user.dir") + "//files";
     File root = new File(uploadRoot);
     if (!root.exists()) {
       root.mkdirs();

@@ -1,6 +1,6 @@
 package com.hirain.phm.bd.ground.kafka;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
@@ -19,39 +19,29 @@ import lombok.Data;
  */
 @Component
 @Data
+@ConfigurationProperties("kafka.consumer")
 public class KafkaConsumerProperties {
 
-	@Value("${kafka.consumer.servers}")
 	private String servers;
 
-	@Value("${kafka.consumer.enable.auto.commit}")
 	private boolean enableAutoCommit;
 
-	@Value("${kafka.consumer.session.timeout}")
 	private String sessionTimeout;
 
-	@Value("${kafka.consumer.auto.commit.interval}")
 	private String autoCommitInterval;
 
-	@Value("${kafka.consumer.group.id}")
 	private String groupId;
 
-	@Value("${kafka.consumer.group.prefix}")
-	private String prefix;
+	private String groupPrefix;
 
-	@Value("${kafka.consumer.auto.offset.reset}")
 	private String autoOffsetReset;
 
-	@Value("${kafka.consumer.concurrency}")
 	private int concurrency;
 
-	@Value("${kafka.consumer.key.deserializer}")
 	private String keyDeserializer;
 
-	@Value("${kafka.consumer.value.deserializer}")
 	private String valueDeserializer;
 
-	@Value("${kafka.consumer.records.max}")
 	private int maxRecords;
 
 }

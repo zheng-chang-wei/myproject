@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=你的目录\ImpalaJDBC41.jar -DgroupId=cloudera -DartifactId=impala-jdbc -Dversion=2.6.15 -Dpackaging=jar -DgeneratePom=true -DcreateChecksum=true -Dmaven.repo.local=你的maven库路径

@@ -1,6 +1,10 @@
 package com.hirain.qsy.shaft.controller;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.SecurityUtils;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hirain.qsy.shaft.common.annotation.Log;
 import com.hirain.qsy.shaft.common.model.ResponseBo;
+import com.hirain.qsy.shaft.common.model.VerificationCode;
 import com.hirain.qsy.shaft.common.util.HttpContextUtils;
 import com.hirain.qsy.shaft.common.util.IPUtils;
 import com.hirain.qsy.shaft.model.User;
@@ -47,7 +52,12 @@ public class LoginController {
 
 	@Log("登录")
 	@PostMapping(value = "/login")
-	public ResponseBo login(String accountname, String password) {
+	public ResponseBo login(String accountname, String password, String code) {
+		HttpServletRequest request = HttpContextUtils.getHttpServletRequest();
+		boolean checkCode = checkCode(request, code);
+		if (!checkCode) {
+			return ResponseBo.error("验证码错误！");
+		}
 		UsernamePasswordToken token = new UsernamePasswordToken(accountname, password);
 		try {
 			Subject subject = SecurityUtils.getSubject();
@@ -56,7 +66,7 @@ public class LoginController {
 			sessionService.forceLogoutByUserName(accountname);
 			subject.login(token);
 			Session session = subject.getSession();
-			HttpServletRequest request = HttpContextUtils.getHttpServletRequest();
+
 			String ip = IPUtils.getIpAddr(request);
 			session.setAttribute("ip", ip);
 			session.setAttribute("user", subject.getPrincipal());
@@ -84,7 +94,6 @@ public class LoginController {
 
 	@GetMapping(value = "/notlogin")
 	public ResponseBo notlogin() {
-
 		User user = (User) SecurityUtils.getSubject().getPrincipal();
 		if (user == null) {
 			return ResponseBo.error("NotLogin");
@@ -92,5 +101,25 @@ public class LoginController {
 			return ResponseBo.ok();
 		}
 
+	}
+
+	@GetMapping("/verifyCode")
+	public void verifyCode(HttpSession session, HttpServletResponse resp) throws IOException {
+		VerificationCode code = new VerificationCode();
+		BufferedImage image = code.getImage();
+		String text = code.getText();
+		session.setAttribute("verify_code", text);
+		VerificationCode.output(image, resp.getOutputStream());
+	}
+
+	// 校验code
+	public boolean checkCode(HttpServletRequest request, String code) {
+		// session 获取
+		String verify_code = (String) request.getSession().getAttribute("verify_code");
+		if (code == null || verify_code == null || "".equals(code) || !verify_code.toLowerCase().equals(code.toLowerCase())) {
+			// 验证码不正确
+			return false;
+		}
+		return true;
 	}
 }

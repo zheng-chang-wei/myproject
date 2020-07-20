@@ -56,6 +56,7 @@ public class WorkDetailServiceImpl extends BaseService<WorkDetail> implements Wo
 
 	@Override
 	public List<CommonStatisticsResult> countPartsFaultByParms(FaultStatisticsRequestParm parm) {
+		// TODO
 		return workDetailMapper.countPartsFaultByParms(parm);
 	}
 

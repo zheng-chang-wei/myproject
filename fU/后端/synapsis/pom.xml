@@ -46,6 +46,8 @@
     <module>synapsis-result-ecn</module>
     <module>synapsis-result</module>
     <module>synapsis-rbac</module>
+    <module>synapsis-log</module>
+    <module>synapsis-update</module>
   </modules>
   <dependencyManagement>
   	<dependencies>
@@ -171,6 +173,27 @@
 			<artifactId>synapsis-rbac</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.hirain.phm.synapsis</groupId>
+			<artifactId>synapsis-log</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hirain.phm.synapsis</groupId>
+			<artifactId>synapsis-update</artifactId>
+			<version>1.0.0</version>
+		</dependency>
   	</dependencies>
   </dependencyManagement>
+  <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

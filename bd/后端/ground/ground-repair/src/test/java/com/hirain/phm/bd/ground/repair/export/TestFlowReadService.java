@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.hirain.phm.bd.ground.common.page.QueryRequest;
 import com.hirain.phm.bd.ground.maintenance.domain.WorkDetail;
 import com.hirain.phm.bd.ground.maintenance.domain.WorkSheet;
 import com.hirain.phm.bd.ground.maintenance.domain.WorkStep;
@@ -41,10 +42,11 @@ public class TestFlowReadService implements FlowReadService {
 	}
 
 	/**
-	 * @see com.hirain.phm.bd.ground.maintenance.service.FlowReadService#listWorkSheets(com.hirain.phm.bd.ground.maintenance.param.WorkSheetQueryParam)
+	 * @see com.hirain.phm.bd.ground.maintenance.service.FlowReadService#listWorkSheets(com.hirain.phm.bd.ground.maintenance.param.WorkSheetQueryParam,
+	 *      QueryRequest)
 	 */
 	@Override
-	public List<WorkSheetRecord> listWorkSheets(WorkSheetQueryParam param) {
+	public List<WorkSheetRecord> listWorkSheets(WorkSheetQueryParam param, QueryRequest queryRequest) {
 		return null;
 	}
 
@@ -108,6 +110,15 @@ public class TestFlowReadService implements FlowReadService {
 
 	@Override
 	public List<FaultType> getFaultTypes() {
+		return null;
+	}
+
+	/**
+	 * @see com.hirain.phm.bd.ground.maintenance.service.FlowReadService#countWorkSheets(com.hirain.phm.bd.ground.maintenance.param.WorkSheetQueryParam)
+	 */
+	@Override
+	public Integer countWorkSheets(WorkSheetQueryParam param) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -38,7 +38,7 @@ public class DigitalTwinPacket {
 	private int doorID;
 
 	@SerializedName("Debug")
-	private int debug;
+	private Boolean debug;
 
 	@SerializedName("Date")
 	private Date date;

@@ -4,7 +4,8 @@
 	<contextName>Demo</contextName>
 	<property name="log.path" value="log" />
 	<property name="log.maxHistory" value="15" />
-	<property name="log.pattern" value="%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n" />
+	<property name="log.error.maxHistory" value="30"/>
+	<property name="log.pattern" value="%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} %L - %msg%n" />
 	<!-- %d{HH: mm:ss.SSS}——日志输出时间 %thread——输出日志的进程名字，这在Web应用以及异步任务处理中很有用 %-5level——日志级别，并且使用5个字符靠左对齐 %logger{36}——日志输出者的名字 %msg——日志消息 %n——平台的换行符 -->
 	<!--输出到控制台 -->
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
@@ -33,6 +34,8 @@
 	<appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${log.path}/error/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!-- 错误日志保留30天 -->
+			<MaxHistory>${log.error.maxHistory}</MaxHistory>
 		</rollingPolicy>
 		<encoder>
 			<pattern>${log.pattern}</pattern>

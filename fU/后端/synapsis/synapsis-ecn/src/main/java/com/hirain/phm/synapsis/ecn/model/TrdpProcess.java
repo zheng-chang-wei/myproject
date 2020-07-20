@@ -47,7 +47,10 @@ public class TrdpProcess extends SheetAndLine {
 	@XmlAttribute(name = "blocking")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String blocking;
+	protected String blocking = "no";
+
+	@XmlAttribute(name = "cycle-time", required = true)
+	protected String cycleTime = "1000";
 
 	@XmlAttribute(name = "priority")
 	protected String priority;
@@ -55,6 +58,6 @@ public class TrdpProcess extends SheetAndLine {
 	@XmlAttribute(name = "traffic-shaping")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String trafficShaping;
+	protected String trafficShaping = "on";
 
 }

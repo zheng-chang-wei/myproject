@@ -5,6 +5,9 @@ package com.hirain.phm.synapsis.setting.db;
 
 import java.util.List;
 
+import com.hirain.phm.synapsis.exception.SynapsisException;
+import com.hirain.phm.synapsis.setting.AlgorithmSetting;
+import com.hirain.phm.synapsis.setting.BoardSetting;
 import com.hirain.phm.synapsis.setting.Setting;
 import com.hirain.phm.synapsis.setting.Subsystem;
 
@@ -24,13 +27,9 @@ public interface SettingDbService {
 
 	/**
 	 * @return
+	 * @throws SynapsisException
 	 */
-	Setting selectCurrent();
-
-	/**
-	 * @param setting
-	 */
-	void saveOrUpdate(Setting setting);
+	Setting selectCurrent() throws SynapsisException;
 
 	/**
 	 * @param settingId
@@ -63,5 +62,22 @@ public interface SettingDbService {
 	 * @return
 	 */
 	List<Setting> selectAll();
+
+	/**
+	 * @param subsystemId
+	 * @return
+	 */
+	List<AlgorithmSetting> selectAlgorithmBySubsystemId(Integer subsystemId);
+
+	/**
+	 * @param name
+	 */
+	Setting selectByName(String name);
+
+	/**
+	 * @param settingId
+	 * @param type
+	 */
+	BoardSetting findBoardSetting(Integer settingId, String type);
 
 }

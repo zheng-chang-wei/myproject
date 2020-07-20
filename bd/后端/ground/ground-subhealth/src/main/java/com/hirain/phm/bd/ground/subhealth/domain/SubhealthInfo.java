@@ -14,11 +14,15 @@
 package com.hirain.phm.bd.ground.subhealth.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.hirain.phm.bd.ground.dictionary.domain.Repair;
+import com.hirain.phm.bd.ground.dictionary.domain.Solution;
 
 import lombok.Data;
 
@@ -30,18 +34,20 @@ public class SubhealthInfo implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -3932673619204586421L;
-	
+
 	@Id
 	@GeneratedValue(generator = "JDBC")
 	private Integer id;
 
-	@Column(name = "subhealth_name")
-	private String typeName;
-	
-	@Column(name = "subhealth_code")
-	private Integer typeCode;
-	
-	@Column(name = "subhealth_desc")
-	private String typeDescribe;
-	
+	private Integer projectId;
+
+	private String subhealthName;
+
+	private Integer subhealthCode;
+
+	@Transient
+	private List<Repair> repairList;
+
+	@Transient
+	private List<Solution> solutionList;
 }

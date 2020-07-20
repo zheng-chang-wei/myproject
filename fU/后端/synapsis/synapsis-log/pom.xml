@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+	    <groupId>com.hirain.phm</groupId>
+	    <artifactId>synapsis</artifactId>
+	    <version>1.0.0</version>
+    </parent>
+	<groupId>com.hirain.phm.synapsis</groupId>
+	<artifactId>synapsis-log</artifactId>
+	<name>synapsis-log</name>
+	<description>4U-PHM log function</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+		  	<groupId>org.mybatis.spring.boot</groupId>
+		  	<artifactId>mybatis-spring-boot-starter</artifactId>
+		  	<type>pom.lastUpdated</type>
+		  </dependency>
+		  <dependency>
+		  	<groupId>tk.mybatis</groupId>
+		  	<artifactId>mapper-spring-boot-starter</artifactId>
+		  </dependency>
+		  <dependency>
+		  	<groupId>com.alibaba</groupId>
+		  	<artifactId>druid-spring-boot-starter</artifactId>
+		  </dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+		  	<groupId>org.apache.shiro</groupId>
+		  	<artifactId>shiro-spring</artifactId>
+		  	<version>1.4.0</version>
+        </dependency>
+		<!-- aop依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+       <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-core</artifactId>
+		</dependency>
+		<dependency>
+	    	<groupId>com.hirain.mapper</groupId>
+	    	<artifactId>derby-mapper</artifactId>
+	    	<version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+		  	<groupId>com.hirain.phm.synapsis</groupId>
+		  	<artifactId>synapsis-common</artifactId>
+        </dependency>
+        <dependency>
+			<groupId>com.hirain.phm.synapsis</groupId>
+			<artifactId>synapsis-rbac</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+</project>

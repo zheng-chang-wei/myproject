@@ -3,10 +3,10 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.udp;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * @Version 1.0
@@ -21,20 +21,13 @@ import lombok.Getter;
  *               Jan 10, 2020 jianwen.xin@hirain.com 1.0 create file
  */
 @Component
+@ConfigurationProperties("connection.udp")
+@Data
 public class UdpProperties {
 
-	/**
-	 * 最大可接收字段长度
-	 */
-	@Value("${connection.udp.recvbyte:65535}")
-	@Getter
-	private int recvByteAllocate;
+	private int recvByteAllocate = 65535;
 
-	@Value("${connection.udp.rvcbuf:1024}")
-	@Getter
-	private int rcvBuf;
+	private int rcvBuf = 1024;
 
-	@Value("${connection.udp.reuseaddr:true}")
-	@Getter
-	private boolean reuseAddr;
+	private boolean reuseAddr = true;
 }

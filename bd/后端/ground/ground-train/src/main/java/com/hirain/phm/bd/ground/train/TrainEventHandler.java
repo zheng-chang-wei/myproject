@@ -54,8 +54,8 @@ public class TrainEventHandler {
 		updateService.updateConfig(message);
 	}
 
-	@EventListener
-	@Async
+	// @EventListener
+	// @Async
 	public void handleOnline(WillMessage message) {
 		System.out.println(message);
 		updateService.upadateOnline(message);

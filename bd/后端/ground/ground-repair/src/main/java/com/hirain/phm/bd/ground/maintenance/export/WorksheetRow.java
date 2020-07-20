@@ -29,7 +29,7 @@ import lombok.Data;
 public class WorksheetRow {
 
 	@CsvProperty("序号")
-	private int seq;
+	private Integer seq;
 
 	@CsvProperty("来源")
 	private String source;
@@ -81,7 +81,7 @@ public class WorksheetRow {
 	private String temporary;
 
 	@CsvProperty("更换调整数量")
-	private int replaceCount;
+	private Integer replaceCount;
 
 	@CsvProperty("故障描述")
 	private String description;
@@ -90,16 +90,16 @@ public class WorksheetRow {
 	private String reason;
 
 	@CsvProperty(value = "是否需要配件", converter = BooleanValueConverter.class)
-	private boolean needParts;
+	private Boolean needParts;
 
 	@CsvProperty("配件名称")
 	private String partName;
 
 	@CsvProperty("配件数量")
-	private int partCount;
+	private Integer partCount;
 
 	@CsvProperty(value = "是否需要分析报告", converter = BooleanValueConverter.class)
-	private boolean needReport;
+	private Boolean needReport;
 
 	@CsvProperty("现场处理人数")
 	private Integer processorCount;
@@ -108,7 +108,7 @@ public class WorksheetRow {
 	private String processor;
 
 	@CsvProperty("维修工时")
-	private int hours;
+	private Integer hours;
 
 	@CsvProperty("属性1名称")
 	private String property1;
@@ -137,7 +137,9 @@ public class WorksheetRow {
 	public static WorksheetRow valueOf(WorkSheet sheet) {
 		WorksheetRow row = new WorksheetRow();
 		WorkDetail detail = sheet.getDetail();
-		row.setSource(FaultTopType.values()[sheet.getFaultType()].getName());
+		if (sheet.getFaultType() != null) {
+			row.setSource(FaultTopType.values()[sheet.getFaultType()].getName());
+		}
 		row.setTimestamp(sheet.getFaultTime());
 		row.setFaultName(sheet.getFaultName());
 		row.setProject(sheet.getProject());

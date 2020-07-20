@@ -3,10 +3,10 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.rbac;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -60,11 +60,8 @@ public class SynapsisAuthRealm extends AuthorizingRealm {
 		Role role = userAll.getRole();
 		info.setRoles(new HashSet<>(Arrays.asList(role.getRolename())));
 
-		List<String> permissions = new ArrayList<>();
-		role.getPermissions().forEach(p -> {
-			permissions.add(p.getPermission());
-		});
-		info.setStringPermissions(new HashSet<>(permissions));
+		Set<String> permissions = role.getPermissions().stream().map(p -> p.getPermission()).collect(Collectors.toSet());
+		info.setStringPermissions(permissions);
 
 		return info;
 	}

@@ -168,13 +168,11 @@ export default {
 				}
 			}
 			vm.listLoading = true
-			vm.retrieveForm.starttime=util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss")
-			vm.retrieveForm.endtime=util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss")
 			let param = {
 				dimensionality: vm.retrieveForm.dimensionality,
 				num: vm.retrieveForm.num,
-				startTime: vm.retrieveForm.starttime,
-				endTime: vm.retrieveForm.endtime,
+				startTime: util.formatDate(new Date(vm.retrieveForm.starttime), "yyyy-MM-dd hh:mm:ss"),
+				endTime: util.formatDate(new Date(vm.retrieveForm.endtime), "yyyy-MM-dd hh:mm:ss"),
 				granularityTime: vm.radio
 			};
 			app.get("exception_statistics_byCar", param).then(data => {

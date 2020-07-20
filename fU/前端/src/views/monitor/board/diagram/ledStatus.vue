@@ -1,60 +1,63 @@
 <template>
   <div>
-    <div :class="[ledStatus[0],'led1']"></div>
-    <div :class="[ledStatus[1],'led2']"></div>
-    <div :class="[ledStatus[2],'led3']"></div>
-    <div :class="[ledStatus[3],'led4']"></div>
+    <div :class="[ledStatus[0],'led1']" />
+    <div :class="[ledStatus[1],'led2']" />
+    <div :class="[ledStatus[2],'led3']" />
+    <div :class="[ledStatus[3],'led4']" />
   </div>
 </template>
 
 <script>
-  export default {
-    name: "ledStatus",
-    data() {
-      return {
-        ledStatus: ['NULL', 'NULL', 'NULL', 'NULL']
-      }
-    },
-    methods: {
-      setLedStatus: function (arrStatus) {
-        this.ledStatus = arrStatus
-      }
+export default {
+  name: 'LedStatus',
+  data() {
+    return {
+      ledStatus: ['NULL', 'NULL', 'NULL', 'NULL']
+    }
+  },
+  methods: {
+    setLedStatus: function(arrStatus) {
+      this.ledStatus = arrStatus
     }
   }
+}
 </script>
 
 <style scoped>
   .led1 {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
     border: 1px solid darkgray;
-    border-radius: 3px;
+    border-radius: 2px;
     display: inline-block;
-    margin-left: 5px;
+    margin-left: 1px;
   }
 
   .led2 {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
     border: 1px solid darkgray;
-    border-radius: 3px;
+    border-radius: 2px;
     display: inline-block;
+    margin-left: -2px;
   }
 
   .led3 {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
     border: 1px solid darkgray;
-    border-radius: 3px;
+    border-radius: 2px;
     display: inline-block;
+    margin-left: -2px;
   }
 
   .led4 {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
     border: 1px solid darkgray;
-    border-radius: 3px;
+    border-radius: 2px;
     display: inline-block;
+    margin-left: -2px;
   }
 
   @keyframes fade {
@@ -79,9 +82,6 @@
     to {
       opacity: 1.0;
     }
-  }
-
-  .OFF {
   }
 
   .NULL {

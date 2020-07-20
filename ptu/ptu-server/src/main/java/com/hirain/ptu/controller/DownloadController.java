@@ -19,17 +19,17 @@ import java.util.List;
 /**
  * @author changwei.zheng
  * @date 2020/4/3 9:45
- * @describe 数据下载
+ * @describe 数据管理页面，数据删除，数据概览查询
  */
 @RestController
 @RequestMapping("/download")
 public class DownloadController {
+
   @Autowired DownloadService downloadService;
 
   @Autowired ComIdDataService comIdDataService;
-  @Autowired CsPortDataService csPortDataService;
 
-  @Autowired ManageService manageService;
+  @Autowired CsPortDataService csPortDataService;
 
   @GetMapping("/download")
   public ResponseBo download() {

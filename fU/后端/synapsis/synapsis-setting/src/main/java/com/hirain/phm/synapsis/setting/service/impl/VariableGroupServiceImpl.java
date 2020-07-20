@@ -144,7 +144,6 @@ public class VariableGroupServiceImpl implements VariableGroupService {
 	@Override
 	public void insertTimeGroup(Integer settingId, VariableGroup group) {
 		insertVariables(Arrays.asList(group));
-		mapper.insertTimeGroup(settingId, group.getId());
 	}
 
 	/**
@@ -163,7 +162,6 @@ public class VariableGroupServiceImpl implements VariableGroupService {
 	public void deleteTimeVariables(Integer settingId) {
 		List<VariableGroup> groups = mapper.selectTimeVariables(settingId);
 		delete(groups);
-		mapper.deleteTimeVariables(settingId);
 	}
 
 	/**

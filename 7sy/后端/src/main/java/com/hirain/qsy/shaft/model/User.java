@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @Table(name = "t_user")
@@ -40,8 +42,13 @@ public class User implements Serializable {
 
 	private String parentName;
 
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 	@Column(name = "CREATE_TIME")
 	private Date createTime;
+
+	private Boolean isFirstLogin;
+
+	private Integer errorCount = 0;
 
 	@Transient
 	private List<Role> roleList = new ArrayList<>();

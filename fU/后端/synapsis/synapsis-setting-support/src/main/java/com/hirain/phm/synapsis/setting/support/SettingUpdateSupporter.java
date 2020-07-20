@@ -3,8 +3,12 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.setting.support;
 
+import java.io.IOException;
+import java.util.List;
+
+import com.hirain.phm.synapsis.setting.AlgorithmSetting;
+import com.hirain.phm.synapsis.setting.BoardSetting;
 import com.hirain.phm.synapsis.setting.Setting;
-import com.hirain.phm.synapsis.setting.support.param.SettingVO;
 
 /**
  * @Version 1.0
@@ -22,25 +26,43 @@ import com.hirain.phm.synapsis.setting.support.param.SettingVO;
 public interface SettingUpdateSupporter {
 
 	/**
-	 * 前端对象转后端对象
-	 * 
-	 * @param settingVO
-	 * @return
-	 */
-	Setting voToSetting(SettingVO settingVO);
-
-	/**
-	 * 自动分配组播地址、端口
-	 */
-	void assignMulticastIP(Setting setting);
-
-	/**
-	 * 将临时文件夹中的资源文件移动到setting配置对应的资源文件夹下
-	 */
-	void moveFromTempToSetting(Setting setting) throws Exception;
-
-	/**
 	 * @param setting
 	 */
 	void deleteResources(Setting setting);
+
+	/**
+	 * 处理板卡的资源文件
+	 * 
+	 * @param settingName
+	 * @param boards
+	 * @throws IOException
+	 */
+	void handleBoardResources(String settingName, List<BoardSetting> boards) throws Exception;
+
+	/**
+	 * 处理算法的资源文件
+	 * 
+	 * @param settingName
+	 * @param algorithms
+	 * @throws IOException
+	 */
+	void handleAlgorithmResources(String settingName, List<AlgorithmSetting> algorithms) throws IOException;
+
+	/**
+	 * @param oldname
+	 * @param newname
+	 */
+	void createOrRename(String oldname, String newname);
+
+	/**
+	 * @param setting
+	 * @return
+	 */
+	String getECNProtocolFilepath(Setting setting);
+
+	/**
+	 * @param boardSetting
+	 * @return
+	 */
+	String getFilename(BoardSetting boardSetting);
 }

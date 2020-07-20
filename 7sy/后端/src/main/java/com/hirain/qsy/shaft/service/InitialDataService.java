@@ -46,4 +46,9 @@ public interface InitialDataService extends IService<InitialData> {
 	 */
 	@Cacheable(key = "'findMaxTime'+#p0 ")
 	String findMaxTime(Integer trainId);
+
+	@CacheEvict(allEntries = true)
+	int save(List<InitialData> list, Integer trainId);
+
+	void createTable(List<InitialData> initialdatas, Integer trainId);
 }

@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import com.hirain.phm.bd.ground.common.data.BaseValueService;
+import com.hirain.phm.bd.ground.dictionary.service.BaseValueService;
 import com.hirain.phm.bd.ground.subhealth.domain.SubhealthData;
 import com.hirain.phm.bd.ground.subhealth.param.SubhealthDataResponse;
 import com.hirain.phm.bd.ground.subhealth.service.SubhealthDataService;

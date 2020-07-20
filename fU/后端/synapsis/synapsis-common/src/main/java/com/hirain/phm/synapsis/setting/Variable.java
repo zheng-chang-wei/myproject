@@ -36,8 +36,8 @@ public class Variable {
 	@XmlTransient
 	private Integer groupId;
 
-	@XmlAttribute(name = "signalName", required = true)
-	private String signalName;
+	@XmlAttribute(name = "name", required = true)
+	private String name;
 
 	@XmlAttribute(name = "dataType", required = true)
 	private Integer dataType;

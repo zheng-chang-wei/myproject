@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.util.StringUtils;
 
 import com.hirain.phm.synapsis.ecn.model.BusInterface;
 import com.hirain.phm.synapsis.ecn.model.BusInterfaceList;
@@ -19,16 +19,10 @@ import com.hirain.phm.synapsis.ecn.model.DataSet;
 import com.hirain.phm.synapsis.ecn.model.DataSetList;
 import com.hirain.phm.synapsis.ecn.model.Destination;
 import com.hirain.phm.synapsis.ecn.model.Device;
-import com.hirain.phm.synapsis.ecn.model.DeviceConfiguration;
 import com.hirain.phm.synapsis.ecn.model.Element;
-import com.hirain.phm.synapsis.ecn.model.MdComParameter;
-import com.hirain.phm.synapsis.ecn.model.MdParameter;
-import com.hirain.phm.synapsis.ecn.model.PdComParameter;
-import com.hirain.phm.synapsis.ecn.model.PdParameter;
 import com.hirain.phm.synapsis.ecn.model.SheetAndLine;
 import com.hirain.phm.synapsis.ecn.model.Source;
 import com.hirain.phm.synapsis.ecn.model.Telegram;
-import com.hirain.phm.synapsis.ecn.model.TrdpProcess;
 import com.hirain.phm.synapsis.protocol.ParseResult;
 import com.hirain.phm.synapsis.util.ExcelUtil;
 
@@ -37,8 +31,13 @@ public class ParseExcelUtil {
 	// 必填
 	private static final String REQUISITE = "1";
 
-	// 选填或没有范围
+	// 选填
 	private static final String OPTIONAL = "0";
+
+	/**
+	 * 没有范围
+	 */
+	public static final String NO_SCOPE = "0";
 
 	// 没有默认值ֵ
 	private static final String NO_DEFAULT = "-1";
@@ -68,192 +67,156 @@ public class ParseExcelUtil {
 		if (file.exists()) {
 			Workbook workbook = ExcelUtil.createWorkbook(file);
 			int numberOfSheets = workbook.getNumberOfSheets();
-			BusInterfaceList busInterfaceList = new BusInterfaceList();
-			List<BusInterface> busInterfaces = new ArrayList<>();
-			busInterfaceList.setBusInterfaces(busInterfaces);
 			for (int index = 0; index < numberOfSheets; index++) {
 				Sheet sheet = workbook.getSheetAt(index);
 				String sheetName = sheet.getSheetName();
-				int lastRowNum = sheet.getLastRowNum();
-				if ("Device & Bus".equals(sheetName)) {
-					for (int i = 0; i <= lastRowNum; i++) {
-						Row row = sheet.getRow(i);
-						for (int j = 0; j < row.getLastCellNum(); j++) {
-							Cell cell = row.getCell(j);
-							String contents = ExcelUtil.getCellValue(cell);
-							if ("Device Parameters".equals(contents)) {
-								device = new Device();
-								device.setBusInterfaceList(busInterfaceList);
-								setValue(sheet, device, i, sheetName);
-							} else if ("Device Configuration Parameters".equals(contents)) {
-								DeviceConfiguration deviceConfiguration = new DeviceConfiguration();
-								setValue(sheet, deviceConfiguration, i, sheetName);
-								if (deviceConfiguration.getMemorySize() != null && !deviceConfiguration.getMemorySize().isEmpty()) {
-									device.setDeviceConfiguration(deviceConfiguration);
-								}
-							}
-						}
-					}
-				} else if ("Bus_Interface_1".equals(sheetName)) {
-					getBusInterface(sheet, device, busInterfaceList, busInterfaces);
-				} else if ("Com-parameter".equals(sheetName)) {
-					List<ComParameter> comParameters = new ArrayList<>();
-
-					for (int i = 0; i <= lastRowNum; i++) {
-						Row row = sheet.getRow(i);
-						for (int j = 0; j < row.getLastCellNum(); j++) {
-							Cell cell = row.getCell(j);
-							String contents = ExcelUtil.getCellValue(cell);
-							if ("Communication Parameters".equals(contents)) {
-								ComParameterList comParameterList = new ComParameterList();
-								device.setComParameterList(comParameterList);
-								comParameterList.setComParameter(comParameters);
-								if (isAllNull(sheet, i + 2)) {
-									ComParameter comParameter = new ComParameter();
-									setValue(sheet, comParameter, i, sheetName);
-									comParameters.add(comParameter);
-								}
-								for (int k = i + 2; k <= lastRowNum; k++) {
-									if (isAllNull(sheet, k)) {
-										break;
-									} else {
-										ComParameter comParameter = new ComParameter();
-										setValue(sheet, comParameter, i, k - 2, sheetName);
-										comParameters.add(comParameter);
-									}
-								}
-							}
-						}
-					}
-				} else if (sheetName.equals("Dataset_1")) {
-					DataSetList dataSetList = new DataSetList();
-					device.setDataSetList(dataSetList);
-					List<DataSet> dataSets = new ArrayList<>();
-					dataSetList.setDataSet(dataSets);
-					DataSet dataSet = null;
-					for (int i = 0; i <= lastRowNum; i++) {
-						Row row = sheet.getRow(i);
-						if (row == null) {
-							continue;
-						}
-						for (int j = 0; j < row.getLastCellNum(); j++) {
-							Cell cell = row.getCell(j);
-							String contents = ExcelUtil.getCellValue(cell);
-							if ("Dataset Parameters".equals(contents)) {
-								dataSet = new DataSet();
-								setValue(sheet, dataSet, i, sheetName);
-								dataSets.add(dataSet);
-							} else if ("Dataset Element".equals(contents)) {
-								List<Element> elementList = new ArrayList<>();
-								dataSet.setElement(elementList);
-								if (isAllNull(sheet, i + 2)) {
-									Element element = new Element();
-									setValue(sheet, element, i, sheetName);
-									elementList.add(element);
-								}
-								for (int k = i + 2; k <= lastRowNum; k++) {
-									if (isAllNull(sheet, k)) {
-										break;
-									} else {
-										Element element = new Element();
-										setValue(sheet, element, i, k - 2, sheetName);
-										elementList.add(element);
-									}
-								}
-							}
-
-						}
-					}
+				if (sheetName.equals("User_config")) {
+					device = setUserConfigSheet(device, sheet);
+				} else if (sheetName.equals("Dataset_config")) {
+					setDatasetConfigSheet(device, sheet);
 				}
 			}
 		}
 		return device;
 	}
 
-	private static void getBusInterface(Sheet sheet, Device device, BusInterfaceList busInterfaceList, List<BusInterface> busInterfaces)
-			throws IllegalAccessException {
-		String sheetName = sheet.getSheetName();
+	private static Device setUserConfigSheet(Device device, Sheet sheet) throws IllegalAccessException {
+		for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+			Row row = sheet.getRow(i);
+			for (int j = 0; j <= row.getLastCellNum(); j++) {
+				String contents = ExcelUtil.getCellValue(row.getCell(j));
+				if (contents.equals("Device and Bus")) {
+					device = new Device();
+					BusInterfaceList busInterfaceList = new BusInterfaceList();
+					List<BusInterface> busInterfaces = new ArrayList<BusInterface>();
+					busInterfaceList.setBusInterfaces(busInterfaces);
+					device.setBusInterfaceList(busInterfaceList);
+					// 设置device属性值
+					setValue(sheet, device, i);
+					// 设置busInterfaces值
+					getBusInterface(sheet, device, busInterfaces);
+					// 设置ComParameterList
+					setComParameterList(device);
+					return device;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param sheet
+	 * @param obj
+	 * @param row
+	 * @param sheetName
+	 * @throws IllegalAccessException
+	 */
+	private static void setValue(Sheet sheet, SheetAndLine obj, int rowNum) throws IllegalAccessException {
+		Field[] fields = obj.getClass().getDeclaredFields();
+		obj.setSheetName(sheet.getSheetName());
+		obj.setLineNum(String.valueOf(rowNum + 3));
+		all.add(obj);
+		Row row = sheet.getRow(rowNum);
+		for (int k = 0; k <= row.getLastCellNum(); k++) {
+			String paramName = ExcelUtil.getCellValue(sheet.getRow(rowNum + 1).getCell(k));
+			String value = ExcelUtil.getCellValue(sheet.getRow(rowNum + 2).getCell(k));
+			for (Field field : fields) {
+				if (field.getName().equals(paramName)) {
+					field.setAccessible(true);
+					field.set(obj, value);
+				}
+			}
+		}
+	}
+
+	private static void getBusInterface(Sheet sheet, Device device, List<BusInterface> busInterfaces) throws IllegalAccessException {
 		List<Telegram> telegramList = null;
 		BusInterface busInterface = null;
 		Telegram telegram = null;
 		List<Source> sourceList = null;
 		List<Destination> destinationList = null;
-		int lastRowNum = sheet.getLastRowNum();
-		for (int i = 0; i <= lastRowNum; i++) {
+		for (int i = 0; i <= sheet.getLastRowNum(); i++) {
 			Row row = sheet.getRow(i);
-			for (int j = 0; j < row.getLastCellNum(); j++) {
+			if (row == null) {
+				continue;
+			}
+			for (int j = 0; j <= row.getLastCellNum(); j++) {
 				String contents = ExcelUtil.getCellValue(row.getCell(j));
-				if ("Bus Interface Configuration".equals(contents)) {
+				if ("Device and Bus".equals(contents)) {
 					busInterface = new BusInterface();
-					setValue(sheet, busInterface, i, sheetName);
+					setValue(sheet, busInterface, i + 2);
 					busInterfaces.add(busInterface);
-				} else if ("Process Configuration".equals(contents)) {
-					TrdpProcess trdpProcess = new TrdpProcess();
-					setValue(sheet, trdpProcess, i, sheetName);
-					busInterface.setTrdpProcess(trdpProcess);
-
-				} else if ("PD Communication Parameters".equals(contents)) {
-					PdComParameter pdComParameter = new PdComParameter();
-					setValue(sheet, pdComParameter, i, sheetName);
-					busInterface.setPdComParameter(pdComParameter);
-				} else if ("MD Communication Parameters".equals(contents)) {
-					MdComParameter mdComParameter = new MdComParameter();
-					setValue(sheet, mdComParameter, i, sheetName);
-					busInterface.setMdComParameter(mdComParameter);
 				} else if ("Telegram Configuration".equals(contents)) {
-					sourceList = new ArrayList<>();
-					destinationList = new ArrayList<>();
+					sourceList = new ArrayList<Source>();
+					destinationList = new ArrayList<Destination>();
 					if (telegramList == null) {
-						telegramList = new ArrayList<>();
+						telegramList = new ArrayList<Telegram>();
 						busInterface.setTelegram(telegramList);
 					}
 					telegram = new Telegram();
-					setValue(sheet, telegram, i, sheetName);
+					setValue(sheet, telegram, i);
+					setValue(sheet, telegram.getPdParameter(), i);
 					telegramList.add(telegram);
 
 					telegram.setSource(sourceList);
 					telegram.setDestination(destinationList);
-
-				} else if ("PD Parameters".equals(contents)) {
-					PdParameter pdParameter = new PdParameter();
-					setValue(sheet, pdParameter, i, sheetName);
-					telegram.setPdParameter(pdParameter);
-				} else if ("MD Parameters".equals(contents)) {
-					MdParameter mdParameter = new MdParameter();
-					setValue(sheet, mdParameter, i, sheetName);
-					telegram.setMdParameter(mdParameter);
-				} else if ("Source Parameters".equals(contents)) {
-					for (int k = i + 2; k <= lastRowNum; k++) {
-						if (isAllNull(sheet, k)) {
-							break;
-						} else {
-							Source source = new Source();
-							setValue(sheet, source, i, k - 2, sheetName);
-							sourceList.add(source);
+					if (isAllNull(sheet, i + 4, 0, 2)) {
+						Source source = new Source();
+						setValue(sheet, source, i + 2);
+						setSourceId(sourceList, source);
+						sourceList.add(source);
+					} else {
+						for (int k = i + 4; k <= sheet.getLastRowNum(); k++) {
+							if (isAllNull(sheet, k, 0, 2)) {
+								break;
+							} else {
+								Source source = new Source();
+								setValue(sheet, source, i + 3, k);
+								setSourceId(sourceList, source);
+								sourceList.add(source);
+							}
 						}
 					}
-					if (isAllNull(sheet, i + 2) && isAllNull(sheet, i + 3)) {
-						Source source = new Source();
-						setValue(sheet, source, i, sheetName);
-						sourceList.add(source);
-					}
-				} else if ("Destination Parameters".equals(contents)) {
-					if (isAllNull(sheet, i + 2)) {
+
+					if (isAllNull(sheet, i + 4, 3, 5)) {
 						Destination destination = new Destination();
-						setValue(sheet, destination, i, sheetName);
+						setValue(sheet, destination, i + 2);
+						setDestinationId(destinationList, destination);
 						destinationList.add(destination);
-					}
-					for (int k = i + 2; k <= lastRowNum; k++) {
-						if (isAllNull(sheet, k)) {
-							break;
-						} else {
-							Destination destination = new Destination();
-							setValue(sheet, destination, i, k - 2, sheetName);
-							destinationList.add(destination);
+					} else {
+						for (int k = i + 4; k <= sheet.getLastRowNum(); k++) {
+							if (isAllNull(sheet, k, 3, 5)) {
+								break;
+							} else {
+								Destination destination = new Destination();
+								setValue(sheet, destination, i + 3, k);
+								setDestinationId(destinationList, destination);
+								destinationList.add(destination);
+							}
 						}
 					}
 				}
 			}
+		}
+	}
+
+	private static void setSourceId(List<Source> sourceList, Source source) {
+		if (sourceList.size() != 0) {
+			// 最后一个source
+			Source lastSource = sourceList.get(sourceList.size() - 1);
+			source.setId(String.valueOf(Integer.valueOf(lastSource.getId()) + 1));
+		} else {
+			source.setId("1");
+		}
+	}
+
+	private static void setDestinationId(List<Destination> destinationList, Destination destination) {
+		if (destinationList.size() != 0) {
+			// 最后一个source
+			Destination lastDestination = destinationList.get(destinationList.size() - 1);
+			destination.setId(String.valueOf(Integer.valueOf(lastDestination.getId()) + 1));
+		} else {
+			destination.setId("1");
 		}
 	}
 
@@ -266,61 +229,104 @@ public class ParseExcelUtil {
 	 *            所在行
 	 * @return true 表示全为空，false表示不全为空
 	 */
-	private static boolean isAllNull(Sheet sheet, int rowNum) {
+
+	private static boolean isAllNull(Sheet sheet, int rowNum, int startCol, int endCol) {
 		Row row = sheet.getRow(rowNum);
 		if (row == null) {
 			return true;
 		}
-		for (int j = 0; j < row.getLastCellNum(); j++) {
+		for (int j = startCol; j < endCol; j++) {
 			String paramName = ExcelUtil.getCellValue(row.getCell(j));
-			if (paramName != null && !"".equals(paramName)) {
+			if (!StringUtils.isEmpty(paramName)) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	/**
-	 * @param sheet
-	 * @param obj
-	 * @param row
-	 * @param sheetName
-	 * @throws IllegalAccessException
-	 */
-	private static void setValue(Sheet sheet, SheetAndLine obj, int rowNum, String sheetName) throws IllegalAccessException {
-		Field[] fields = obj.getClass().getDeclaredFields();
-		obj.setSheetName(sheetName);
-		obj.setLineNum(String.valueOf(rowNum + 3));
-		all.add(obj);
+	private static boolean isAllNull(Sheet sheet, int rowNum) {
 		Row row = sheet.getRow(rowNum);
-		for (int k = 0; k < row.getLastCellNum(); k++) {
-			String paramName = ExcelUtil.getCellValue(sheet.getRow(rowNum + 1).getCell(k));
-			String value = ExcelUtil.getCellValue(sheet.getRow(rowNum + 2).getCell(k));
-			for (Field field : fields) {
-				if (field.getName().equals(paramName)) {
-					field.setAccessible(true);
-					field.set(obj, value);
+		if (row == null) {
+			return true;
+		}
+		for (int m = 0; m <= row.getLastCellNum(); m++) {
+			String paramName = ExcelUtil.getCellValue(row.getCell(m));
+			if (!StringUtils.isEmpty(paramName)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static void setComParameterList(Device device) {
+		ComParameterList comParameterList = new ComParameterList();
+		List<ComParameter> comParameters = new ArrayList<ComParameter>();
+		comParameterList.setComParameter(comParameters);
+		comParameters.add(new ComParameter("1", "5", "64", "3"));
+		comParameters.add(new ComParameter("2", "3", "64", "3"));
+		comParameters.add(new ComParameter("4", "4", "2", "3"));
+		device.setComParameterList(comParameterList);
+	}
+
+	private static void setDatasetConfigSheet(Device device, Sheet sheet) throws IllegalAccessException {
+		DataSetList dataSetList = new DataSetList();
+		device.setDataSetList(dataSetList);
+
+		List<DataSet> dataSets = new ArrayList<DataSet>();
+		dataSetList.setDataSet(dataSets);
+
+		DataSet dataSet = null;
+		for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+			Row row = sheet.getRow(i);
+			if (row == null) {
+				continue;
+			}
+			for (int j = 0; j <= row.getLastCellNum(); j++) {
+				String contents = ExcelUtil.getCellValue(row.getCell(j));
+				if (("Dataset Parameters").equals(contents)) {
+					dataSet = new DataSet();
+					setValue(sheet, dataSet, i);
+					dataSets.add(dataSet);
+				} else if (("Dataset Element").equals(contents)) {
+
+					List<Element> elementList = new ArrayList<Element>();
+					dataSet.setElement(elementList);
+					if (isAllNull(sheet, i + 2)) {
+						Element element = new Element();
+						setValue(sheet, element, i);
+						elementList.add(element);
+					} else {
+						for (int k = i + 2; k <= sheet.getLastRowNum(); k++) {
+							if (isAllNull(sheet, k)) {
+								break;
+							} else {
+								Element element = new Element();
+								setValue(sheet, element, i + 1, k);
+								elementList.add(element);
+							}
+						}
+					}
 				}
+
 			}
 		}
 	}
 
-	private static void setValue(Sheet sheet, SheetAndLine obj, int i, int j, String sheetName) throws IllegalAccessException {
+	private static void setValue(Sheet sheet, SheetAndLine obj, int rowParamNameNum, int rowValueNum) throws IllegalAccessException {
 		Field[] fields = obj.getClass().getDeclaredFields();
-		obj.setSheetName(sheetName);
-		obj.setLineNum(String.valueOf(j + 3));
+		obj.setSheetName(sheet.getSheetName());
+		obj.setLineNum(String.valueOf(rowValueNum + 1));
 		all.add(obj);
-		Row row = sheet.getRow(j);
-		for (int k = 0; k < row.getLastCellNum(); k++) {
-			String paramName = ExcelUtil.getCellValue(sheet.getRow(i + 1).getCell(k));
-			Cell cell = sheet.getRow(j + 2).getCell(k);
-			if (cell != null) {
-				String value = ExcelUtil.getCellValue(cell);
-				for (Field field : fields) {
-					if (field.getName().equals(paramName)) {
-						field.setAccessible(true);
-						field.set(obj, value);
-					}
+		Row rowParamName = sheet.getRow(rowParamNameNum);
+		Row rowValue = sheet.getRow(rowValueNum);
+		for (int k = 0; k <= rowParamName.getLastCellNum(); k++) {
+			String paramName = ExcelUtil.getCellValue(rowParamName.getCell(k));
+			String value = ExcelUtil.getCellValue(rowValue.getCell(k));
+			for (Field field : fields) {
+				if (field.getName().equals(paramName)) {
+					field.setAccessible(true);
+					field.set(obj, value);
+					break;
 				}
 			}
 		}
@@ -332,58 +338,34 @@ public class ParseExcelUtil {
 	 * @return
 	 */
 	private static List<String[]> initParameScope() {
-		List<String[]> list = new ArrayList<>();
-		// hostName,1,0,-1:分别表示参数名，必填（1）还是选填（0）,范围 0表示没有范围,默认值 -1表示没有默认值ֵ
-		String[] device = { "Device", "hostName", REQUISITE, OPTIONAL, NO_DEFAULT, "leaderName", OPTIONAL, OPTIONAL, NO_DEFAULT, "type", OPTIONAL,
-				OPTIONAL, NO_DEFAULT };
-		String[] deviceConfiguration = { "DeviceConfiguration", "memorySize", OPTIONAL, EXTENT_UINT32, NO_DEFAULT };
+		List<String[]> list = new ArrayList<String[]>();
+		// hostName,1,0,-1:分别表示参数名，必填（1）还是选填（0）,范围 0表示没有范围,默认值 -1表示没有默认值
+		String[] device = { "Device", "hostName", REQUISITE, NO_SCOPE, NO_DEFAULT };
 
-		String[] busInterface = { "BusInterface", "networkId", REQUISITE, "1-4", NO_DEFAULT, "name", REQUISITE, OPTIONAL, NO_DEFAULT, "hostIp",
-				OPTIONAL, OPTIONAL, NO_DEFAULT, "leaderIp", OPTIONAL, OPTIONAL, NO_DEFAULT };
-		String[] trdpProcess = { "TrdpProcess", "cycleTime", OPTIONAL, EXTENT_UINT32, NO_DEFAULT, "blocking", OPTIONAL, OPTIONAL, "no",
-				"trafficShaping", OPTIONAL, OPTIONAL, "on", "priority", OPTIONAL, "1-255", NO_DEFAULT };
-		String[] pdComParameter = { "PdComParameter", "timeOutValue", OPTIONAL, EXTENT_UINT32, "100000", "validityBehaviour", OPTIONAL, OPTIONAL,
-				"zero", "ttl", OPTIONAL, EXTENT_UINT32, "64", "qos", OPTIONAL, "0-7", "5", "marshall", OPTIONAL, OPTIONAL, "off", "callback",
-				OPTIONAL, OPTIONAL, "off", "port", OPTIONAL, EXTENT_UINT32, NO_DEFAULT };
-		String[] mdComParameter = { "MdComParameter", "confirmTimeOut", OPTIONAL, EXTENT_UINT32, "1000000", "replyTimeOut", OPTIONAL, EXTENT_UINT32,
-				"5000000", "connectTimeOut", OPTIONAL, EXTENT_UINT32, "6000000", "ttl", OPTIONAL, EXTENT_UINT32, "64", "qos", OPTIONAL, "0-7", "3",
-				"protocol", OPTIONAL, OPTIONAL, "UDP", "marshall", OPTIONAL, OPTIONAL, "off", "callback", OPTIONAL, OPTIONAL, "on", "udpPort",
-				OPTIONAL, EXTENT_UINT32, NO_DEFAULT, "tcpPort", OPTIONAL, EXTENT_UINT32, NO_DEFAULT, "numSessions", OPTIONAL, EXTENT_UINT32, "1000" };
-		String[] telegram = { "Telegram", "name", OPTIONAL, OPTIONAL, NO_DEFAULT, "comId", REQUISITE, EXTENT_UINT32, NO_DEFAULT, "datasetId",
-				OPTIONAL, EXTENT_UINT32, NO_DEFAULT, "comParameterId", OPTIONAL, EXTENT_UINT32, NO_DEFAULT };
-		String[] pdParameter = { "PdParameter", "timeOutValue", OPTIONAL, EXTENT_UINT32, "100000", "validityBehaviour", OPTIONAL, OPTIONAL, "zero",
-				"cycle", REQUISITE, EXTENT_UINT32, NO_DEFAULT, "redundant", OPTIONAL, OPTIONAL, NO_DEFAULT, "marshall", OPTIONAL, OPTIONAL, "off",
-				"callback", OPTIONAL, OPTIONAL, "off", "offsetAddress", OPTIONAL, OPTIONAL, NO_DEFAULT };
-		String[] mdParameter = { "MdParameter", "confirmTimeOut", OPTIONAL, EXTENT_UINT32, "100000", "replyTimeOut", OPTIONAL, EXTENT_UINT32,
-				"5000000", "marshall", OPTIONAL, OPTIONAL, "off", "callback", OPTIONAL, OPTIONAL, "on", "protocol", OPTIONAL, OPTIONAL, "UDP" };
-		String[] source = { "Source", "id", REQUISITE, EXTENT_UINT32, NO_DEFAULT, "uri1", REQUISITE, OPTIONAL, NO_DEFAULT, "uri2", OPTIONAL, OPTIONAL,
-				NO_DEFAULT, "name", OPTIONAL, OPTIONAL, NO_DEFAULT };
-		String[] destination = { "Destination", "id", REQUISITE, EXTENT_UINT32, NO_DEFAULT, "uri", REQUISITE, OPTIONAL, NO_DEFAULT, "name", OPTIONAL,
-				OPTIONAL, NO_DEFAULT };
+		String[] busInterface = { "BusInterface", "networkId", REQUISITE, "1-4", NO_DEFAULT, "name", REQUISITE, NO_SCOPE, NO_DEFAULT, "hostIp",
+				REQUISITE, NO_SCOPE, NO_DEFAULT };
+		String[] telegram = { "Telegram", "name", REQUISITE, NO_SCOPE, NO_DEFAULT, "comId", REQUISITE, EXTENT_UINT32, NO_DEFAULT, "datasetId",
+				REQUISITE, EXTENT_UINT32, NO_DEFAULT };
+		String[] pdParameter = { "PdParameter", "PD_cycle", REQUISITE, EXTENT_UINT32, NO_DEFAULT };
+		String[] source = { "Source", "Source_uri", REQUISITE, NO_SCOPE, NO_DEFAULT, "Source_name", REQUISITE, NO_SCOPE, NO_DEFAULT };
+		String[] destination = { "Destination", "Destination_uri", REQUISITE, NO_SCOPE, NO_DEFAULT, "Destination_name", REQUISITE, NO_SCOPE,
+				NO_DEFAULT };
 
-		String[] comParameter = { "ComParameter", "id", REQUISITE, EXTENT_UINT32, NO_DEFAULT, "qos", OPTIONAL, "0-7", NO_DEFAULT, "ttl", OPTIONAL,
-				EXTENT_UINT32, "64", "retries", OPTIONAL, EXTENT_UINT32, "3" };
+		String[] dataSet = { "DataSet", "name", OPTIONAL, NO_SCOPE, NO_DEFAULT, "id", REQUISITE, EXTENT_UINT32, NO_DEFAULT };
 
-		String[] dataSet = { "DataSet", "name", OPTIONAL, OPTIONAL, NO_DEFAULT, "id", REQUISITE, EXTENT_UINT32, NO_DEFAULT };
-
-		String[] element = { "Element", "name", OPTIONAL, OPTIONAL, NO_DEFAULT, "type", REQUISITE, OPTIONAL, NO_DEFAULT, "arraySize", OPTIONAL,
-				EXTENT_UINT32, "1", "unit", OPTIONAL, OPTIONAL, NO_DEFAULT, "scale", OPTIONAL, EXTENT_FLOAT, NO_DEFAULT, "offset", OPTIONAL,
+		String[] element = { "Element", "name", OPTIONAL, NO_SCOPE, NO_DEFAULT, "type", REQUISITE, NO_SCOPE, NO_DEFAULT, "arraySize", OPTIONAL,
+				EXTENT_UINT32, "1", "unit", OPTIONAL, NO_SCOPE, NO_DEFAULT, "scale", OPTIONAL, EXTENT_FLOAT, NO_DEFAULT, "offset", OPTIONAL,
 				EXTENT_INT32, NO_DEFAULT };
 
 		list.add(device);
-		list.add(deviceConfiguration);
 		list.add(busInterface);
-		list.add(trdpProcess);
-		list.add(pdComParameter);
-		list.add(mdComParameter);
 		list.add(telegram);
 		list.add(pdParameter);
-		list.add(mdParameter);
 		list.add(source);
 		list.add(destination);
-		list.add(comParameter);
 		list.add(dataSet);
 		list.add(element);
+
 		return list;
 	}
 
@@ -402,7 +384,7 @@ public class ParseExcelUtil {
 			String name = obj.getClass().getName();
 			for (String[] parameScopes : parameScopeList) {
 				if (name.equals("com.hirain.phm.synapsis.ecn.model." + parameScopes[0])) {
-					List<String> list = test(obj, parameScopes);
+					List<String> list = verifyValues(obj, parameScopes);
 					resultList.addAll(list);
 				}
 			}
@@ -447,7 +429,7 @@ public class ParseExcelUtil {
 			String dataSetId = telegramDatasetIdList.get(i);
 			if (dataSetId != null && !datasetIdList.contains(dataSetId)) {
 				Telegram telegram = allTelegramList.get(i);
-				resultList.add(telegram.getSheetName() + "页，第" + telegram.getLineNum() + "行dataSetId不存在");
+				resultList.add(telegram.getSheetName() + "页，第" + telegram.getLineNum() + "行的datasetId无法在dataset_config页中找到");
 				telegramDatasetIdList.remove(i);
 				comIdList.remove(i);
 				allTelegramList.remove(i);
@@ -458,6 +440,9 @@ public class ParseExcelUtil {
 		for (int i = 0; i < comIdList.size(); i++) {
 			String comId = comIdList.get(i);
 			String dataSetId = telegramDatasetIdList.get(i);
+			if (StringUtils.isEmpty(dataSetId)) {
+				break;
+			}
 			for (int j = 0; j < i; j++) {
 				if (comId.equals(comIdList.get(j))) {
 					if (!dataSetId.equals(telegramDatasetIdList.get(j))) {
@@ -470,31 +455,9 @@ public class ParseExcelUtil {
 		}
 	}
 
-	private static List<String> test(SheetAndLine obj, String[] parameScopes) throws Exception {
+	private static List<String> verifyValues(SheetAndLine obj, String[] parameScopes) throws Exception {
 		List<String> resultList = new ArrayList<>();
 		Class<?> clazz = obj.getClass();
-		// 设置Telegram的datasetId是否为必填
-		if (clazz.getName().equals(Telegram.class.getName())) {
-			Field mdParameterField = clazz.getDeclaredField("mdParameter");
-			mdParameterField.setAccessible(true);
-			MdParameter mdParameter = (MdParameter) mdParameterField.get(obj);
-			if (mdParameter != null) {
-				Field[] fields = mdParameter.getClass().getDeclaredFields();
-				int j = 1;
-				for (j = 1; j < parameScopes.length; j = j + 4) {
-					if (parameScopes[j].equals("datasetId")) {
-						break;
-					}
-				}
-				if (isAllNull(fields, mdParameter)) {
-					parameScopes[j + 1] = OPTIONAL;
-				} else {
-					parameScopes[j + 1] = REQUISITE;
-				}
-			}
-
-		}
-
 		String sheetName = obj.getSheetName();
 		String lineNum = obj.getLineNum();
 		for (; clazz != Object.class; clazz = clazz.getSuperclass()) {
@@ -506,7 +469,7 @@ public class ParseExcelUtil {
 					if (field.getName().equals(parameScopes[i])) {
 						String value = (String) field.get(obj);
 						// 判断是否为空
-						if ("".equals(value) || value == null) {
+						if (StringUtils.isEmpty(value)) {
 							// 判断是否为必填项，1表示必填
 							if (parameScopes[i + 1].equals(REQUISITE)) {
 								resultList.add(sheetName + "页，第" + lineNum + "行" + field.getName() + "不能为空");
@@ -543,25 +506,6 @@ public class ParseExcelUtil {
 	}
 
 	/**
-	 * 判断某个类中的属性是否全为空
-	 * 
-	 * @param fields
-	 * @param obj
-	 * @return true 表示全为空，false 表示不全为空
-	 * @throws Exception
-	 */
-	private static boolean isAllNull(Field[] fields, SheetAndLine obj) throws Exception {
-		for (Field field : fields) {
-			field.setAccessible(true);
-			Object anObject = field.get(obj);
-			if (anObject != null && !"".equals(anObject)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
 	 * 校验数据是否在范围内
 	 * 
 	 * @param extent
@@ -569,7 +513,7 @@ public class ParseExcelUtil {
 	 * @return
 	 */
 	private static boolean verifyExtent(String extent, String value) {
-		if (extent.equals("uint32")) {
+		if (("uint32").equals(extent)) {
 			// 判断value是否为 正整数
 			if (value.matches("^[0-9]*$")) {
 				long parseLong = Long.parseLong(value);
@@ -580,7 +524,7 @@ public class ParseExcelUtil {
 			} else {
 				return false;
 			}
-		} else if (extent.equals("int32")) {
+		} else if (("int32").equals(extent)) {
 			// 判断value是否为 整数
 			if (value.matches("^-?[0-9]*$")) {
 				long parseLong = Long.parseLong(value);
@@ -591,12 +535,12 @@ public class ParseExcelUtil {
 			} else {
 				return false;
 			}
-		} else if (extent.equals("float")) {
+		} else if (("float").equals(extent)) {
 			// 判断value是否为 float
 			if (!value.matches("^[+-]?(([0-9]+)([.]([0-9]+))?)$")) {
 				return false;
 			}
-		} else if (extent.equals(OPTIONAL)) {
+		} else if ((NO_SCOPE).equals(extent)) {
 
 		} else {
 			long parseLong = Long.parseLong(value);

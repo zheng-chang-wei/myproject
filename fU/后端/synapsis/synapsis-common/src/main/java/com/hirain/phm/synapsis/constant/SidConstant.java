@@ -33,14 +33,9 @@ public class SidConstant {
 	public static final int CONTROL_COMMAND = 0x02;
 
 	/**
-	 * 版本文件下载
+	 * 版本更新
 	 */
-	public static final int DOWNLOAD_COMMAND = 0x03;
-
-	/**
-	 * 版本文件激活
-	 */
-	public static final int ACTIVATE_COMMAND = 0x04;
+	public static final int VERSION_UPDATE_COMMAND = 0x03;
 
 	/**
 	 * 板卡状态查询
@@ -63,5 +58,15 @@ public class SidConstant {
 	 * 启动步骤
 	 */
 	public static final int LAUNCH_STEP_COMMAND = 0x09;
+
+	/**
+	 * 版本文件下载
+	 */
+	public static final int DOWNLOAD_COMMAND = 0x0A;
+
+	/**
+	 * 版本文件激活
+	 */
+	public static final int ACTIVATE_COMMAND = 0x0B;
 
 }

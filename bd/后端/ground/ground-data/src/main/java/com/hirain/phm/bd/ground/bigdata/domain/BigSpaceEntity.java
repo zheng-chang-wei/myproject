@@ -3,9 +3,6 @@
  ******************************************************************************/
 package com.hirain.phm.bd.ground.bigdata.domain;
 
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import lombok.Data;
 
 /**
@@ -21,11 +18,7 @@ import lombok.Data;
  *               2019年6月5日 jianwen.xin@hirain.com 1.0 create file
  */
 @Data
-@Table(name = "t_big")
 public class BigSpaceEntity {
-
-	@Id
-	private Long id;
 
 	private Long used;
 

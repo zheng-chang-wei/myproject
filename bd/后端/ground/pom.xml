@@ -33,10 +33,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -189,6 +185,36 @@
 				<artifactId>data-impala</artifactId>
 				<version>0.0.1</version>
 			</dependency>
+			<dependency>
+				<groupId>com.hirain.phm.bd</groupId>
+				<artifactId>ground-dictionary</artifactId>
+				<version>1.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hirain.phm.bd</groupId>
+				<artifactId>ground-owner</artifactId>
+				<version>1.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi</artifactId>
+				<version>3.17</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml</artifactId>
+				<version>3.17</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml-schemas</artifactId>
+				<version>3.17</version>
+			</dependency>
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>easyexcel</artifactId>
+				<version>2.2.6</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<modules>
@@ -204,7 +230,8 @@
 		<module>ground-web</module>
 		<module>ground-statistics</module>
 		<module>ground-log</module>
-    <module>ground-digitaltwin</module>
-    
+    	<module>ground-digitaltwin</module>
+    	<module>ground-dictionary</module>
+    <module>ground-owner</module>
   </modules>
 </project>

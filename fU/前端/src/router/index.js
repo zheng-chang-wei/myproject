@@ -31,7 +31,7 @@ import Layout from '@/layout'
  * all roles can be accessed
  */
 export const constantRoutes = [{
-  path: '/login',
+  path: '/',
   component: () =>
     import('@/views/login/index'),
   hidden: true
@@ -45,11 +45,10 @@ export const constantRoutes = [{
 },
 
 {
-  path: '/',
+  path: '/dashboard',
   component: Layout,
-  redirect: '/dashboard',
   children: [{
-    path: 'dashboard',
+    path: '',
     name: 'Dashboard',
     component: () =>
         import('@/views/dashboard/index'),
@@ -59,7 +58,21 @@ export const constantRoutes = [{
     }
   }]
 },
-
+{
+  path: '/algorithm',
+  component: Layout,
+  redirect: '/algorithm/monitor',
+  name: 'Algorithm',
+  children: [{
+    path: 'monitor',
+    name: 'monitor',
+    component: () => import('@/views/algorithm/index'),
+    meta: {
+      title: '算法监控',
+      icon: 'algorithm'
+    }
+  }]
+},
 {
   path: '/config',
   component: Layout,
@@ -75,46 +88,6 @@ export const constantRoutes = [{
       icon: 'config'
     }
   }]
-},
-{
-  path: '/monitor',
-  component: Layout,
-  redirect: '/monitor/boardCard',
-  name: 'Monitor',
-  meta: {
-    title: '状态监控',
-    icon: 'monitor'
-  },
-  children: [{
-    path: 'boards',
-    name: 'Boards',
-    component: () =>
-        import('@/views/monitor/board/diagram/index'),
-    meta: {
-      title: '机箱示意图',
-      icon: 'boardCard'
-    }
-  }, {
-    path: 'boardCard',
-    name: 'BoardCard',
-    component: () =>
-        import('@/views/monitor/board/index'),
-    meta: {
-      title: '板卡监控',
-      icon: 'boardCard'
-    }
-  },
-  {
-    path: 'algorithm',
-    name: 'Algorithm',
-    component: () =>
-          import('@/views/monitor/algorithm/index'),
-    meta: {
-      title: '算法监控',
-      icon: 'algorithm'
-    }
-  }
-  ]
 },
 {
   path: '/data',
@@ -195,17 +168,7 @@ export const constantRoutes = [{
       title: '软件设置',
       icon: 'softConfig'
     }
-  }, {
-    path: 'group',
-    name: 'group',
-    component: () =>
-            import('@/views/system/algorithmGroup/index'),
-    meta: {
-      title: '算法分组管理',
-      icon: 'config'
-    }
-  }
-  ]
+  }]
 },
 // 404 page must be placed at the end !!!
 {

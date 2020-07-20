@@ -67,11 +67,12 @@ public interface WorkSheetService extends IService<WorkSheet> {
 
 	/**
 	 * @param param
+	 * @param userId
 	 * @return
 	 */
-	List<WorkSheet> listWorkSheetWithDetail(WorkSheetQueryParam param);
+	List<WorkSheet> listWorkSheetWithDetail(WorkSheetQueryParam param, Long userId);
 
-	List<WorkSheet> listWorkSheetOfProjects(List<Long> projects, WorkSheetQueryParam param);
+	List<WorkSheet> listWorkSheetOfProjects(List<Long> projects, WorkSheetQueryParam param, Long userId);
 
 	/**
 	 * @param id
@@ -80,4 +81,19 @@ public interface WorkSheetService extends IService<WorkSheet> {
 	WorkSheet selectBySheetId(long id);
 
 	List<Integer> getFaultTypes();
+
+	/**
+	 * @param projects
+	 * @param param
+	 * @param userId
+	 * @return
+	 */
+	Integer countWorkSheetOfProjects(List<Long> projects, WorkSheetQueryParam param, Long userId);
+
+	/**
+	 * @param param
+	 * @param userId
+	 * @return
+	 */
+	Integer countWorkSheetWithDetail(WorkSheetQueryParam param, Long userId);
 }

@@ -144,17 +144,18 @@ public class WorkSheetServiceImpl extends BaseService<WorkSheet> implements Work
 	}
 
 	@Override
-	public List<WorkSheet> listWorkSheetWithDetail(WorkSheetQueryParam param) {
-		return mapper.listWorkSheetWithDetail(param);
+	public List<WorkSheet> listWorkSheetWithDetail(WorkSheetQueryParam param, Long userId) {
+		return mapper.listWorkSheetWithDetail(param.getProject(), param.getTrainNo(), param.getFaultType(), userId, param.getLimit(),
+				param.getOffset());
 	}
 
 	/**
 	 * @see com.hirain.phm.bd.ground.maintenance.service.WorkSheetService#listWorkSheetOfProjects(java.util.List,
-	 *      com.hirain.phm.bd.ground.maintenance.param.WorkSheetQueryParam)
+	 *      com.hirain.phm.bd.ground.maintenance.param.WorkSheetQueryParam, Integer)
 	 */
 	@Override
-	public List<WorkSheet> listWorkSheetOfProjects(List<Long> projects, WorkSheetQueryParam param) {
-		return mapper.listWorkSheetOfProjects(projects, param.getTrainNo(), param.getFaultType());
+	public List<WorkSheet> listWorkSheetOfProjects(List<Long> projects, WorkSheetQueryParam param, Long userId) {
+		return mapper.listWorkSheetOfProjects(projects, param.getTrainNo(), param.getFaultType(), userId, param.getLimit(), param.getOffset());
 	}
 
 	@Override
@@ -165,5 +166,23 @@ public class WorkSheetServiceImpl extends BaseService<WorkSheet> implements Work
 	@Override
 	public List<Integer> getFaultTypes() {
 		return mapper.getFaultTypes();
+	}
+
+	/**
+	 * @see com.hirain.phm.bd.ground.maintenance.service.WorkSheetService#countWorkSheetOfProjects(java.util.List,
+	 *      com.hirain.phm.bd.ground.maintenance.param.WorkSheetQueryParam, java.lang.Long)
+	 */
+	@Override
+	public Integer countWorkSheetOfProjects(List<Long> projects, WorkSheetQueryParam param, Long userId) {
+		return mapper.countWorkSheetOfProjects(projects, param.getTrainNo(), param.getFaultType(), userId);
+	}
+
+	/**
+	 * @see com.hirain.phm.bd.ground.maintenance.service.WorkSheetService#countWorkSheetWithDetail(com.hirain.phm.bd.ground.maintenance.param.WorkSheetQueryParam,
+	 *      java.lang.Long)
+	 */
+	@Override
+	public Integer countWorkSheetWithDetail(WorkSheetQueryParam param, Long userId) {
+		return mapper.countWorksheetWithDetail(param.getProject(), param.getTrainNo(), param.getFaultType(), userId);
 	}
 }

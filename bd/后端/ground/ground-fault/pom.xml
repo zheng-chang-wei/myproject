@@ -38,5 +38,9 @@
   	<groupId>org.springframework.cloud</groupId>
   	<artifactId>spring-cloud-starter-feign</artifactId>
   </dependency>
+  <dependency>
+  	<groupId>com.hirain.phm.bd</groupId>
+  	<artifactId>ground-dictionary</artifactId>
+  </dependency>
   </dependencies>
 </project>

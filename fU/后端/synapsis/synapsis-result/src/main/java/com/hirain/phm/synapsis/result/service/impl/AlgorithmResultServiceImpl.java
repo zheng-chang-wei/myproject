@@ -44,9 +44,11 @@ public class AlgorithmResultServiceImpl implements AlgorithmResultService {
 	 */
 	@Override
 	public void save(AlgorithmResult result) {
-		headerMapper.insertGenerateKey(result.getHeader());
+		if (result.getHeader() != null) {
+			headerMapper.insertGenerateKey(result.getHeader());
+			result.setHeaderId(result.getHeader().getId());
+		}
 		algorithmMapper.insertGenerateKey(result.getAlgorithmHeader());
-		result.setHeaderId(result.getHeader().getId());
 		result.setAlgorithmHeaderId(result.getAlgorithmHeader().getId());
 		resultMapper.insertGenerateKey(result);
 	}
@@ -73,6 +75,14 @@ public class AlgorithmResultServiceImpl implements AlgorithmResultService {
 	@Override
 	public AlgorithmResult selectById(long resultId) {
 		return resultMapper.selectByPrimaryKey(resultId);
+	}
+
+	/**
+	 * @see com.hirain.phm.synapsis.result.service.AlgorithmResultService#deleteById(long)
+	 */
+	@Override
+	public void deleteById(long resultId) {
+		resultMapper.deleteByResultId(resultId);
 	}
 
 }

@@ -18,6 +18,7 @@ package com.hirain.phm.synapsis.setting.support.utils;
 public class SupportUtils {
 
 	private SupportUtils() {
+		throw new UnsupportedOperationException();
 	}
 
 	public static boolean isExcelFile(String fileName) {

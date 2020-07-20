@@ -13,11 +13,9 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 
 import com.hirain.phm.bd.data.bean.DataRecord;
-import com.hirain.phm.bd.data.hive.HiveProperties;
 import com.hirain.phm.bd.data.hive.event.LoadFileEvent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,17 +35,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FileWriterImpl implements FileWriter {
 
-	@Value("${store.file.root:D:\\test}")
-	public String root;
-
-	@Value("${store.file.interval:24}")
-	private int interval;
+	@Autowired
+	private FileProperties properties;
 
 	@Autowired
 	private ApplicationEventPublisher publisher;
-
-	@Autowired
-	private HiveProperties props;
 
 	private String tableName;
 
@@ -67,7 +59,7 @@ public class FileWriterImpl implements FileWriter {
 
 	@Override
 	public void init(String tableName) {
-		folder = root + File.separator + "packet" + File.separator + tableName;
+		folder = properties.getRoot() + File.separator + "packet" + File.separator + tableName;
 	}
 
 	/**
@@ -82,7 +74,7 @@ public class FileWriterImpl implements FileWriter {
 		List<String> lines = getLines(records);
 		try {
 			System.out.println("file writer write lines");
-			FileUtils.writeLines(current, lines, "\n", true);
+			FileUtils.writeLines(current, "utf-8", lines, "\n", true);
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -93,7 +85,7 @@ public class FileWriterImpl implements FileWriter {
 	 */
 	private List<String> getLines(List<DataRecord> records) {
 		List<String> lines = new ArrayList<>();
-		String sep = props.getSeperator();
+		String sep = properties.getSeperator();
 		for (DataRecord record : records) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(record.getProject()).append(sep);
@@ -117,7 +109,8 @@ public class FileWriterImpl implements FileWriter {
 			return file;
 		}
 		try {
-			closeAndLoadToHive(path);
+			String oldPath = path;
+			closeAndLoadToHive(oldPath);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -155,6 +148,7 @@ public class FileWriterImpl implements FileWriter {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(timestamp);
 		int hour = calendar.get(Calendar.HOUR_OF_DAY);
+		int interval = properties.getInterval();
 		System.err.println(interval);
 		int integral = hour / interval * interval;
 		System.err.println(integral);
@@ -165,13 +159,4 @@ public class FileWriterImpl implements FileWriter {
 		return sdf.format(date);
 	}
 
-	// public static void main(String[] args) {
-	// for (int i = 1; i <= 24; i++) {
-	// System.out.println("interval:" + (i));
-	// for (int h = 0; h <= 23; h++) {
-	// int integral = (h) / i * i;
-	// System.out.println("\thour:" + h + ", integral:" + integral);
-	// }
-	// }
-	// }
 }

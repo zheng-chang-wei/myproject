@@ -3,6 +3,7 @@
  ******************************************************************************/
 package com.hirain.phm.synapsis.rbac.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.SecurityUtils;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hirain.phm.synapsis.annotation.Log;
 import com.hirain.phm.synapsis.rbac.domain.User;
 import com.hirain.phm.synapsis.response.ResultBean;
 
@@ -39,7 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 public class LoginController {
 
 	@PostMapping("/login")
-	public ResultBean<String> login(String username, String password) {
+	@Log("登录")
+	public ResultBean<String> login(String username, String password, HttpServletRequest request) {
 		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
 		try {
 			Subject subject = SecurityUtils.getSubject();
@@ -48,6 +51,7 @@ public class LoginController {
 			}
 			subject.login(token);
 			subject.getSession().setAttribute("user", subject.getPrincipal());
+			request.getSession().setAttribute("userName", username);
 			return new ResultBean<>("登录成功");
 		} catch (UnknownAccountException | IncorrectCredentialsException | LockedAccountException e) {
 			log.error(e.getMessage(), e);
@@ -62,6 +66,7 @@ public class LoginController {
 	}
 
 	@PostMapping("/logout")
+	@Log("登出")
 	public ResultBean<String> logOut(HttpSession session) {
 		Subject subject = SecurityUtils.getSubject();
 		subject.logout();

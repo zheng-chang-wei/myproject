@@ -50,7 +50,7 @@ public class AlgorithmTest {
 
 	@Test
 	public void testInit() {
-		List<AlgorithmPacket> list = service.list();
+		List<AlgorithmPacket> list = service.list(null).getData();
 		assertEquals(settings.size(), list.size());
 
 		AlgorithmSetting setting = settings.get(0);
@@ -67,8 +67,8 @@ public class AlgorithmTest {
 		Map<Integer, RunStatus> statusMap = new HashMap<>();
 		statusMap.put(1, RunStatus.Run);
 		statusMap.put(2, RunStatus.Err);
-		service.update(statusMap);
-		List<AlgorithmPacket> list = service.list();
+		service.update(1, statusMap);
+		List<AlgorithmPacket> list = service.list(null).getData();
 
 		for (AlgorithmPacket packet : list) {
 			assertEquals(statusMap.get(packet.getData().getCode()), packet.getData().getStatus());
@@ -87,7 +87,7 @@ public class AlgorithmTest {
 		Map<Integer, RunStatus> statusMap = new HashMap<>();
 		statusMap.put(1, RunStatus.Run);
 		statusMap.put(2, RunStatus.Err);
-		service.update(statusMap);
+		service.update(1, statusMap);
 
 		response = service.count();
 		assertEquals(1, response.getRunning());

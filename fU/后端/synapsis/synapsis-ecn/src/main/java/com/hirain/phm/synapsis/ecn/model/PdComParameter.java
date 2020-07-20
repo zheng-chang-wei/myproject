@@ -51,28 +51,28 @@ public class PdComParameter extends SheetAndLine {
 	@XmlAttribute(name = "callback")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String callback;
+	protected String callback = "off";
 
 	@XmlAttribute(name = "marshall")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String marshall;
+	protected String marshall = "off";
 
 	@XmlAttribute(name = "port")
-	protected String port;
+	protected String port = "17224";
 
 	@XmlAttribute(name = "qos")
-	protected String qos;
+	protected String qos = "5";
 
 	@XmlAttribute(name = "timeout-value")
-	protected String timeOutValue;
+	protected String timeOutValue = "100000";
 
 	@XmlAttribute(name = "ttl")
-	protected String ttl;
+	protected String ttl = "64";
 
 	@XmlAttribute(name = "validity-behavior")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "NCName")
-	protected String validityBehaviour;
+	protected String validityBehaviour = "zero";
 
 }

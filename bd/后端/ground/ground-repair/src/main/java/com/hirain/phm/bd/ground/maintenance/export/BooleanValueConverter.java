@@ -24,8 +24,11 @@ public class BooleanValueConverter implements ValueConverter {
 	 */
 	@Override
 	public String converter(Object object) {
-		boolean b = (boolean) object;
-		return b ? "是" : "否";
+		if (object != null) {
+			boolean b = (Boolean) object;
+			return b ? "是" : "否";
+		}
+		return "";
 	}
 
 }

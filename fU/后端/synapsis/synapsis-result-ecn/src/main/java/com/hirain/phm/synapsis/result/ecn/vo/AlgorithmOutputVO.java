@@ -22,6 +22,8 @@ import lombok.Data;
 @Data
 public class AlgorithmOutputVO {
 
+	private Integer settingId;
+
 	private int commonLength;
 
 	private int dataLength;

@@ -121,4 +121,5 @@ public class ResultSegmentWriter {
 		segment.setByteLen(byteLen);
 		return segment;
 	}
+	
 }
